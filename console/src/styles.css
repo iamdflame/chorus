@@ -220,8 +220,18 @@ html, body, #root {
 /* -- swarm stage ---------------------------------------------------------- */
 
 /* Both stages stay mounted; each owns a WebGL context that is expensive to recreate,
-   so switching modes toggles visibility rather than tearing a renderer down. */
-.swarm-stage, .stage { position: relative; flex: 1 1 auto; min-height: 0; }
+   so switching modes hides a renderer rather than tearing it down.
+
+   Hidden with `visibility`, never `display: none`. A display-hidden host measures zero,
+   and Pixi's resize plugin then thrashes the canvas between zero and full size every
+   frame — which keeps the whole page in perpetual reflow and makes controls permanently
+   un-clickable. Absolute positioning inside a sized wrapper keeps both hosts at stable
+   dimensions whether or not they are on screen. */
+.stages { position: relative; flex: 1 1 auto; min-height: 0; }
+.swarm-stage, .stage {
+  position: absolute; inset: 0; overflow: hidden;
+}
 .swarm-stage[data-visible="false"], .stage[data-visible="false"] {
-  display: none;
+  visibility: hidden;
+  pointer-events: none;
 }

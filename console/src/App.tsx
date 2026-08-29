@@ -293,6 +293,7 @@ export function App() {
         )}
       </header>
 
+      <div className="stages">
       <div className="swarm-stage" ref={swarmRef} data-visible={mode === "swarm"} />
       <main className="stage" ref={stageRef} data-visible={mode !== "swarm"}>
         {mode === "search" && (
@@ -344,6 +345,7 @@ export function App() {
           </aside>
         )}
       </main>
+      </div>
 
       <footer className="footer">
         <div className="readout">
