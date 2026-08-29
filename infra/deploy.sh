@@ -10,7 +10,7 @@ set -euo pipefail
 
 PROJECT="${1:?usage: deploy.sh PROJECT_ID [REGION]}"
 REGION="${2:-us-central1}"
-SERVICE="lightcone"
+SERVICE="chorus"
 
 echo "==> project ${PROJECT} · region ${REGION}"
 gcloud config set project "${PROJECT}" >/dev/null
@@ -28,11 +28,19 @@ echo "==> ensuring Firestore database"
 gcloud firestore databases create --location=nam5 --project="${PROJECT}" 2>/dev/null \
   || echo "    (already exists)"
 
-if [[ -z "${GOOGLE_API_KEY:-}" ]]; then
-  echo "!! GOOGLE_API_KEY is not set; the fleet cannot reach Gemini." >&2
-  echo "   export it, or switch to Vertex AI by setting GOOGLE_GENAI_USE_VERTEXAI=1" >&2
-  exit 1
-fi
+# Vertex rather than an API key: it authenticates with the service account the container
+# already runs as, so no secret has to be baked into the image or the deploy command, and
+# it bills through Cloud billing instead of a separate AI Studio prepaid balance.
+SA="$(gcloud projects describe "${PROJECT}" --format='value(projectNumber)')-compute@developer.gserviceaccount.com"
+echo "==> granting Vertex access to ${SA}"
+gcloud projects add-iam-policy-binding "${PROJECT}" \
+  --member="serviceAccount:${SA}" \
+  --role="roles/aiplatform.user" \
+  --condition=None --quiet >/dev/null
+gcloud projects add-iam-policy-binding "${PROJECT}" \
+  --member="serviceAccount:${SA}" \
+  --role="roles/datastore.user" \
+  --condition=None --quiet >/dev/null
 
 echo "==> building and deploying"
 gcloud run deploy "${SERVICE}" \
@@ -45,7 +53,7 @@ gcloud run deploy "${SERVICE}" \
   --timeout 3600 \
   --concurrency 8 \
   --max-instances 4 \
-  --set-env-vars "GOOGLE_API_KEY=${GOOGLE_API_KEY},GOOGLE_CLOUD_PROJECT=${PROJECT},LIGHTCONE_REGION=${REGION},LIGHTCONE_SNAPSHOT=data/history.json"
+  --set-env-vars "GOOGLE_GENAI_USE_VERTEXAI=1,GOOGLE_CLOUD_PROJECT=${PROJECT},GOOGLE_CLOUD_LOCATION=global,LIGHTCONE_REGION=${REGION},LIGHTCONE_SNAPSHOT=data/history.json"
 
 URL=$(gcloud run services describe "${SERVICE}" --region "${REGION}" \
         --project "${PROJECT}" --format='value(status.url)')
