@@ -15,7 +15,11 @@ import { gsap } from "gsap";
 
 const C = {
   ground: 0x07080a,
-  idle: 0x1c2029,
+  // Bright enough to read as a population rather than as noise. The whole claim is
+  // that you can SEE twenty thousand agents, so an idle cohort must be visible before
+  // anything happens to it.
+  idle: 0x39424f,
+  cell: 0x11141a,
   thinking: 0xffffff,
   thought: 0x5ef0c8,
   shared: 0x2f8f7c,
@@ -79,6 +83,55 @@ export class Murmuration {
     if (this.ready) this.app.destroy(true, { children: true });
   }
 
+  /** Squarified treemap: rows of cells whose areas are proportional to cohort size,
+   *  chosen to keep each cell near square. Classic Bruls/Huizing/van Wijk. */
+  private static tile(
+    sizes: number[], x: number, y: number, w: number, h: number,
+  ): { x: number; y: number; w: number; h: number }[] {
+    const out: { x: number; y: number; w: number; h: number }[] = [];
+    const total = sizes.reduce((a, b) => a + b, 0) || 1;
+    let remaining = sizes.map((s) => (s / total) * w * h);
+    let i = 0;
+    let [cx, cy, cw, ch] = [x, y, w, h];
+
+    const worst = (row: number[], side: number): number => {
+      const sum = row.reduce((a, b) => a + b, 0);
+      const max = Math.max(...row);
+      const min = Math.min(...row);
+      const s2 = side * side;
+      const sum2 = sum * sum;
+      return Math.max((s2 * max) / sum2, sum2 / (s2 * min));
+    };
+
+    while (i < remaining.length) {
+      const vertical = cw >= ch;
+      const side = vertical ? ch : cw;
+      const row: number[] = [remaining[i]];
+      let j = i + 1;
+      while (j < remaining.length &&
+             worst(row.concat(remaining[j]), side) <= worst(row, side)) {
+        row.push(remaining[j]);
+        j += 1;
+      }
+      const rowSum = row.reduce((a, b) => a + b, 0);
+      const thickness = rowSum / side;
+      let offset = 0;
+      for (const area of row) {
+        const length = area / thickness;
+        if (vertical) {
+          out.push({ x: cx, y: cy + offset, w: thickness, h: length });
+        } else {
+          out.push({ x: cx + offset, y: cy, w: length, h: thickness });
+        }
+        offset += length;
+      }
+      if (vertical) { cx += thickness; cw -= thickness; }
+      else { cy += thickness; ch -= thickness; }
+      i = j;
+    }
+    return out;
+  }
+
   /** Lay the population out as clustered clouds, one per cohort, area proportional to
    *  cohort size so the eye reads population weight directly. */
   setCohorts(cohorts: Cohort[]): void {
@@ -88,34 +141,46 @@ export class Murmuration {
 
     const w = this.host.clientWidth || 1200;
     const h = this.host.clientHeight || 700;
-    const columns = Math.ceil(Math.sqrt(cohorts.length * (w / Math.max(h, 1))));
-    const rows = Math.ceil(cohorts.length / columns);
-    const cellW = w / columns;
-    const cellH = h / rows;
+    const pad = 18;
 
-    const largest = Math.max(...cohorts.map((c) => c.size), 1);
+    const ordered = [...cohorts].sort((a, b) => b.size - a.size);
+    const cells = Murmuration.tile(
+      ordered.map((c) => c.size), pad, pad, w - pad * 2, h - pad * 2,
+    );
 
-    cohorts.forEach((cohort, index) => {
-      const col = index % columns;
-      const row = Math.floor(index / columns);
-      const cx = col * cellW + cellW / 2;
-      const cy = row * cellH + cellH / 2;
-
+    ordered.forEach((cohort, index) => {
+      const cell = cells[index];
+      if (!cell) return;
       const container = new Container();
+      const backing = new Graphics();
+      backing
+        .rect(cell.x + 1, cell.y + 1, Math.max(cell.w - 2, 1), Math.max(cell.h - 2, 1))
+        .fill({ color: C.cell, alpha: 0.9 });
       const dots = new Graphics();
       const random = rng(index * 7919 + 13);
 
-      // Radius follows sqrt of size so area, not radius, tracks population.
-      const spread = Math.min(cellW, cellH) * 0.42 * Math.sqrt(cohort.size / largest);
-      const drawn = Math.min(cohort.size, 260); // beyond this the cloud reads as solid
+      // Fill the cell rather than a circle inscribed in it: the treemap already encodes
+      // area, so a cloud that fills its cell reads as its true share of the population.
+      const cx = cell.x + cell.w / 2;
+      const cy = cell.y + cell.h / 2;
+      const rx = Math.max(cell.w / 2 - 3, 1.5);
+      const ry = Math.max(cell.h / 2 - 3, 1.5);
+      const drawn = Math.min(cohort.size, 300); // beyond this the cloud reads as solid
+      // Floor the dot size: a cohort of four in a tiny cell must still be a visible mark,
+      // not a sub-pixel smudge that reads as empty space.
+      const dotSize = Math.max(Math.min(rx, ry) / 12, 1.1);
       for (let i = 0; i < drawn; i += 1) {
         const angle = random() * Math.PI * 2;
-        const radius = Math.sqrt(random()) * spread;
-        dots.circle(cx + Math.cos(angle) * radius, cy + Math.sin(angle) * radius, 1.5);
+        const radius = Math.sqrt(random());
+        dots.circle(
+          cx + Math.cos(angle) * radius * rx,
+          cy + Math.sin(angle) * radius * ry,
+          dotSize,
+        );
       }
-      dots.fill({ color: C.idle, alpha: 0.9 });
+      dots.fill({ color: C.idle, alpha: 1 });
 
-      container.addChild(dots);
+      container.addChild(backing, dots);
       this.stage.addChild(container);
       this.views.set(cohort.key, {
         key: cohort.key, container, dots, size: cohort.size,

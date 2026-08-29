@@ -163,11 +163,16 @@ export function App() {
             `${event.scenario.souls_on_board.toLocaleString()} souls for ${event.scenario.seats_available.toLocaleString()} seats`,
           );
         } else if (event.event === "progress") {
+          if (event.cohort) {
+            if (event.thought) murmurRef.current?.think(event.cohort);
+            else murmurRef.current?.share(event.cohort);
+          }
           setSwarmStats(event as Record<string, number>);
           setLog(
             `${event.done.toLocaleString()}/${event.total.toLocaleString()} agents · ` +
-            `${event.model_calls} thoughts · ${event.cache_hits.toLocaleString()} shared · ` +
-            `${usd(event.cost_usd)}`,
+            (event.model_calls === 0
+              ? `every thought already recorded — replayed for $0.00`
+              : `${event.model_calls} thoughts · ${event.cache_hits.toLocaleString()} shared · ${usd(event.cost_usd)}`),
           );
         } else if (event.event === "swarm_done") {
           setSwarmStats(event.metrics as Record<string, number>);
@@ -239,11 +244,15 @@ export function App() {
   return (
     <div className="shell">
       <header className="topbar">
-        <div className="wordmark">LIGHT<span>CONE</span></div>
-        <div className="tagline">version control for agent reality</div>
+        <div className="wordmark">CHO<span>RUS</span></div>
+        <div className="tagline">
+          {mode === "swarm"
+            ? "twenty thousand agents · two hundred thoughts"
+            : "shared cognition for agent swarms"}
+        </div>
         <div className="spacer" />
         <nav className="rail">
-          {branches.map((b) => (
+          {mode !== "swarm" && branches.map((b) => (
             <button
               key={b.id}
               className="branch-chip"
@@ -264,18 +273,24 @@ export function App() {
           <button className="branch-chip" data-active={mode === "search"}
                   onClick={() => setMode("search")}>search</button>
         </div>
-        <button className="action" onClick={() => runSwarm(20000)} disabled={busy}>
-          wake 20,000
+        <button className="action" data-variant={mode === "swarm" ? "primary" : undefined}
+                onClick={() => runSwarm(20000)} disabled={busy}>
+          {busy && mode === "swarm" ? "thinking" : "wake 20,000"}
         </button>
-        <button className="action" onClick={forkAndTighten} disabled={busy}>
-          fork
-        </button>
-        <button className="action" onClick={replay} disabled={busy}>
-          replay
-        </button>
-        <button className="action" data-variant="primary" onClick={runSearch} disabled={busy}>
-          {busy ? "searching" : "optimise fleet"}
-        </button>
+        {mode !== "swarm" && (
+          <>
+            <button className="action" onClick={forkAndTighten} disabled={busy}>
+              fork
+            </button>
+            <button className="action" onClick={replay} disabled={busy}>
+              replay
+            </button>
+            <button className="action" data-variant="primary" onClick={runSearch}
+                    disabled={busy}>
+              {busy ? "searching" : "optimise fleet"}
+            </button>
+          </>
+        )}
       </header>
 
       <div className="swarm-stage" ref={swarmRef} data-visible={mode === "swarm"} />
@@ -339,8 +354,12 @@ export function App() {
                 <span className="metric-value">{(swarmStats.agents_invoked ?? 0).toLocaleString()}</span>
               </div>
               <div className="metric">
-                <span className="metric-label">thoughts</span>
-                <span className="metric-value" data-tone="accent">{swarmStats.model_calls ?? 0}</span>
+                <span className="metric-label">
+                  {swarmStats.model_calls === 0 ? "thoughts · replayed" : "thoughts"}
+                </span>
+                <span className="metric-value" data-tone="accent">
+                  {swarmStats.model_calls ?? 0}
+                </span>
               </div>
               <div className="metric">
                 <span className="metric-label">cost</span>
@@ -390,12 +409,22 @@ export function App() {
         <div className="log">{log ? <b>{log}</b> : `${activeBranch?.name ?? ""} · click an effect to compute its lightcone`}</div>
 
         <div className="legend">
-          <span><i style={{ background: "#5ef0c8" }} />executed here</span>
-          <span><i style={{ background: "#2f8f7c" }} />reasoning</span>
-          <span><i style={{ background: "#232833" }} />inherited</span>
-          <span><i style={{ background: "#8b7bff" }} />delegation</span>
-          <span><i style={{ background: "#f5a524" }} />staged</span>
-          <span><i style={{ background: "#ff5c5c" }} />irreversible</span>
+          {mode === "swarm" ? (
+            <>
+              <span><i style={{ background: "#1c2029" }} />not yet woken</span>
+              <span><i style={{ background: "#ffffff" }} />reached the model</span>
+              <span><i style={{ background: "#2f8f7c" }} />shared a thought</span>
+              <span>each cloud is one cohort · area = population</span>
+            </>
+          ) : (
+            <>
+              <span><i style={{ background: "#5ef0c8" }} />executed here</span>
+              <span><i style={{ background: "#2f8f7c" }} />reasoning</span>
+              <span><i style={{ background: "#232833" }} />inherited</span>
+              <span><i style={{ background: "#8b7bff" }} />delegation</span>
+              <span><i style={{ background: "#ff5c5c" }} />irreversible</span>
+            </>
+          )}
         </div>
       </footer>
     </div>

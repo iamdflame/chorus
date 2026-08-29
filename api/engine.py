@@ -395,16 +395,22 @@ class Engine:
             )
             swarm = Swarm(store=self.store, branch_id=PRIMARY,
                           mode=Mode.REPLAY, concurrency=concurrency)
-            seen: set[str] = set()
             resolved: set[str] = set()
 
             queue: asyncio.Queue = asyncio.Queue()
 
-            def progress(done: int, total: int, metrics) -> None:
-                queue.put_nowait({
-                    "event": "progress", "done": done, "total": total,
-                    **metrics.to_dict(),
-                })
+            def progress(done: int, total: int, metrics, cohort: str, thought: bool) -> None:
+                # One event per agent would flood the stream; cohorts are emitted the
+                # first time they resolve, and aggregate counters ride along every 25.
+                first_time = cohort not in resolved
+                if first_time:
+                    resolved.add(cohort)
+                if first_time or done % 25 == 0 or done == total:
+                    queue.put_nowait({
+                        "event": "progress", "done": done, "total": total,
+                        "cohort": cohort, "thought": thought, "first": first_time,
+                        **metrics.to_dict(),
+                    })
 
             task = asyncio.create_task(
                 swarm.run(entities=passengers, projector=project_passenger,

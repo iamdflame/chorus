@@ -202,7 +202,7 @@ class Swarm:
         role: str,
         context: str,
         round_id: str,
-        on_progress: Callable[[int, int, SwarmMetrics], None] | None = None,
+        on_progress: Callable[[int, int, SwarmMetrics, str, bool], None] | None = None,
     ) -> tuple[dict[str, dict[str, Any]], SwarmMetrics]:
         """Invoke every entity's agent. Sharing is discovered, never assumed."""
         started = time.perf_counter()
@@ -232,7 +232,13 @@ class Swarm:
                 seen_addresses.update(plugin.diverged)
                 metrics.distinct_thoughts = len(seen_addresses)
                 if on_progress:
-                    on_progress(metrics.agents_invoked, len(entities), metrics)
+                    # `thought` distinguishes a cohort that reached the model from one
+                    # served by the store; the console draws those two states apart, and
+                    # the difference between them is the entire claim.
+                    on_progress(
+                        metrics.agents_invoked, len(entities), metrics,
+                        projection.key(), plugin.misses > 0,
+                    )
 
         # Sequential batches rather than one giant gather: 8,000 coroutines all holding
         # ADK sessions at once exhausts memory long before the semaphore matters.
