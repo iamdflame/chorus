@@ -211,3 +211,32 @@ async def test_unregistered_tools_default_to_quarantined():
         LightconePlugin(store=store, branch_id=branch.id, mode=Mode.REPLAY),
     )
     assert LEDGER == [], "an unregistered tool must default to quarantined off-primary"
+
+
+@pytest.mark.asyncio
+async def test_tool_effects_are_recorded_when_the_tool_declares_a_read_set():
+    """Regression: the open/close keys for a tool effect must agree.
+
+    A read-set tool was opened under a key built from its full request (including the
+    state fingerprint) and closed under one built from its arguments alone, so it was
+    never recorded — and then missed forever on replay while reporting itself executed.
+    """
+    from kernel.effect import EffectKind
+
+    LEDGER.clear()
+    store = InMemoryEffectStore()
+    registry = ReversibilityRegistry()
+    registry.register("issue_refund", Determinism.RECORDED, reads=("disputes",))
+
+    model = CountingLlm(use_tool="issue_refund",
+                        tool_args={"dispute_id": "D-7", "amount_usd": 5.0})
+    plugin = LightconePlugin(
+        store=store, mode=Mode.RECORD, registry=registry,
+        state_fingerprint=lambda collections: "fixed-fingerprint",
+    )
+    await run_once(build("go", model, issue_refund), plugin)
+
+    tool_effects = [e for e in store.own_effects(PRIMARY) if e.kind is EffectKind.TOOL_CALL]
+    assert tool_effects, "a read-set tool's effect must be persisted, not silently dropped"
+    assert tool_effects[0].response is not None, "the effect must carry its result"
+    assert "reads" in tool_effects[0].request, "the read fingerprint belongs in the address"

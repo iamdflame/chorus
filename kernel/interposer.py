@@ -109,6 +109,18 @@ def canonical_llm_request(req: LlmRequest) -> dict[str, Any]:
     }
 
 
+def _tool_key(agent: str, tool_name: str, tool_args: dict[str, Any]) -> str:
+    """Key linking a tool effect opened in `before_tool` to its close in `after_tool`.
+
+    Deliberately built from only the three things both callbacks see. The address cannot
+    be used here because `after_tool_callback` never receives it, and rebuilding it there
+    from the request would mean reconstructing the read-set fingerprint identically — a
+    silent drop the moment the two constructions disagree, which is exactly the bug this
+    replaced.
+    """
+    return f"tool:{agent}:{tool_name}:{hash_payload(tool_args)}"
+
+
 class LightconePlugin(BasePlugin):
     """Records or replays every model call, tool call and delegation on a branch."""
 
@@ -407,7 +419,7 @@ class LightconePlugin(BasePlugin):
             self._close(effect, {"result": result}, quarantined=True)
             return result
 
-        self._pending[f"tool:{agent}:{hash_payload(request)}"] = (effect, time.perf_counter())
+        self._pending[_tool_key(agent, tool.name, tool_args)] = (effect, time.perf_counter())
         return None
 
     async def after_tool_callback(
@@ -419,8 +431,7 @@ class LightconePlugin(BasePlugin):
         result: dict[str, Any],
     ) -> dict[str, Any] | None:
         agent = tool_context.agent_name
-        key = f"tool:{agent}:{hash_payload({'tool': tool.name, 'args': tool_args})}"
-        entry = self._pending.pop(key, None)
+        entry = self._pending.pop(_tool_key(agent, tool.name, tool_args), None)
         if entry is None:
             return None
         effect, started = entry

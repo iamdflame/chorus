@@ -1,0 +1,167 @@
+/* Lightcone console.
+   Dark, quiet, and almost entirely empty. The causal graph is the only thing on screen
+   with any weight; every control is a thin line of type at the edge of the frame. */
+
+:root {
+  --ground: #07080a;
+  --ground-lift: #0c0e12;
+  --rule: #16181d;
+  --rule-bright: #232730;
+
+  --ink-faint: #3f4450;
+  --ink-dim: #565c69;
+  --ink: #98a1b0;
+  --ink-bright: #e6eaf1;
+
+  /* One accent. Semantic colours below carry meaning, not decoration. */
+  --accent: #5ef0c8;
+  --accent-dim: #1e5c4e;
+  --staged: #f5a524;
+  --irreversible: #ff5c5c;
+  --delegation: #8b7bff;
+
+  --mono: "JetBrains Mono", "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  --pad: 24px;
+}
+
+* { box-sizing: border-box; }
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+::selection { background: var(--accent); color: var(--ground); }
+
+/* -- shell ---------------------------------------------------------------- */
+
+.shell { display: flex; flex-direction: column; height: 100%; }
+
+.topbar {
+  display: flex; align-items: baseline; gap: 28px;
+  padding: 18px var(--pad) 16px;
+  border-bottom: 1px solid var(--rule);
+  flex: 0 0 auto;
+}
+
+.wordmark {
+  font-size: 12px; letter-spacing: 0.34em; text-transform: uppercase;
+  color: var(--ink-bright); font-weight: 500;
+}
+.wordmark span { color: var(--accent); }
+
+.tagline { color: var(--ink-dim); font-size: 11px; letter-spacing: 0.06em; }
+
+.spacer { flex: 1; }
+
+.stage { position: relative; flex: 1 1 auto; min-height: 0; }
+.stage canvas { display: block; }
+
+/* -- branch rail ---------------------------------------------------------- */
+
+.rail { display: flex; align-items: center; gap: 2px; }
+
+.branch-chip {
+  appearance: none; border: 1px solid transparent; background: none;
+  color: var(--ink-dim); font: inherit; font-size: 11px;
+  padding: 5px 11px; cursor: pointer; letter-spacing: 0.04em;
+  transition: color 140ms ease, border-color 140ms ease;
+}
+.branch-chip:hover { color: var(--ink-bright); }
+.branch-chip[data-active="true"] {
+  color: var(--ground); background: var(--accent); border-color: var(--accent);
+}
+.branch-chip[data-primary="true"]:not([data-active="true"]) { color: var(--ink); }
+
+/* -- controls ------------------------------------------------------------- */
+
+.action {
+  appearance: none; background: none; border: 1px solid var(--rule-bright);
+  color: var(--ink); font: inherit; font-size: 11px; letter-spacing: 0.08em;
+  text-transform: uppercase; padding: 7px 14px; cursor: pointer;
+  transition: color 140ms ease, border-color 140ms ease, background 140ms ease;
+}
+.action:hover:not(:disabled) { color: var(--accent); border-color: var(--accent-dim); }
+.action:disabled { opacity: 0.32; cursor: default; }
+.action[data-variant="primary"] {
+  border-color: var(--accent); color: var(--accent);
+}
+.action[data-variant="primary"]:hover:not(:disabled) {
+  background: var(--accent); color: var(--ground);
+}
+
+/* -- readouts ------------------------------------------------------------- */
+
+.readout { display: flex; gap: 26px; align-items: baseline; }
+.metric { display: flex; flex-direction: column; gap: 3px; }
+.metric-label {
+  font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-dim);
+}
+.metric-value {
+  font-size: 19px; color: var(--ink-bright); font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+.metric-value[data-tone="accent"] { color: var(--accent); }
+.metric-value[data-tone="staged"] { color: var(--staged); }
+.metric-value[data-tone="danger"] { color: var(--irreversible); }
+
+/* -- inspector ------------------------------------------------------------ */
+
+.inspector {
+  position: absolute; right: var(--pad); top: var(--pad); width: 336px;
+  background: color-mix(in srgb, var(--ground-lift) 92%, transparent);
+  border: 1px solid var(--rule-bright);
+  padding: 18px 20px 20px;
+  max-height: calc(100% - var(--pad) * 2); overflow-y: auto;
+}
+.inspector h2 {
+  margin: 0 0 14px; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--ink-dim); font-weight: 500;
+}
+.kv { display: grid; grid-template-columns: 96px 1fr; gap: 5px 12px; font-size: 11px; }
+.kv dt { color: var(--ink-dim); }
+.kv dd { margin: 0; color: var(--ink-bright); word-break: break-word; }
+
+.cone-banner {
+  margin: 16px 0 0; padding: 12px 0 0; border-top: 1px solid var(--rule);
+  font-size: 11px; color: var(--ink);
+}
+.cone-count { color: var(--accent); font-size: 26px; display: block; margin-bottom: 2px; }
+
+.staged-item {
+  font-size: 10px; color: var(--staged); padding: 4px 0;
+  border-bottom: 1px solid var(--rule); word-break: break-word;
+}
+
+/* -- footer --------------------------------------------------------------- */
+
+.footer {
+  display: flex; align-items: center; gap: 22px;
+  padding: 14px var(--pad); border-top: 1px solid var(--rule); flex: 0 0 auto;
+}
+
+.legend { display: flex; gap: 16px; font-size: 10px; color: var(--ink-dim); }
+.legend i {
+  display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+  margin-right: 6px; vertical-align: middle;
+}
+
+.log {
+  font-size: 10px; color: var(--ink-dim); white-space: nowrap;
+  overflow: hidden; text-overflow: ellipsis; flex: 1;
+}
+.log b { color: var(--accent); font-weight: 400; }
+
+.empty {
+  position: absolute; inset: 0; display: grid; place-content: center;
+  text-align: center; color: var(--ink-dim); gap: 10px;
+}
+.empty strong { color: var(--ink-bright); font-weight: 400; font-size: 15px; }
