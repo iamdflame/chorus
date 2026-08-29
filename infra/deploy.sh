@@ -42,8 +42,17 @@ gcloud projects add-iam-policy-binding "${PROJECT}" \
   --role="roles/datastore.user" \
   --condition=None --quiet >/dev/null
 
+# Created explicitly rather than letting `run deploy` offer to make it: that offer is an
+# interactive prompt, which hangs any non-interactive run.
+echo "==> ensuring Artifact Registry repository"
+gcloud artifacts repositories create cloud-run-source-deploy \
+  --repository-format=docker --location="${REGION}" --project="${PROJECT}" \
+  --description="Cloud Run source deploys" --quiet 2>/dev/null \
+  || echo "    (already exists)"
+
 echo "==> building and deploying"
 gcloud run deploy "${SERVICE}" \
+  --quiet \
   --source . \
   --region "${REGION}" \
   --project "${PROJECT}" \
