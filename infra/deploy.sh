@@ -71,3 +71,21 @@ echo
 echo "==> live at ${URL}"
 echo "==> health:"
 curl -fsS "${URL}/health" && echo
+
+# Smoke the routes that actually exercise the container's Python packages and its Vertex
+# credentials. /health only proves the process booted: a missing COPY in the Dockerfile
+# still serves a healthy process that raises ModuleNotFoundError on the first real call.
+echo "==> smoke test: console"
+curl -fsS "${URL}/" | grep -q "assets/index-" \
+  && echo "    console bundle served" \
+  || { echo "!! console bundle missing from image" >&2; exit 1; }
+
+echo "==> smoke test: swarm through Vertex (4 agents)"
+if curl -fsS --max-time 180 -X POST "${URL}/api/swarm" \
+     -H 'content-type: application/json' -d '{"agents":4,"concurrency":2}' \
+     | grep -q '"event": *"swarm_done"'; then
+  echo "    swarm completed on Cloud Run"
+else
+  echo "!! swarm failed; check: gcloud run services logs read ${SERVICE} --region ${REGION}" >&2
+  exit 1
+fi

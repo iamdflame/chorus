@@ -24,6 +24,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY kernel/ ./kernel/
 COPY world/ ./world/
 COPY fleet/ ./fleet/
+COPY swarm/ ./swarm/
 COPY optimizer/ ./optimizer/
 COPY api/ ./api/
 COPY scripts/ ./scripts/
