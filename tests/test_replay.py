@@ -258,3 +258,80 @@ async def test_delegation_is_not_quarantined_on_a_branch():
     # Anything that actually reaches the world must still fail closed.
     assert registry.classify("issue_refund") is Determinism.EXTERNAL_IRREVERSIBLE
     assert registry.classify("some_tool_nobody_registered") is Determinism.EXTERNAL_IRREVERSIBLE
+
+
+@pytest.mark.asyncio
+async def test_search_candidates_inherit_production_history():
+    """The economics the whole optimiser rests on.
+
+    Every candidate forks from the branch holding production's recorded run, so the
+    stages upstream of the policy — intake, customer lookup, the facts of the dispute —
+    are inherited rather than re-executed. Scoring the baseline on its own fork instead
+    puts that shared work on a sibling branch no candidate can resolve through, and the
+    search degrades to full re-execution while still looking like it worked.
+    """
+    from kernel.effect import EffectKind
+
+    store = InMemoryEffectStore()
+    model = CountingLlm()
+
+    # Production runs and records.
+    await run_once(build("Ceiling is $500.", model), LightconePlugin(store=store, mode=Mode.RECORD))
+    recorded = len(store.own_effects(PRIMARY))
+    assert recorded > 0
+
+    # A candidate forks from production and changes the policy.
+    branch = store.create_branch(
+        Branch.fork(parent=store.get_branch(PRIMARY), name="candidate", at_seq=0)
+    )
+    model.reset()
+    plugin = LightconePlugin(store=store, branch_id=branch.id, mode=Mode.REPLAY)
+    await run_once(build("Ceiling is $500.", model), plugin)
+
+    assert plugin.hits > 0, (
+        "a candidate must inherit production's recorded work; if it cannot resolve "
+        "through the branch chain the search silently costs full price"
+    )
+    assert model.calls == 0, "an unchanged candidate must not reach the model at all"
+    assert store.own_effects(branch.id) == []
+
+
+@pytest.mark.asyncio
+async def test_a_diverging_candidate_still_reuses_the_shared_prefix():
+    """A policy edit must invalidate the calls that read it — and only those.
+
+    This is the shape of every search candidate: the intake reasoning before the policy
+    is consulted stays cached, while the policy-reading tool and everything downstream
+    re-executes. If the edit invalidated the whole run, the search would cost full price
+    per candidate; if it invalidated nothing, the counterfactual would be a lie.
+    """
+    store = InMemoryEffectStore()
+    registry = ReversibilityRegistry()
+    # Declares a read set, so its address folds in the state fingerprint.
+    registry.register("issue_refund", Determinism.RECORDED, reads=("policies",))
+
+    fingerprint = {"value": "policy-v1"}
+
+    def plugin_for(branch_id: str, mode: Mode) -> LightconePlugin:
+        return LightconePlugin(
+            store=store, branch_id=branch_id, mode=mode, registry=registry,
+            state_fingerprint=lambda _collections: fingerprint["value"],
+        )
+
+    model = CountingLlm(use_tool="issue_refund",
+                        tool_args={"dispute_id": "D-1", "amount_usd": 10.0})
+    agent = build("Handle the dispute.", model, issue_refund)
+    await run_once(agent, plugin_for(PRIMARY, Mode.RECORD))
+
+    branch = store.create_branch(
+        Branch.fork(parent=store.get_branch(PRIMARY), name="cand", at_seq=0)
+    )
+    fingerprint["value"] = "policy-v2"  # the exogenous edit a candidate makes
+
+    replay_model = CountingLlm(use_tool="issue_refund",
+                               tool_args={"dispute_id": "D-1", "amount_usd": 10.0})
+    plugin = plugin_for(branch.id, Mode.REPLAY)
+    await run_once(build("Handle the dispute.", replay_model, issue_refund), plugin)
+
+    assert plugin.hits > 0, "reasoning before the policy read must stay cached"
+    assert plugin.misses > 0, "the call that reads the edited policy must re-execute"

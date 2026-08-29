@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { api, streamReplay, type Branch, type Diff, type Graph, type GraphNode, type Lightcone } from "./api";
+import { api, streamReplay, streamSearch, type Branch, type Diff, type Graph, type GraphNode, type Lightcone } from "./api";
 import { Worldline } from "./gl/worldline";
+import { SearchView, type SearchCandidate } from "./ui/SearchView";
 
 const CEILING_CLAUSE = "POL-REFUND-CEILING";
 const TIGHTENED =
@@ -28,6 +29,13 @@ export function App() {
   const [diff, setDiff] = useState<Diff | null>(null);
   const [log, setLog] = useState("");
   const [busy, setBusy] = useState(false);
+
+  const [mode, setMode] = useState<"worldline" | "search">("worldline");
+  const [searchBaseline, setSearchBaseline] = useState<SearchCandidate | null>(null);
+  const [searchCandidates, setSearchCandidates] = useState<SearchCandidate[]>([]);
+  const [searchWinner, setSearchWinner] = useState<SearchCandidate | null>(null);
+  // Fixed for now; the search is real model traffic and the API key is rate limited.
+  const generations = 2;
 
   // Mount the renderer once. Pixi owns its canvas; React only owns the chrome around it.
   useEffect(() => {
@@ -127,6 +135,56 @@ export function App() {
       ? (selected.seq - Math.min(...seqs)) / Math.max(Math.max(...seqs) - Math.min(...seqs), 1) > 0.55
       : false;
 
+  async function runSearch() {
+    setBusy(true);
+    setMode("search");
+    setSearchBaseline(null);
+    setSearchCandidates([]);
+    setSearchWinner(null);
+    setLog("searching policy space against recorded history…");
+    try {
+      await streamSearch({ generations, population: 3 }, (event) => {
+        if (event.event === "baseline") {
+          setSearchBaseline(event.candidate);
+          setLog(`production policy costs $${event.candidate.outcome.total_cost_usd.toFixed(2)} on this history — searching for better`);
+        } else if (event.event === "generation_start") {
+          setLog(`generation ${event.generation}: ${event.candidates.length} proposals from gemini-3.5-flash`);
+        } else if (event.event === "evaluated") {
+          setSearchCandidates((prev) => [...prev, event.candidate]);
+          const o = event.candidate.outcome;
+          if (o) {
+            const delta = event.baseline_cost - o.total_cost_usd;
+            setLog(
+              `${event.candidate.id} · ${usd(o.total_cost_usd)} (${delta > 0 ? "−" : "+"}${usd(Math.abs(delta))}) · ` +
+              `${event.running.evaluations} evaluations · ${event.running.replay_hits} crossings reused · ` +
+              `${usd(event.running.compute_usd)} compute`,
+            );
+          }
+        } else if (event.event === "search_done") {
+          setSearchWinner(event.winner);
+          setLog(
+            event.improvement_usd > 0
+              ? `search complete · found a policy worth ${usd(event.improvement_usd)} on this history across ${event.evaluations} full fleet evaluations`
+              : `search complete · no candidate beat production across ${event.evaluations} evaluations`,
+          );
+        }
+      });
+      await loadBranches();
+    } catch (e) {
+      setLog(`search: ${(e as Error).message}`);
+    } finally { setBusy(false); }
+  }
+
+  async function adopt(candidate: SearchCandidate) {
+    try {
+      await api.adopt("POL-REFUND-CEILING", candidate.text);
+      setLog("adopted into production · the fleet now runs the policy it proved");
+      await loadGraph(active);
+    } catch (e) {
+      setLog(`adopt: ${(e as Error).message}`);
+    }
+  }
+
   const activeBranch = branches.find((b) => b.id === active);
   const stats = (graph?.stats ?? {}) as Record<string, number>;
 
@@ -150,23 +208,42 @@ export function App() {
             </button>
           ))}
         </nav>
+        <div className="mode-rail">
+          <button className="branch-chip" data-active={mode === "worldline"}
+                  onClick={() => setMode("worldline")}>worldline</button>
+          <button className="branch-chip" data-active={mode === "search"}
+                  onClick={() => setMode("search")}>search</button>
+        </div>
         <button className="action" onClick={forkAndTighten} disabled={busy}>
-          fork · tighten ceiling
+          fork
         </button>
-        <button className="action" data-variant="primary" onClick={replay} disabled={busy}>
-          {busy ? "working" : "replay"}
+        <button className="action" onClick={replay} disabled={busy}>
+          replay
+        </button>
+        <button className="action" data-variant="primary" onClick={runSearch} disabled={busy}>
+          {busy ? "searching" : "optimise fleet"}
         </button>
       </header>
 
       <main className="stage" ref={stageRef}>
-        {graph && graph.nodes.length === 0 && (
+        {mode === "search" && (
+          <SearchView
+            baseline={searchBaseline}
+            candidates={searchCandidates}
+            generations={generations}
+            running={busy}
+            winner={searchWinner}
+            onAdopt={adopt}
+          />
+        )}
+        {mode === "worldline" && graph && graph.nodes.length === 0 && (
           <div className="empty">
             <strong>No recorded history on this timeline</strong>
             <span>Run scripts/verify_fleet_replay.py to record one, then reload.</span>
           </div>
         )}
 
-        {selected && (
+        {mode === "worldline" && selected && (
           <aside className="inspector" data-side={selectionIsLate ? "left" : "right"}>
             <h2>Effect</h2>
             <dl className="kv">
@@ -209,6 +286,14 @@ export function App() {
             <span className="metric-label">reused</span>
             <span className="metric-value" data-tone="accent">{stats.replayed ?? 0}</span>
           </div>
+          {searchWinner?.outcome && searchBaseline?.outcome && (
+            <div className="metric">
+              <span className="metric-label">found</span>
+              <span className="metric-value" data-tone="accent">
+                −{usd(searchBaseline.outcome.total_cost_usd - searchWinner.outcome.total_cost_usd)}
+              </span>
+            </div>
+          )}
           {diff && (
             <>
               <div className="metric">

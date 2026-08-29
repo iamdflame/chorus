@@ -66,6 +66,19 @@ class MergeRequest(BaseModel):
     force: bool = False
 
 
+class SearchRequest(BaseModel):
+    dispute_ids: list[str] = Field(default_factory=list)
+    clause_id: str = "POL-REFUND-CEILING"
+    generations: int = 2
+    population: int = 3
+    concurrency: int = 3
+
+
+class AdoptRequest(BaseModel):
+    clause_id: str
+    text: str
+
+
 # -- meta ---------------------------------------------------------------------
 
 @app.get("/health")
@@ -194,6 +207,53 @@ async def replay(branch_id: str, request: ReplayRequest) -> StreamingResponse:
         media_type="text/event-stream",
         headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
     )
+
+
+# -- policy search ------------------------------------------------------------
+
+@app.post("/api/search")
+async def search(request: SearchRequest) -> StreamingResponse:
+    """Search policy space against recorded history.
+
+    Streams because the search is the demo: candidates fork, replay, and settle onto a
+    cost frontier one at a time, and a final JSON blob would throw away the only part
+    worth watching.
+    """
+    dispute_ids = request.dispute_ids or [
+        d["id"]
+        for d in engine.world_view(PRIMARY, DISPUTES).values()
+        if d.get("status") != "open"
+    ][:6]
+    if not dispute_ids:
+        raise HTTPException(
+            status_code=409,
+            detail="no recorded disputes to search against; record a history first",
+        )
+
+    async def stream():
+        async for event in engine.search_policy(
+            dispute_ids=dispute_ids,
+            clause_id=request.clause_id,
+            generations=request.generations,
+            population=request.population,
+            concurrency=request.concurrency,
+        ):
+            yield f"data: {json.dumps(event)}\n\n"
+
+    return StreamingResponse(
+        stream(),
+        media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+    )
+
+
+@app.post("/api/policies/adopt")
+def adopt(request: AdoptRequest) -> dict[str, Any]:
+    """Install a policy the search proved better into production."""
+    try:
+        return engine.adopt(clause_id=request.clause_id, text=request.text)
+    except KeyError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
 
 
 # -- console ------------------------------------------------------------------

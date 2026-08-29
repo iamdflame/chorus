@@ -175,3 +175,44 @@ html, body, #root {
   text-align: center; color: var(--ink-dim); gap: 10px;
 }
 .empty strong { color: var(--ink-bright); font-weight: 400; font-size: 15px; }
+
+/* -- search view ---------------------------------------------------------- */
+
+.search-view {
+  position: absolute; inset: 0; display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px; gap: 0;
+}
+.search-plot { width: 100%; height: 100%; padding: 8px 0 0 8px; }
+
+.axis-label {
+  fill: var(--ink-dim); font-family: var(--mono); font-size: 10px;
+  letter-spacing: 0.06em;
+}
+.axis-note {
+  fill: var(--irreversible); font-family: var(--mono); font-size: 10px;
+  letter-spacing: 0.08em; opacity: 0.85;
+}
+
+.search-panel {
+  border-left: 1px solid var(--rule); padding: 22px 24px; overflow-y: auto;
+}
+.search-panel h2 {
+  margin: 0 0 12px; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--ink-dim); font-weight: 500;
+}
+.search-blurb {
+  margin: 0 0 18px; font-size: 11px; line-height: 1.65; color: var(--ink-dim);
+}
+.search-panel .kv dd[data-tone="good"] { color: var(--accent); }
+
+.clause {
+  margin: 0 0 12px; padding: 12px 14px; border-left: 2px solid var(--accent);
+  background: var(--ground-lift); font-size: 11px; line-height: 1.6;
+  color: var(--ink-bright);
+}
+.rationale {
+  margin: 0 0 16px; font-size: 10px; line-height: 1.6; color: var(--ink-dim);
+  font-style: italic;
+}
+
+.mode-rail { display: flex; gap: 2px; }

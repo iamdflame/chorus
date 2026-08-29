@@ -223,8 +223,8 @@ async def main(live: bool) -> int:
         return 1
 
     reuse = perturbed["replay_hits"] / max(perturbed["boundary_crossings"], 1)
-    print(f"  PASS  replay is free and exact; the fork reused {reuse:.0%} of three weeks "
-          f"of work\n        and paid only for the {perturbed['executed']} crossing(s) "
+    print(f"  PASS  replay is free and exact; the fork reused {reuse:.0%} of the recorded "
+          f"run\n        and paid only for the {perturbed['executed']} crossing(s) "
           f"the change actually touched.\n")
     return 0
 

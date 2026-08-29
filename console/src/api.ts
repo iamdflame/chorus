@@ -73,6 +73,23 @@ async function json<T>(path: string, init?: RequestInit): Promise<T> {
   return res.json() as Promise<T>;
 }
 
+export interface SearchCandidateDTO {
+  id: string;
+  generation: number;
+  text: string;
+  rationale: string;
+  parent_id: string | null;
+  outcome: {
+    total_cost_usd: number;
+    wrongful_refunds_usd: number;
+    missed_valid_usd: number;
+    escalations: number;
+    refunds_issued: number;
+    compute_usd: number;
+  } | null;
+  error: string | null;
+}
+
 export const api = {
   branches: () => json<Branch[]>("/api/branches"),
   graph: (branch: string) => json<Graph>(`/api/branches/${branch}/graph`),
@@ -92,6 +109,11 @@ export const api = {
       method: "PATCH",
       body: JSON.stringify({ text }),
     }),
+  adopt: (clause_id: string, text: string) =>
+    json<Record<string, unknown>>("/api/policies/adopt", {
+      method: "POST",
+      body: JSON.stringify({ clause_id, text }),
+    }),
   merge: (branch: string, into = "primary", force = false) =>
     json<Record<string, unknown>>(`/api/branches/${branch}/merge`, {
       method: "POST",
@@ -99,22 +121,13 @@ export const api = {
     }),
 };
 
-/** Stream a replay. Server-Sent Events over POST, so it is read manually rather than
- *  with EventSource — the payload matters and EventSource cannot POST. */
-export async function streamReplay(
-  branch: string,
-  body: { dispute_ids?: string[]; limit?: number },
+/** Shared SSE reader. Both replay and search stream over POST, which EventSource
+ *  cannot do, so frames are parsed by hand. */
+async function readEvents(
+  res: Response,
   onEvent: (event: Record<string, any>) => void,
-  signal?: AbortSignal,
 ): Promise<void> {
-  const res = await fetch(`/api/branches/${branch}/replay`, {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify(body),
-    signal,
-  });
-  if (!res.ok || !res.body) throw new Error(`replay failed: ${res.status}`);
-
+  if (!res.ok || !res.body) throw new Error(`stream failed: ${res.status}`);
   const reader = res.body.getReader();
   const decoder = new TextDecoder();
   let buffer = "";
@@ -131,4 +144,37 @@ export async function streamReplay(
       }
     }
   }
+}
+
+/** Stream a policy search: candidates fork, replay against real history, and settle
+ *  onto a cost frontier one at a time. */
+export async function streamSearch(
+  body: { dispute_ids?: string[]; generations?: number; population?: number },
+  onEvent: (event: Record<string, any>) => void,
+  signal?: AbortSignal,
+): Promise<void> {
+  const res = await fetch("/api/search", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(body),
+    signal,
+  });
+  await readEvents(res, onEvent);
+}
+
+/** Stream a replay. Server-Sent Events over POST, so it is read manually rather than
+ *  with EventSource — the payload matters and EventSource cannot POST. */
+export async function streamReplay(
+  branch: string,
+  body: { dispute_ids?: string[]; limit?: number },
+  onEvent: (event: Record<string, any>) => void,
+  signal?: AbortSignal,
+): Promise<void> {
+  const res = await fetch(`/api/branches/${branch}/replay`, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(body),
+    signal,
+  });
+  await readEvents(res, onEvent);
 }

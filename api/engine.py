@@ -310,6 +310,51 @@ class Engine:
             yield {"event": "done", "branch": branch_id,
                    "root_hash": self.store.dag(branch_id).root_hash(), "totals": totals}
 
+    async def search_policy(
+        self,
+        *,
+        dispute_ids: list[str],
+        clause_id: str = "POL-REFUND-CEILING",
+        generations: int = 2,
+        population: int = 3,
+        concurrency: int = 3,
+    ) -> AsyncIterator[dict[str, Any]]:
+        """Search policy space against recorded history, streaming every event.
+
+        Held under the same lock as replay: both mutate the branch tree, and two searches
+        interleaving would attribute one another's effects to the wrong timeline.
+        """
+        from optimizer.search import PolicySearch
+
+        async with self._lock:
+            search = PolicySearch(
+                store=self.store, world=self.world, dispute_ids=dispute_ids,
+                epoch=self.state_floor, clause_id=clause_id, concurrency=concurrency,
+            )
+            async for event in search.run(
+                generations=generations, population=population, survivors=2
+            ):
+                yield event
+            self._sync_branches()
+
+    def adopt(self, *, clause_id: str, text: str) -> dict[str, Any]:
+        """Promote a discovered policy into production.
+
+        The end of the loop the product exists to close: the fleet does not merely
+        report that a better policy exists, it installs the one it proved.
+        """
+        clause = self.world.read(branch_id=PRIMARY, collection=POLICIES, key=clause_id)
+        if clause is None:
+            raise KeyError(f"unknown clause {clause_id}")
+        self.state_floor += 1
+        updated = {**clause, "text": text, "version": clause.get("version", 1) + 1,
+                   "adopted_from_search": True}
+        self.world.write(
+            branch_id=PRIMARY, collection=POLICIES, key=clause_id,
+            value=updated, seq=self.state_floor,
+        )
+        return {"adopted": True, "clause": updated}
+
     def snapshot(self, path: str | Path) -> dict[str, Any]:
         save(path, store=self.store, world=self.world)
         from kernel.snapshot import describe
