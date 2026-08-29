@@ -43,6 +43,9 @@ class ToolClass:
     compensator: Compensator | None = None
     # Shown in the console when an action is staged rather than executed.
     describe: Callable[[dict[str, Any]], str] | None = None
+    # World collections this tool reads. Folded into the tool's address so that a change
+    # to the data it consults invalidates it, and a change elsewhere does not.
+    reads: tuple[str, ...] = ()
 
 
 class ReversibilityRegistry:
@@ -65,6 +68,7 @@ class ReversibilityRegistry:
         *,
         compensator: Compensator | None = None,
         describe: Callable[[dict[str, Any]], str] | None = None,
+        reads: tuple[str, ...] = (),
     ) -> None:
         if determinism is Determinism.EXTERNAL_REVERSIBLE and compensator is None:
             raise ValueError(
@@ -72,7 +76,8 @@ class ReversibilityRegistry:
                 "reversibility without a compensator is just an untested claim"
             )
         self._tools[name] = ToolClass(
-            name=name, determinism=determinism, compensator=compensator, describe=describe
+            name=name, determinism=determinism, compensator=compensator,
+            describe=describe, reads=tuple(reads),
         )
 
     def classify(self, name: str) -> Determinism:
@@ -97,6 +102,10 @@ class ReversibilityRegistry:
             return entry.describe(args)
         rendered = ", ".join(f"{k}={v!r}" for k, v in sorted(args.items()))
         return f"{name}({rendered})"
+
+    def reads_of(self, name: str) -> tuple[str, ...]:
+        entry = self._tools.get(name)
+        return entry.reads if entry else ()
 
     def registered(self) -> dict[str, Determinism]:
         return {name: tc.determinism for name, tc in sorted(self._tools.items())}

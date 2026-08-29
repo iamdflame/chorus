@@ -30,6 +30,7 @@ from dataclasses import dataclass, field
 from typing import Any, Iterator
 
 from kernel.branch import PRIMARY, Branch
+from kernel.effect import canonical_json, digest
 
 # Sentinel for "this key was deleted at this version", so a deletion on a branch can
 # shadow an inherited value instead of silently falling through to the parent's.
@@ -290,6 +291,29 @@ class ShadowWorld:
             "applied": len(final),
             "forced": force and bool(conflicts),
         }
+
+    def fingerprint(
+        self, *, branch_id: str, collections: tuple[str, ...], at_seq: int | None = None
+    ) -> str:
+        """A content hash of the state visible to a reader of `collections`.
+
+        This closes the hole that otherwise makes counterfactuals silently wrong. A tool
+        that reads world state is not a pure function of its arguments: `search_policy`
+        with an unchanged query returns different clauses after a policy edit. Addressing
+        it by arguments alone means a replay hits the cache and hands the agent the old
+        policy, so the perturbation never propagates and the counterfactual reports that
+        nothing changed.
+
+        Folding this fingerprint into the address makes the dependency explicit: edit a
+        clause, and every call that reads the corpus misses and re-executes, while calls
+        reading untouched collections still hit. The read set is the unit of invalidation.
+        """
+        parts: list[str] = []
+        for collection in sorted(collections):
+            visible = self.scan(branch_id=branch_id, collection=collection, at_seq=at_seq)
+            parts.append(collection)
+            parts.append(canonical_json(visible).decode("utf-8"))
+        return digest(*parts)
 
     # -- diagnostics -----------------------------------------------------------
 

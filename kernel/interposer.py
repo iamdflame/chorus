@@ -28,7 +28,7 @@ from __future__ import annotations
 
 import time
 from enum import Enum
-from typing import Any
+from typing import Any, Callable
 
 from google.adk.agents.base_agent import BaseAgent
 from google.adk.agents.callback_context import CallbackContext
@@ -121,12 +121,17 @@ class LightconePlugin(BasePlugin):
         registry: ReversibilityRegistry | None = None,
         name: str = "lightcone",
         seed_parents: tuple[str, ...] = (),
+        state_fingerprint: Callable[[tuple[str, ...]], str] | None = None,
     ) -> None:
         super().__init__(name=name)
         self.store = store
         self.branch_id = branch_id
         self.mode = mode
         self.registry = registry or ReversibilityRegistry()
+        # Supplied by the world so a state-reading tool is addressed by what it reads as
+        # well as by its arguments. Without it, a counterfactual that edits data the
+        # agents consult would replay straight past the edit.
+        self._state_fingerprint = state_fingerprint
 
         # Causal bookkeeping. None of this may leak into an address: invocation ids are
         # fresh on every run, so including one would make every replay miss.
@@ -366,7 +371,11 @@ class LightconePlugin(BasePlugin):
     ) -> dict[str, Any] | None:
         agent = tool_context.agent_name
         determinism = self.registry.classify(tool.name)
-        request = {"tool": tool.name, "args": tool_args}
+        request: dict[str, Any] = {"tool": tool.name, "args": tool_args}
+        reads = self.registry.reads_of(tool.name)
+        if reads and self._state_fingerprint is not None:
+            request["reads"] = {"collections": list(reads),
+                                "state": self._state_fingerprint(reads)}
         effect, cached = self._open(
             agent=agent,
             kind=EffectKind.TOOL_CALL,
