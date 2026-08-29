@@ -236,6 +236,13 @@ def build_tools(ctx: FleetContext) -> tuple[list[Callable[..., dict]], Reversibi
 
     registry = ReversibilityRegistry()
 
+    # ADK's built-in handoff. It is control flow, not a world effect, so it must be
+    # declared — the registry's fail-safe default would otherwise quarantine it off
+    # primary, severing delegation on every branch and silently truncating the
+    # counterfactual at the point the fleet hands off. Worth noting that the default
+    # caught it rather than letting it through: an unclassified tool fails visible.
+    registry.register("transfer_to_agent", Determinism.PURE)
+
     # Read sets are what make a counterfactual propagate. `search_policy` consults the
     # policy corpus, so editing a clause must invalidate it; `get_dispute` does not, so a
     # policy edit must leave it cached.

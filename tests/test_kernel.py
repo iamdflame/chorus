@@ -241,3 +241,19 @@ def test_snapshot_roundtrip_preserves_timeline_and_state(tmp_path):
     assert world2.read(branch_id=branch.id, collection="ledger", key="k") is None, (
         "a tombstone must survive the round trip or deletions silently un-delete"
     )
+
+
+def test_staged_action_lookup_survives_a_null_tool_result():
+    """Regression: `.get(k, default)` returns the default only when the key is absent.
+
+    A tool that returns None stores {"result": null}, so the default never applied and
+    reading the staged action raised, taking out the whole lightcone endpoint.
+    """
+    from kernel.effect import Determinism, Effect, EffectKind
+
+    effect = Effect.create(
+        branch_id=PRIMARY, seq=1, agent="comms", kind=EffectKind.TOOL_CALL,
+        determinism=Determinism.EXTERNAL_IRREVERSIBLE, causal_parents=(),
+        request={"tool": "send_customer_email", "args": {}}, response={"result": None},
+    )
+    assert ((effect.response or {}).get("result") or {}).get("_lightcone_action") is None

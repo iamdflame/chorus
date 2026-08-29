@@ -18,13 +18,16 @@ const C = {
   ground: 0x07080a,
   rule: 0x16181d,
   laneText: 0x565c69,
-  inherited: 0x2b313c,
+  axis: 0x2a2f39,
+  // Inherited work sits barely above the ground: reused effects should read as texture,
+  // not as content. The eye must land on what this timeline actually did.
+  inherited: 0x232833,
   executed: 0x5ef0c8,
-  model: 0x7b8496,
+  reasoning: 0x2f8f7c,
   staged: 0xf5a524,
   irreversible: 0xff5c5c,
   delegation: 0x8b7bff,
-  edge: 0x1b1f27,
+  edge: 0x161a21,
   edgeHot: 0x5ef0c8,
 };
 
@@ -48,6 +51,11 @@ export class Worldline {
   private root: string | null = null;
   private dirty = true;
   private hovered: string | null = null;
+  // Pixi's Application is only safe to destroy once init() has resolved; React can
+  // unmount before that, and tearing down a half-initialised app throws inside the
+  // resize plugin and takes the whole tree with it.
+  private ready = false;
+  private destroyed = false;
 
   onSelect: (node: GraphNode | null) => void = () => {};
   onHover: (node: GraphNode | null) => void = () => {};
@@ -61,6 +69,12 @@ export class Worldline {
       resolution: Math.min(window.devicePixelRatio ?? 1, 2),
       autoDensity: true,
     });
+    if (this.destroyed) {
+      // Unmounted while init() was in flight — clean up here instead of leaking.
+      this.app.destroy(true, { children: true });
+      return;
+    }
+    this.ready = true;
     host.appendChild(this.app.canvas);
 
     this.stage.addChild(this.edgeLayer, this.nodeLayer, this.laneLayer);
@@ -84,8 +98,11 @@ export class Worldline {
   }
 
   destroy(): void {
+    if (this.destroyed) return;
+    this.destroyed = true;
     window.removeEventListener("resize", this.handleResize);
-    this.app.destroy(true, { children: true });
+    // If init() has not resolved, mount() performs the teardown once it does.
+    if (this.ready) this.app.destroy(true, { children: true });
   }
 
   private handleResize = () => {
@@ -177,13 +194,18 @@ export class Worldline {
     }
   }
 
+  /** Colour answers one question first — was this work done on this timeline, or
+   *  inherited from its parent — and only then annotates exceptions. Reversing that
+   *  order is what made the graph read as flat grey: every model call fell through to a
+   *  neutral before the accent was ever reached. */
   private colourOf(node: Placed, st: NodeState): number {
+    if (st.glow > 0.02) return C.executed;
+    if (node.inherited) return C.inherited;
     if (node.quarantined) return C.staged;
     if (node.determinism === "external_irreversible") return C.irreversible;
     if (node.kind === "delegation") return C.delegation;
-    if (st.glow > 0.02) return C.executed;
-    if (node.inherited) return C.inherited;
-    if (node.kind === "model_call") return C.model;
+    // Reasoning is the substrate; tool calls are the moments something happened.
+    if (node.kind === "model_call" || node.kind === "agent_enter") return C.reasoning;
     return C.executed;
   }
 
@@ -196,6 +218,24 @@ export class Worldline {
     for (const lane of lanes) {
       this.edgeLayer.moveTo(120, lane.y).lineTo(width - 24, lane.y)
         .stroke({ color: C.rule, width: 1, alpha: 0.55 });
+    }
+
+    // time axis — six quiet ticks along the foot of the frame
+    let minX = Infinity;
+    let maxX = -Infinity;
+    for (const node of nodes) {
+      if (node.x < minX) minX = node.x;
+      if (node.x > maxX) maxX = node.x;
+    }
+    if (nodes.length && maxX > minX) {
+      const baseline = this.view.height - 22;
+      this.edgeLayer.moveTo(minX, baseline).lineTo(maxX, baseline)
+        .stroke({ color: C.axis, width: 1, alpha: 0.5 });
+      for (let i = 0; i <= 6; i += 1) {
+        const x = minX + ((maxX - minX) * i) / 6;
+        this.edgeLayer.moveTo(x, baseline).lineTo(x, baseline + 5)
+          .stroke({ color: C.axis, width: 1, alpha: 0.7 });
+      }
     }
 
     // causal edges

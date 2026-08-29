@@ -240,3 +240,21 @@ async def test_tool_effects_are_recorded_when_the_tool_declares_a_read_set():
     assert tool_effects, "a read-set tool's effect must be persisted, not silently dropped"
     assert tool_effects[0].response is not None, "the effect must carry its result"
     assert "reads" in tool_effects[0].request, "the read fingerprint belongs in the address"
+
+
+@pytest.mark.asyncio
+async def test_delegation_is_not_quarantined_on_a_branch():
+    """Handoff is control flow, not a world effect.
+
+    Quarantining it severs delegation on every branch, so the counterfactual silently
+    stops at the point the fleet hands off and reports far less downstream work than
+    really would have happened.
+    """
+    from fleet.tools import FleetContext, build_tools
+    from world.shadow import ShadowWorld
+
+    _, registry = build_tools(FleetContext(world=ShadowWorld(), branch_id=PRIMARY))
+    assert registry.classify("transfer_to_agent") is Determinism.PURE
+    # Anything that actually reaches the world must still fail closed.
+    assert registry.classify("issue_refund") is Determinism.EXTERNAL_IRREVERSIBLE
+    assert registry.classify("some_tool_nobody_registered") is Determinism.EXTERNAL_IRREVERSIBLE

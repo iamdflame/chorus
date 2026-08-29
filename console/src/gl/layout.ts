@@ -23,8 +23,8 @@ export interface Layout {
   height: number;
 }
 
-const TOP = 56;
-const BOTTOM = 40;
+const TOP = 34;
+const BOTTOM = 46;
 const LEFT = 132;
 const RIGHT = 48;
 
@@ -46,13 +46,23 @@ export function layout(
 ): Layout {
   const usableW = Math.max(width - LEFT - RIGHT, 10);
   const usableH = Math.max(height - TOP - BOTTOM, 10);
-  const laneH = usableH / Math.max(agents.length, 1);
+
+  // Square-rooted so a busy lane gets more room without a quiet one collapsing to a
+  // line; every agent stays visible, none dominates.
+  const counts = new Map(agents.map((a) => [a, 0]));
+  for (const node of nodes) counts.set(node.agent, (counts.get(node.agent) ?? 0) + 1);
+  const weights = agents.map((a) => Math.sqrt(Math.max(counts.get(a) ?? 0, 1)));
+  const totalWeight = weights.reduce((sum, w) => sum + w, 0) || 1;
 
   const laneOf = new Map(agents.map((a, i) => [a, i]));
-  const lanes = agents.map((agent, i) => ({
-    agent,
-    y: TOP + laneH * i + laneH / 2,
-  }));
+  const heights = weights.map((w) => (w / totalWeight) * usableH);
+  const centres: number[] = [];
+  let cursor = TOP;
+  for (const h of heights) {
+    centres.push(cursor + h / 2);
+    cursor += h;
+  }
+  const lanes = agents.map((agent, i) => ({ agent, y: centres[i] }));
 
   const seqs = nodes.map((n) => n.seq);
   const min = Math.min(...seqs, 0);
@@ -73,7 +83,11 @@ export function layout(
       ...node,
       lane,
       x: LEFT + ((node.seq - min) / span) * usableW,
-      y: TOP + laneH * lane + laneH / 2 + (collisions % 2 ? 1 : -1) * Math.ceil(collisions / 2) * 9,
+      y:
+        centres[lane] +
+        (collisions % 2 ? 1 : -1) *
+          Math.ceil(collisions / 2) *
+          Math.min(9, heights[lane] / 5),
       r: radius(node),
     };
   });

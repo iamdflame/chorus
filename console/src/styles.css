@@ -53,7 +53,7 @@ html, body, #root {
 }
 
 .wordmark {
-  font-size: 12px; letter-spacing: 0.34em; text-transform: uppercase;
+  font-size: 13px; letter-spacing: 0.42em; text-transform: uppercase;
   color: var(--ink-bright); font-weight: 500;
 }
 .wordmark span { color: var(--accent); }
@@ -100,14 +100,16 @@ html, body, #root {
 
 /* -- readouts ------------------------------------------------------------- */
 
-.readout { display: flex; gap: 26px; align-items: baseline; }
-.metric { display: flex; flex-direction: column; gap: 3px; }
+/* The readout is the page's one loud element. Everything else is a thin line of type at
+   the edge of the frame, so the numbers can carry real weight without competing. */
+.readout { display: flex; gap: 40px; align-items: flex-end; }
+.metric { display: flex; flex-direction: column; gap: 2px; }
 .metric-label {
-  font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-dim);
+  font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-dim);
 }
 .metric-value {
-  font-size: 19px; color: var(--ink-bright); font-variant-numeric: tabular-nums;
-  letter-spacing: -0.01em;
+  font-size: 40px; line-height: 0.92; color: var(--ink-bright);
+  font-variant-numeric: tabular-nums; letter-spacing: -0.035em; font-weight: 300;
 }
 .metric-value[data-tone="accent"] { color: var(--accent); }
 .metric-value[data-tone="staged"] { color: var(--staged); }
@@ -116,12 +118,17 @@ html, body, #root {
 /* -- inspector ------------------------------------------------------------ */
 
 .inspector {
-  position: absolute; right: var(--pad); top: var(--pad); width: 336px;
+  position: absolute; top: var(--pad); width: 336px;
+  transition: left 220ms ease, right 220ms ease;
   background: color-mix(in srgb, var(--ground-lift) 92%, transparent);
   border: 1px solid var(--rule-bright);
   padding: 18px 20px 20px;
   max-height: calc(100% - var(--pad) * 2); overflow-y: auto;
 }
+/* Sit opposite the selection so the panel never covers the cone it is describing.
+   Left placement clears the lane labels. */
+.inspector[data-side="right"] { right: var(--pad); left: auto; }
+.inspector[data-side="left"] { left: 148px; right: auto; }
 .inspector h2 {
   margin: 0 0 14px; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;
   color: var(--ink-dim); font-weight: 500;
@@ -144,19 +151,22 @@ html, body, #root {
 /* -- footer --------------------------------------------------------------- */
 
 .footer {
-  display: flex; align-items: center; gap: 22px;
-  padding: 14px var(--pad); border-top: 1px solid var(--rule); flex: 0 0 auto;
+  display: flex; align-items: flex-end; gap: 34px;
+  padding: 18px var(--pad) 20px; border-top: 1px solid var(--rule); flex: 0 0 auto;
 }
 
-.legend { display: flex; gap: 16px; font-size: 10px; color: var(--ink-dim); }
+.legend {
+  display: flex; gap: 15px; font-size: 10px; color: var(--ink-dim);
+  padding-bottom: 3px; letter-spacing: 0.02em;
+}
 .legend i {
   display: inline-block; width: 7px; height: 7px; border-radius: 50%;
   margin-right: 6px; vertical-align: middle;
 }
 
 .log {
-  font-size: 10px; color: var(--ink-dim); white-space: nowrap;
-  overflow: hidden; text-overflow: ellipsis; flex: 1;
+  font-size: 11px; color: var(--ink-dim); white-space: nowrap;
+  overflow: hidden; text-overflow: ellipsis; flex: 1; padding-bottom: 3px;
 }
 .log b { color: var(--accent); font-weight: 400; }
 

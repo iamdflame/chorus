@@ -138,7 +138,7 @@ class Engine:
             return None
         payload = found.to_dict()
         payload["staged_action"] = (
-            (found.response or {}).get("result", {}).get("_lightcone_action")
+            ((found.response or {}).get("result") or {}).get("_lightcone_action")
             if found.quarantined
             else None
         )
@@ -159,7 +159,7 @@ class Engine:
             "agents_touched": sorted({e.agent for e in affected}),
             "irreversible_downstream": [
                 {"id": e.id, "agent": e.agent,
-                 "action": (e.response or {}).get("result", {}).get("_lightcone_action")
+                 "action": ((e.response or {}).get("result") or {}).get("_lightcone_action")
                  or e.request.get("tool")}
                 for e in affected
                 if e.determinism.value == "external_irreversible"
@@ -196,7 +196,7 @@ class Engine:
         left_money, right_money = money(left), money(right)
         staged = [
             {"id": e.id, "agent": e.agent,
-             "action": (e.response or {}).get("result", {}).get("_lightcone_action")}
+             "action": ((e.response or {}).get("result") or {}).get("_lightcone_action")}
             for e in self.store.timeline(right)
             if e.quarantined
         ]

@@ -8,7 +8,13 @@ const TIGHTENED =
   "refund without human review, provided the customer has fewer than three prior " +
   "disputes. Amounts above the ceiling must be escalated.";
 
-const usd = (n: number) => `$${n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+const usd = (n: number) =>
+  `$${n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+/** Per-effect costs are fractions of a cent; rounding them to two places renders every
+ *  reasoning step as "$0.00" and destroys the comparison. */
+const micro = (n: number) =>
+  n === 0 ? "—" : n < 0.01 ? `$${n.toFixed(4)}` : usd(n);
 
 export function App() {
   const stageRef = useRef<HTMLDivElement>(null);
@@ -27,13 +33,12 @@ export function App() {
   useEffect(() => {
     const world = new Worldline();
     worldRef.current = world;
-    let live = true;
-    (async () => {
-      if (!stageRef.current) return;
-      await world.mount(stageRef.current);
-      if (!live) world.destroy();
+    void (async () => {
+      if (stageRef.current) await world.mount(stageRef.current);
     })();
-    return () => { live = false; world.destroy(); worldRef.current = null; };
+    // Single teardown path; Worldline.destroy is idempotent and handles the case where
+    // mount() is still awaiting init().
+    return () => { world.destroy(); worldRef.current = null; };
   }, []);
 
   const loadBranches = useCallback(async () => {
@@ -114,6 +119,14 @@ export function App() {
     } finally { setBusy(false); }
   }
 
+  // Which half of the timeline the selection sits in, so the panel can move out of the
+  // cone's way rather than occluding it.
+  const seqs = graph?.nodes.map((n) => n.seq) ?? [];
+  const selectionIsLate =
+    selected !== null && seqs.length > 0
+      ? (selected.seq - Math.min(...seqs)) / Math.max(Math.max(...seqs) - Math.min(...seqs), 1) > 0.55
+      : false;
+
   const activeBranch = branches.find((b) => b.id === active);
   const stats = (graph?.stats ?? {}) as Record<string, number>;
 
@@ -154,7 +167,7 @@ export function App() {
         )}
 
         {selected && (
-          <aside className="inspector">
+          <aside className="inspector" data-side={selectionIsLate ? "left" : "right"}>
             <h2>Effect</h2>
             <dl className="kv">
               <dt>address</dt><dd>{selected.id.slice(0, 20)}</dd>
@@ -163,7 +176,7 @@ export function App() {
               <dt>class</dt><dd>{selected.determinism.replace(/_/g, " ")}</dd>
               <dt>seq</dt><dd>{selected.seq}</dd>
               <dt>tokens</dt><dd>{selected.tokens || "—"}</dd>
-              <dt>cost</dt><dd>{selected.cost_usd ? usd(selected.cost_usd) : "—"}</dd>
+              <dt>cost</dt><dd>{micro(selected.cost_usd)}</dd>
               <dt>origin</dt><dd>{selected.inherited ? "inherited" : "executed here"}</dd>
             </dl>
 
@@ -215,8 +228,9 @@ export function App() {
         <div className="log">{log ? <b>{log}</b> : `${activeBranch?.name ?? ""} · click an effect to compute its lightcone`}</div>
 
         <div className="legend">
-          <span><i style={{ background: "#5ef0c8" }} />executed</span>
-          <span><i style={{ background: "#2b313c" }} />inherited</span>
+          <span><i style={{ background: "#5ef0c8" }} />executed here</span>
+          <span><i style={{ background: "#2f8f7c" }} />reasoning</span>
+          <span><i style={{ background: "#232833" }} />inherited</span>
           <span><i style={{ background: "#8b7bff" }} />delegation</span>
           <span><i style={{ background: "#f5a524" }} />staged</span>
           <span><i style={{ background: "#ff5c5c" }} />irreversible</span>
