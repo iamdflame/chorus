@@ -87,6 +87,28 @@ millions a year to.
 
 ---
 
+## Does the reasoning actually help?
+
+Cheap is half the claim. The other half is whether twenty thousand agents stating what
+they would accept produces a better recovery than the queue-order fallback airlines
+actually use. Measured on 8,000 agents:
+
+| | first come | swarm | |
+|---|---|---|---|
+| souls seated | 2,888 | 2,888 | — |
+| **weighted satisfaction** | 1,131.3 | **2,173.9** | **+92%** |
+| mean wait (hours) | 17.12 | **16.76** | −0.36 |
+| parties kept together | — | 8 split of 1,095 | |
+
+**Souls seated is deliberately not the headline.** With 2,888 seats against 20,367 souls
+the seat budget is the binding constraint, so every competent allocator fills every seat
+and that metric saturates at an identical number — it cannot tell a good plan from a bad
+one. Under a fixed budget the question is not how many people move but *which*: the swarm
+prioritises by self-assessed urgency weighted by tier rather than by arrival order, and
+the proof script fails if it does not beat the queue on that measure.
+
+---
+
 ## Architecture
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the full diagram and data flow.
