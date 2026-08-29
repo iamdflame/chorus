@@ -85,12 +85,36 @@ class FleetRunner:
         self.world = world
         self.branch_id = branch_id
         self.mode = mode
+        # The run's epoch: the state position after all deliberate setup (the seed, plus
+        # any perturbation such as a policy edit) and before the run's own mutations.
+        self.epoch = state_seq_floor
         self.ctx = FleetContext(world=world, branch_id=branch_id)
         self.ctx.sync_seq(state_seq_floor)
         self.fleet, self.registry = build_fleet(self.ctx)
 
     def _fingerprint(self, collections: tuple[str, ...]) -> str:
-        return self.world.fingerprint(branch_id=self.branch_id, collections=collections)
+        """Fingerprint the read set as of this run's epoch, not as of now.
+
+        Pinning is essential, and getting it wrong makes replay useless. The fleet writes
+        into the same collections it reads — `set_dispute_status` mutates `disputes`,
+        which `get_dispute` consults. Fingerprinting live state therefore means the
+        recording run changes its own addresses as it goes, and the replay (whose tools
+        are cache hits and so write nothing) computes different ones and misses
+        everything downstream of the first tool call.
+
+        Pinning to the epoch separates the two kinds of change, which is the distinction
+        that matters:
+
+            exogenous  data the fleet consults but does not produce — a policy edit.
+                       Written at or before the epoch, so it *does* shift the fingerprint
+                       and correctly invalidates every decision that read it.
+            endogenous the fleet's own writes, at seq > epoch. Already recorded as
+                       effects in the DAG, so folding them into addresses too would
+                       double-count them and destroy every cache hit.
+        """
+        return self.world.fingerprint(
+            branch_id=self.branch_id, collections=collections, at_seq=self.epoch
+        )
 
     async def run_dispute(self, dispute_id: str) -> dict[str, Any]:
         """Process one dispute end to end, recording every boundary crossing.

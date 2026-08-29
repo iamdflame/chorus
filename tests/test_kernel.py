@@ -209,3 +209,35 @@ def test_next_seq_on_a_fork_starts_above_the_fork_point():
     store = InMemoryEffectStore()
     br = store.create_branch(Branch.fork(parent=store.get_branch(PRIMARY), name="b", at_seq=400))
     assert store.next_seq(br.id) == 401
+
+
+# -- snapshots ----------------------------------------------------------------
+
+def test_snapshot_roundtrip_preserves_timeline_and_state(tmp_path):
+    """A recorded history is expensive real work; it must survive the process."""
+    from kernel.snapshot import load, save
+    from world.shadow import TOMBSTONE, ShadowWorld
+
+    store = InMemoryEffectStore()
+    a = mk("triage", (), {"i": 1}, response={"r": 1}, seq=1)
+    b = mk("policy", (a.id,), {"i": 2}, response={"r": 2}, seq=2)
+    store.put_many([a, b])
+    store.append_manifest(PRIMARY, [a.id, b.id])
+    branch = store.create_branch(
+        Branch.fork(parent=store.get_branch(PRIMARY), name="alt", at_seq=1)
+    )
+
+    world = ShadowWorld(branches={x.id: x for x in store.list_branches()})
+    world.write(branch_id=PRIMARY, collection="ledger", key="k", value={"v": 1}, seq=1)
+    world.delete(branch_id=branch.id, collection="ledger", key="k", seq=2)
+
+    path = save(tmp_path / "snap.json", store=store, world=world)
+    store2, world2 = load(path)
+
+    assert store2.dag(PRIMARY).root_hash() == store.dag(PRIMARY).root_hash()
+    assert [e.id for e in store2.timeline(PRIMARY)] == [a.id, b.id]
+    assert store2.get_branch(branch.id).fork_at_seq == 1
+    assert world2.read(branch_id=PRIMARY, collection="ledger", key="k") == {"v": 1}
+    assert world2.read(branch_id=branch.id, collection="ledger", key="k") is None, (
+        "a tombstone must survive the round trip or deletions silently un-delete"
+    )
