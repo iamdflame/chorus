@@ -28,6 +28,7 @@ if os.path.exists(_env):
 from kernel.branch import PRIMARY
 from kernel.interposer import Mode
 from kernel.store import InMemoryEffectStore
+from swarm.allocate import allocate_first_come, allocate_with_preferences
 from swarm.canonical import collapse, project_passenger
 from swarm.runtime import Swarm
 from swarm.scenario import build_scenario, load_into_world
@@ -94,9 +95,47 @@ async def main(count: int, concurrency: int) -> int:
     print(f"  {'preferences produced':<30}{len(preferences):>12,}")
     print("  " + "=" * 70)
 
+    # -- did the reasoning actually help? --------------------------------------
+    # Cheap is only half the claim. The other half is whether twenty thousand agents
+    # stating what they would accept produces a better recovery than the queue-order
+    # fallback airlines actually use when a hub goes down.
+    flights = [asdict(f) for f in scenario.flights]
+    swarm_plan = allocate_with_preferences(
+        passengers=passengers, preferences=preferences,
+        flights=flights, hotel_rooms=scenario.hotel_rooms,
+    )
+    fcfs_plan = allocate_first_come(
+        passengers=passengers, flights=flights, hotel_rooms=scenario.hotel_rooms,
+    )
+
+    a, b = swarm_plan.to_dict(), fcfs_plan.to_dict()
+    print()
+    print(f"  {'':<26}{'FIRST COME':>14}{'SWARM':>14}{'DELTA':>14}")
+    print("  " + "-" * 68)
+    for label, key in (
+        ("passengers seated", "seated"),
+        ("souls seated", "souls_seated"),
+        ("stranded", "stranded"),
+        ("parties split", "parties_split"),
+        ("hotel rooms used", "hotel_granted"),
+    ):
+        delta = a[key] - b[key]
+        print(f"  {label:<26}{b[key]:>14,}{a[key]:>14,}{delta:>+14,}")
+    print(f"  {'mean wait (hours)':<26}{b['mean_wait_hours']:>14.2f}"
+          f"{a['mean_wait_hours']:>14.2f}{a['mean_wait_hours']-b['mean_wait_hours']:>+14.2f}")
+    print(f"  {'weighted satisfaction':<26}{b['weighted_satisfaction']:>14,.1f}"
+          f"{a['weighted_satisfaction']:>14,.1f}"
+          f"{a['weighted_satisfaction']-b['weighted_satisfaction']:>+14,.1f}")
+    print("  " + "-" * 68)
+
     from kernel.snapshot import save
     save(os.path.join(ROOT, "data/swarm.json"), store=store, world=world)
-    print(f"  {'snapshot':<30}{'data/swarm.json':>12}")
+    import json as _json
+    with open(os.path.join(ROOT, "data/preferences.json"), "w") as fh:
+        _json.dump({"preferences": preferences, "metrics": m,
+                    "swarm_plan": a, "fcfs_plan": b}, fh)
+    print(f"\n  {'snapshot':<30}{'data/swarm.json':>16}")
+    print(f"  {'preferences + plans':<30}{'data/preferences.json':>16}")
 
     failures = []
     if m["model_calls"] >= m["agents_invoked"]:
@@ -106,6 +145,11 @@ async def main(count: int, concurrency: int) -> int:
     if len(preferences) < m["agents_invoked"] * 0.9:
         failures.append(
             f"only {len(preferences)} of {m['agents_invoked']} agents produced a preference"
+        )
+    if swarm_plan.souls_seated <= fcfs_plan.souls_seated:
+        failures.append(
+            f"swarm seated {swarm_plan.souls_seated:,} souls vs first-come "
+            f"{fcfs_plan.souls_seated:,}; the reasoning bought nothing"
         )
     if metrics.errors:
         print(f"\n  first errors: {metrics.errors[:3]}")

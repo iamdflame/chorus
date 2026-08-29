@@ -12,16 +12,33 @@ Unless identical reasoning is computed once.
 Chorus gives each entity a real, independent agent, and discovers that most of them are
 thinking the same thought. Measured on a live scenario:
 
-| agents | distinct thoughts | collapse |
+| agents | distinct situations | collapse |
 |---|---|---|
 | 500 | 128 | 3.9x |
+| 1,000 | 149 | 6.7x |
+| 4,000 | 183 | 21.9x |
 | 8,000 | 187 | 42.8x |
 | 20,000 | **192** | **104x** |
 
 Thought count **saturates** while agent count grows without bound. Adding twelve thousand
-agents costs five more thoughts. **The cost of a swarm is bounded by the diversity of its
-situations, not by its size** — which is what makes per-entity agents economically
-possible for the first time.
+agents costs five more distinct situations. **The cost of a swarm is bounded by the
+diversity of its situations, not by its size** — which is what makes per-entity agents
+economically possible for the first time.
+
+Run end to end against live `gemini-3.5-flash`, 20,000 independent agent invocations:
+
+| | |
+|---|---|
+| agents invoked | **20,000** |
+| model calls actually made | **222** |
+| served from the store | **19,778** |
+| cost incurred | **$0.2137** |
+| collapse | **90x** |
+
+The measured 222 exceeds the 192 distinct situations because a handful of agents take a
+second turn before returning valid JSON — those are genuinely different requests at a
+different causal position, so they correctly miss. The number reported is what was really
+spent, not the projection.
 
 ---
 

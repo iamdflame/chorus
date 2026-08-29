@@ -5,85 +5,98 @@
 ```mermaid
 flowchart TB
     subgraph console["Console — Vite + React + PixiJS"]
-        WL["Worldline<br/>causal graph, lightcone ignition"]
-        SV["Search view<br/>cost landscape"]
+        MU["Murmuration<br/>20,000 agents as cohort clouds"]
+        WL["Worldline<br/>causal graph, lightcone"]
     end
 
     subgraph api["API — FastAPI on Cloud Run"]
-        RT["Routes<br/>branches · graph · lightcone · diff · merge"]
-        SSE["SSE streams<br/>replay · search"]
+        SSE["SSE streams<br/>swarm · replay · search"]
         ENG["Engine<br/>owns store + world + branches"]
     end
 
-    subgraph opt["Optimizer"]
-        PROP["Proposer<br/>gemini-3.5-flash reads the scoreboard"]
-        EVAL["Evaluator<br/>fork · replay · score in dollars"]
-        OBJ["Objective<br/>wrongful refunds + human cost + churn"]
+    subgraph swarm["Swarm — one agent per entity"]
+        SC["Scenario<br/>hub closure, real scarcity"]
+        CP["Canonical projection<br/>decision-relevant features only"]
+        RT["Runtime<br/>N independent ADK invocations"]
+        AL["Allocator<br/>deterministic, never sees a model"]
     end
 
-    subgraph fleet["Fleet — Google ADK"]
-        TR["triage"] --> PO["policy"] --> RE["resolver"]
-        RE -->|transfer_to_agent| RF["refund_specialist"]
-        RE -->|transfer_to_agent| ES["escalation_specialist"]
-        RF --> CO["comms"]
-        ES --> CO
-    end
-
-    subgraph kernel["Kernel — the engine"]
+    subgraph kernel["Kernel — shared cognition"]
         IP["LightconePlugin<br/>ADK BasePlugin · total interposition"]
-        DAG["Causal DAG<br/>forward + backward lightcone"]
-        BR["Branches<br/>O(1) fork, chain resolution"]
-        QU["Quarantine gate<br/>irreversible actions staged"]
+        AD["Content addressing<br/>H(kind, role, parents, request)"]
+        ST["Effect store<br/>collision = shared thought"]
     end
 
-    subgraph world["Shadow World"]
-        MV["MVCC over a branch tree<br/>time travel · isolation · merge"]
-    end
-
-    GEM["Gemini 3.5 Flash<br/>agents · proposer · embeddings"]
-    FS[("Firestore<br/>effects keyed by content address")]
+    GEM["Gemini 3.5 Flash"]
+    FS[("Firestore<br/>durable, keyed by address")]
 
     console --> api
-    ENG --> opt
-    opt --> fleet
-    fleet <-->|every model + tool call| IP
-    IP --> GEM
-    IP --> DAG
-    IP --> QU
-    DAG --> BR
-    BR --> FS
-    fleet -->|reads + writes| MV
-    MV --> BR
+    ENG --> swarm
+    SC --> CP --> RT
+    RT -->|every model call| IP
+    IP --> AD --> ST
+    ST -->|miss| GEM
+    ST -->|hit: 19,778 of 20,000| RT
+    RT -->|preferences| AL
+    ST --> FS
 ```
 
 ## The mechanism
 
 Everything rests on one interposition point. ADK's `BasePlugin` registers on the `Runner`,
-applies to every agent in the fleet, takes precedence over per-agent callbacks, and — the
-part that matters — lets a callback return a value that **short-circuits** the real call:
+applies to every agent, and — the part that matters — lets a callback **short-circuit** the
+real call:
 
 ```python
 before_model_callback(...) -> Optional[LlmResponse]   # returning one skips the model
 before_tool_callback(...)  -> Optional[dict]          # returning one skips the tool
 ```
 
-So the agent under replay is byte-for-byte the agent that ran in production. No
-monkey-patching, no forked framework, no swapped tools.
+So an agent served from the store is byte-for-byte the agent that would have called
+Gemini. No monkey-patching, no forked framework, no swapped model.
 
-### Addressing
+### Why the sharing is correct
 
 ```
-address    = H(kind, agent, [parent addresses], request_hash)   # the request side
-content_id = H(address, response)                               # the value side
+address = H(kind, role, [causal parents], canonical request)
 ```
 
-Replay looks up by `address` *before* it has a response. Integrity is checked with
-`content_id`. Conflating the two breaks replay.
+Three things make a collision mean "these are the same computation" rather than "these
+look similar":
 
-For a tool that reads world state, the address also folds in a fingerprint of the
-collections it declares as its read set — otherwise `search_policy` with an unchanged
-query would hit the cache and hand the agent the *old* policy, and the counterfactual
-would silently report that nothing changed.
+1. **The role, not the individual, is the agent name.** Naming agents per-entity would make
+   every address unique and defeat sharing entirely.
+2. **The request is the canonical projection.** Identity, destination and flight number are
+   absent — they decide *which seat* a passenger is matched to, never *what kind of
+   itinerary they would accept*.
+3. **Causal parents include a round anchor.** Agents reasoning about the same world state
+   share it; two rounds facing different scarcity cannot silently share answers.
+
+A naive text cache would be wrong here. Content addressing over full causal history is
+what makes it sound.
+
+### The split that keeps it honest
+
+| | | |
+|---|---|---|
+| **reasoning** | shared | what would someone in this situation accept |
+| **matching** | private | which specific seat this specific passenger gets |
+
+Matching depends on identity and live inventory, so it is individual by nature. It never
+reaches a model at all — allocation under hard constraints is exactly what deterministic
+code is good at, and sending it to a model would be both more expensive and worse.
+
+### Saturation
+
+Distinct situations are bounded by the *product of the buckets*, not by population:
+
+```
+tier(4) x urgency(4) x party(4) x constraints(3) = 192 maximum
+```
+
+Which is why 20,000 agents need 192 thoughts and 20,000,000 would need the same 192.
+Buckets are deliberately coarse: every extra distinction multiplies cost, and a
+distinction that does not change the decision buys nothing.
 
 ### Two reads, deliberately different
 
