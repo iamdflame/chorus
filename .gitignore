@@ -6,3 +6,7 @@ node_modules/
 dist/
 .env
 *.log
+
+# Accidentally extracted here once by a malformed shell command.
+gcloud auth login/
+google-cloud-sdk/
