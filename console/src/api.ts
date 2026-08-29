@@ -146,6 +146,22 @@ async function readEvents(
   }
 }
 
+/** Stream a swarm run: one event per cohort as it resolves, distinguishing cohorts that
+ *  reached the model from those served by the store. */
+export async function streamSwarm(
+  body: { agents?: number; concurrency?: number },
+  onEvent: (event: Record<string, any>) => void,
+  signal?: AbortSignal,
+): Promise<void> {
+  const res = await fetch("/api/swarm", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(body),
+    signal,
+  });
+  await readEvents(res, onEvent);
+}
+
 /** Stream a policy search: candidates fork, replay against real history, and settle
  *  onto a cost frontier one at a time. */
 export async function streamSearch(

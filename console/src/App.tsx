@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { api, streamReplay, streamSearch, type Branch, type Diff, type Graph, type GraphNode, type Lightcone } from "./api";
+import { api, streamReplay, streamSearch, streamSwarm, type Branch, type Diff, type Graph, type GraphNode, type Lightcone } from "./api";
 import { Worldline } from "./gl/worldline";
 import { SearchView, type SearchCandidate } from "./ui/SearchView";
+import { Murmuration, type Cohort } from "./gl/murmuration";
 
 const CEILING_CLAUSE = "POL-REFUND-CEILING";
 const TIGHTENED =
@@ -30,7 +31,10 @@ export function App() {
   const [log, setLog] = useState("");
   const [busy, setBusy] = useState(false);
 
-  const [mode, setMode] = useState<"worldline" | "search">("worldline");
+  const [mode, setMode] = useState<"swarm" | "worldline" | "search">("swarm");
+  const swarmRef = useRef<HTMLDivElement>(null);
+  const murmurRef = useRef<Murmuration | null>(null);
+  const [swarmStats, setSwarmStats] = useState<Record<string, number> | null>(null);
   const [searchBaseline, setSearchBaseline] = useState<SearchCandidate | null>(null);
   const [searchCandidates, setSearchCandidates] = useState<SearchCandidate[]>([]);
   const [searchWinner, setSearchWinner] = useState<SearchCandidate | null>(null);
@@ -47,6 +51,15 @@ export function App() {
     // Single teardown path; Worldline.destroy is idempotent and handles the case where
     // mount() is still awaiting init().
     return () => { world.destroy(); worldRef.current = null; };
+  }, []);
+
+  useEffect(() => {
+    const murmur = new Murmuration();
+    murmurRef.current = murmur;
+    void (async () => {
+      if (swarmRef.current) await murmur.mount(swarmRef.current);
+    })();
+    return () => { murmur.destroy(); murmurRef.current = null; };
   }, []);
 
   const loadBranches = useCallback(async () => {
@@ -135,6 +148,41 @@ export function App() {
       ? (selected.seq - Math.min(...seqs)) / Math.max(Math.max(...seqs) - Math.min(...seqs), 1) > 0.55
       : false;
 
+  async function runSwarm(agents: number) {
+    setBusy(true);
+    setMode("swarm");
+    setSwarmStats(null);
+    murmurRef.current?.reset();
+    setLog(`waking ${agents.toLocaleString()} agents…`);
+    try {
+      await streamSwarm({ agents, concurrency: 6 }, (event) => {
+        if (event.event === "swarm_start") {
+          murmurRef.current?.setCohorts(event.cohorts as Cohort[]);
+          setLog(
+            `${event.agents.toLocaleString()} agents · ${event.cohorts.length} distinct situations · ` +
+            `${event.scenario.souls_on_board.toLocaleString()} souls for ${event.scenario.seats_available.toLocaleString()} seats`,
+          );
+        } else if (event.event === "progress") {
+          setSwarmStats(event as Record<string, number>);
+          setLog(
+            `${event.done.toLocaleString()}/${event.total.toLocaleString()} agents · ` +
+            `${event.model_calls} thoughts · ${event.cache_hits.toLocaleString()} shared · ` +
+            `${usd(event.cost_usd)}`,
+          );
+        } else if (event.event === "swarm_done") {
+          setSwarmStats(event.metrics as Record<string, number>);
+          const m = event.metrics;
+          setLog(
+            `${m.agents_invoked.toLocaleString()} agents reasoned for ${usd(m.cost_usd)} — ` +
+            `${m.collapse}x fewer thoughts than agents (naive: ${usd(m.naive_cost_usd)})`,
+          );
+        }
+      });
+    } catch (e) {
+      setLog(`swarm: ${(e as Error).message}`);
+    } finally { setBusy(false); }
+  }
+
   async function runSearch() {
     setBusy(true);
     setMode("search");
@@ -209,11 +257,16 @@ export function App() {
           ))}
         </nav>
         <div className="mode-rail">
+          <button className="branch-chip" data-active={mode === "swarm"}
+                  onClick={() => setMode("swarm")}>swarm</button>
           <button className="branch-chip" data-active={mode === "worldline"}
                   onClick={() => setMode("worldline")}>worldline</button>
           <button className="branch-chip" data-active={mode === "search"}
                   onClick={() => setMode("search")}>search</button>
         </div>
+        <button className="action" onClick={() => runSwarm(20000)} disabled={busy}>
+          wake 20,000
+        </button>
         <button className="action" onClick={forkAndTighten} disabled={busy}>
           fork
         </button>
@@ -225,7 +278,8 @@ export function App() {
         </button>
       </header>
 
-      <main className="stage" ref={stageRef}>
+      <div className="swarm-stage" ref={swarmRef} data-visible={mode === "swarm"} />
+      <main className="stage" ref={stageRef} data-visible={mode !== "swarm"}>
         {mode === "search" && (
           <SearchView
             baseline={searchBaseline}
@@ -278,6 +332,27 @@ export function App() {
 
       <footer className="footer">
         <div className="readout">
+          {mode === "swarm" && swarmStats ? (
+            <>
+              <div className="metric">
+                <span className="metric-label">agents</span>
+                <span className="metric-value">{(swarmStats.agents_invoked ?? 0).toLocaleString()}</span>
+              </div>
+              <div className="metric">
+                <span className="metric-label">thoughts</span>
+                <span className="metric-value" data-tone="accent">{swarmStats.model_calls ?? 0}</span>
+              </div>
+              <div className="metric">
+                <span className="metric-label">cost</span>
+                <span className="metric-value">{usd(swarmStats.cost_usd ?? 0)}</span>
+              </div>
+              <div className="metric">
+                <span className="metric-label">collapse</span>
+                <span className="metric-value" data-tone="accent">{swarmStats.collapse ?? 0}x</span>
+              </div>
+            </>
+          ) : (
+          <>
           <div className="metric">
             <span className="metric-label">effects</span>
             <span className="metric-value">{stats.effects ?? 0}</span>
@@ -286,6 +361,8 @@ export function App() {
             <span className="metric-label">reused</span>
             <span className="metric-value" data-tone="accent">{stats.replayed ?? 0}</span>
           </div>
+          </>
+          )}
           {searchWinner?.outcome && searchBaseline?.outcome && (
             <div className="metric">
               <span className="metric-label">found</span>

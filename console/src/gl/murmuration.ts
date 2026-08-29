@@ -10,7 +10,7 @@
  *  per-cohort by construction, so 192 containers with static geometry beat a particle
  *  system that has to touch every point every frame — which matters on modest hardware. */
 
-import { Application, Container, Graphics, Text, TextStyle } from "pixi.js";
+import { Application, Container, Graphics } from "pixi.js";
 import { gsap } from "gsap";
 
 const C = {

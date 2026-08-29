@@ -216,3 +216,12 @@ html, body, #root {
 }
 
 .mode-rail { display: flex; gap: 2px; }
+
+/* -- swarm stage ---------------------------------------------------------- */
+
+/* Both stages stay mounted; each owns a WebGL context that is expensive to recreate,
+   so switching modes toggles visibility rather than tearing a renderer down. */
+.swarm-stage, .stage { position: relative; flex: 1 1 auto; min-height: 0; }
+.swarm-stage[data-visible="false"], .stage[data-visible="false"] {
+  display: none;
+}

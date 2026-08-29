@@ -1,1 +1,1 @@
-{"root":["./src/App.tsx","./src/api.ts","./src/main.tsx","./src/gl/layout.ts","./src/gl/worldline.ts","./src/ui/SearchView.tsx"],"version":"5.9.3"}
+{"root":["./src/App.tsx","./src/api.ts","./src/main.tsx","./src/gl/layout.ts","./src/gl/murmuration.ts","./src/gl/worldline.ts","./src/ui/SearchView.tsx"],"version":"5.9.3"}

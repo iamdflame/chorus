@@ -355,6 +355,73 @@ class Engine:
         )
         return {"adopted": True, "clause": updated}
 
+    async def run_swarm(
+        self, *, agents: int = 2000, concurrency: int = 6
+    ) -> AsyncIterator[dict[str, Any]]:
+        """Run the swarm, streaming one event per cohort as it resolves.
+
+        Distinguishes a cohort that reached the model from one served by the store,
+        because that difference is the entire claim and the console draws them apart.
+        """
+        from dataclasses import asdict
+
+        from swarm.canonical import collapse, project_passenger
+        from swarm.runtime import Swarm
+        from swarm.scenario import build_scenario
+
+        async with self._lock:
+            scenario = build_scenario(passengers=agents)
+            passengers = [asdict(p) for p in scenario.passengers]
+            cohorts = collapse(passengers, project_passenger)
+            summary = scenario.summary()
+
+            yield {
+                "event": "swarm_start",
+                "agents": len(passengers),
+                "cohorts": [
+                    {"key": key, "size": len(members),
+                     "label": key.split("|", 1)[1] if "|" in key else key}
+                    for key, members in sorted(
+                        cohorts.items(), key=lambda kv: len(kv[1]), reverse=True
+                    )
+                ],
+                "scenario": summary,
+            }
+
+            context = (
+                f"Hub closed by severe weather. {summary['souls_on_board']:,} travellers "
+                f"need to move. {summary['seats_available']:,} seats exist on the next "
+                f"departures. Seats are scarce."
+            )
+            swarm = Swarm(store=self.store, branch_id=PRIMARY,
+                          mode=Mode.REPLAY, concurrency=concurrency)
+            seen: set[str] = set()
+            resolved: set[str] = set()
+
+            queue: asyncio.Queue = asyncio.Queue()
+
+            def progress(done: int, total: int, metrics) -> None:
+                queue.put_nowait({
+                    "event": "progress", "done": done, "total": total,
+                    **metrics.to_dict(),
+                })
+
+            task = asyncio.create_task(
+                swarm.run(entities=passengers, projector=project_passenger,
+                          role="passenger", context=context,
+                          round_id=f"irrops-{agents}", on_progress=progress)
+            )
+            while not task.done() or not queue.empty():
+                try:
+                    event = await asyncio.wait_for(queue.get(), timeout=0.4)
+                except asyncio.TimeoutError:
+                    continue
+                yield event
+
+            preferences, metrics = await task
+            yield {"event": "swarm_done", "metrics": metrics.to_dict(),
+                   "preferences": len(preferences)}
+
     def snapshot(self, path: str | Path) -> dict[str, Any]:
         save(path, store=self.store, world=self.world)
         from kernel.snapshot import describe

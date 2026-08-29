@@ -74,6 +74,11 @@ class SearchRequest(BaseModel):
     concurrency: int = 3
 
 
+class SwarmRequest(BaseModel):
+    agents: int = 2000
+    concurrency: int = 6
+
+
 class AdoptRequest(BaseModel):
     clause_id: str
     text: str
@@ -254,6 +259,29 @@ def adopt(request: AdoptRequest) -> dict[str, Any]:
         return engine.adopt(clause_id=request.clause_id, text=request.text)
     except KeyError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
+# -- swarm --------------------------------------------------------------------
+
+@app.post("/api/swarm")
+async def swarm(request: SwarmRequest) -> StreamingResponse:
+    """Run the swarm, streaming progress.
+
+    A recorded swarm replays from the store with no model calls at all, so re-running
+    one is instant and free — which is what makes twenty thousand agents watchable in a
+    demo rather than a twenty-minute wait.
+    """
+    async def stream():
+        async for event in engine.run_swarm(
+            agents=request.agents, concurrency=request.concurrency
+        ):
+            yield f"data: {json.dumps(event)}\n\n"
+
+    return StreamingResponse(
+        stream(),
+        media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+    )
 
 
 # -- console ------------------------------------------------------------------

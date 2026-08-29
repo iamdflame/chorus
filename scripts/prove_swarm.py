@@ -94,6 +94,10 @@ async def main(count: int, concurrency: int) -> int:
     print(f"  {'preferences produced':<30}{len(preferences):>12,}")
     print("  " + "=" * 70)
 
+    from kernel.snapshot import save
+    save(os.path.join(ROOT, "data/swarm.json"), store=store, world=world)
+    print(f"  {'snapshot':<30}{'data/swarm.json':>12}")
+
     failures = []
     if m["model_calls"] >= m["agents_invoked"]:
         failures.append("no collapse: every agent reached the model")

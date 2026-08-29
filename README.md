@@ -1,60 +1,72 @@
-# Lightcone
+# Chorus
 
-**Your agent fleet rewrites itself, and proves the rewrite was better — by re-running your
-actual history, not a benchmark.**
+**Twenty thousand agents. Two hundred thoughts.**
 
-Point Lightcone at what your agents really did last month. It searches the space of
-policies they *could* have followed, executes each candidate with the real fleet against
-the real disputes, and hands you the version that would have cost you least — with the
-counterfactual as evidence. Then you adopt it into production.
+Reasoning now costs less than a database query, so every entity in a system can have its
+own permanent agent — one per passenger, per machine, per account, running for weeks and
+negotiating with the others. Nobody builds that, because twenty thousand agents means
+twenty thousand model calls.
 
-Nobody optimises agents against production history today, and the reason is not cost. It
-is catastrophe: re-running a live fleet a thousand times would send a thousand real
-emails and issue a thousand real refunds. Lightcone makes the experiment ordinary.
+Unless identical reasoning is computed once.
+
+Chorus gives each entity a real, independent agent, and discovers that most of them are
+thinking the same thought. Measured on a live scenario:
+
+| agents | distinct thoughts | collapse |
+|---|---|---|
+| 500 | 128 | 3.9x |
+| 8,000 | 187 | 42.8x |
+| 20,000 | **192** | **104x** |
+
+Thought count **saturates** while agent count grows without bound. Adding twelve thousand
+agents costs five more thoughts. **The cost of a swarm is bounded by the diversity of its
+situations, not by its size** — which is what makes per-entity agents economically
+possible for the first time.
 
 ---
 
-## The three properties that make it possible
+## How it works
 
-Each is verified by a test in this repository, not asserted.
+An agent reasons over a **canonical projection** of itself — the decision-relevant
+features only, bucketed, never its identity. Two stranded platinum passengers, both
+travelling alone, both needing to move within four hours, both with a checked bag, face
+the same decision. Their names differ. Their reasoning does not.
 
-**1. Execution is deterministic and replayable.** Every crossing of the agent/world
-boundary — model call, tool call, delegation — is content-addressed by its *entire causal
-history*:
+Because the kernel addresses every model call by its full causal history:
 
 ```
-address = H(kind, agent, [parent addresses], request)
+address = H(kind, role, [causal parents], canonical request)
 ```
 
-Because a parent's address is itself a hash of its own history, a change anywhere upstream
-changes every address downstream. Cache invalidation is free: a perturbed run misses the
-store exactly where it genuinely diverges and hits everywhere else. This is the
-content-addressed derivation trick Nix and Bazel use for builds, applied to agent
-execution.
+two agents whose situations are genuinely equivalent compute the **same address**, and the
+second is served from the store instead of the model.
 
-> Measured on the real six-agent fleet: replay reproduced **82 of 82** boundary crossings,
-> reached the model **0 times**, cost **$0.0000**, and reproduced the causal root hash
-> exactly.
+**Nothing in the runtime groups agents.** Each is invoked independently, with its own ADK
+session, unaware the others exist. The sharing is *discovered* by collision in a
+content-addressed store — not assumed by a `GROUP BY`. That distinction is the whole
+point: hand-grouping would make the same number of API calls and prove nothing, and it
+would break the moment two situations were equivalent in a way nobody anticipated.
 
-**2. Forking is O(1).** A branch is a reference, not a copy — `(parent, fork_at_seq,
-overlay)`. Forking a timeline writes one small record and copies nothing, so exploring
-thousands of alternatives is tractable.
+The split that keeps it sound:
 
-> Measured: a fork of a 99-effect timeline stores **0** effects.
+| | | |
+|---|---|---|
+| **reasoning** | shared | what would someone in this situation accept |
+| **matching** | private | which specific seat this specific passenger gets |
 
-**3. Irreversible actions are quarantined.** Tools are classified by what they do to the
-world. Reversible ones re-execute against branch-isolated state; ones with no honest
-compensator — sending mail, moving money, paging a human — are *staged*: never dispatched,
-but recorded with the exact arguments the agent chose. The agent's reasoning is unchanged,
-so the counterfactual stays faithful; the blast radius stops at the process boundary.
+Matching depends on identity and live inventory, so it is individual by nature and never
+reaches a model at all — it is deterministic allocation over the shared preferences,
+scored against the first-come-first-served fallback airlines actually use.
 
-> Measured: a counterfactual staged **6** irreversible actions and issued **0** real
-> refunds while production issued 4 totalling $314.30.
+---
 
-An unregistered tool defaults to *irreversible*, so a forgotten classification produces a
-visibly staged action rather than an unintended side effect. This caught a real bug during
-development: ADK's built-in `transfer_to_agent` was unclassified and got quarantined,
-severing delegation on every branch.
+## The scenario
+
+A hub closure at ORD, with deliberate scarcity: **20,367 souls, 2,888 seats, a deficit of
+17,479.** An allocation problem where everyone fits is not an allocation problem. Everyone
+has been stranded at an airport, so the stakes need no explanation — and irregular
+operations is a genuinely unsolved combinatorial problem airlines lose hundreds of
+millions a year to.
 
 ---
 
