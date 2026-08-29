@@ -2,6 +2,8 @@
 
 **Twenty thousand agents. Two hundred thoughts.**
 
+**Live:** https://chorus-512017284899.us-central1.run.app
+
 Reasoning now costs less than a database query, so every entity in a system can have its
 own permanent agent — one per passenger, per machine, per account, running for weeks and
 negotiating with the others. Nobody builds that, because twenty thousand agents means
@@ -146,6 +148,28 @@ causal root hash.
 the policy decision that moves money gets `high`, record lookups get `low`. Per-agent
 context caching is enabled because every delegation swaps the system instruction and
 re-sends the prompt uncached, which was most of the bill.
+
+---
+
+## Deployed
+
+Running on Cloud Run at
+[chorus-512017284899.us-central1.run.app](https://chorus-512017284899.us-central1.run.app),
+with Gemini 3.5 Flash through Vertex AI and the timeline in Firestore. The container
+authenticates as the service account it runs as, so no key is baked into the image.
+
+```bash
+./infra/deploy.sh YOUR_PROJECT_ID us-central1
+```
+
+The script enables the services, creates the Firestore database, grants the runtime
+service account `aiplatform.user` and `datastore.user`, builds the container and then
+smoke-tests the deployment — that the console bundle is really in the image, and that a
+real swarm completes through Vertex. `/health` alone proves only that the process booted;
+a missing `COPY` still serves a healthy process that fails on the first real request.
+
+Verified on the live deployment: 300 agents, 122 model calls, 178 served from the store,
+300 preferences produced, 0 errors.
 
 ---
 
