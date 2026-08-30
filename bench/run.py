@@ -30,7 +30,7 @@ from bench.baselines import (
     b0_random,
     b1_first_come,
     b2_rules,
-    b3_greedy_upper_bound,
+    b3_value_packing,
     rule_preferences,
 )
 from bench.metrics import Panel, score, table
@@ -97,8 +97,8 @@ def main(count: int, preferences_path: str | None) -> int:
                         assignments=b1_first_come(passengers, flights)))
     panels.append(score(strategy="B2  rules, zero LLM", passengers=passengers, flights=flights,
                         assignments=b2_rules(passengers, flights)))
-    panels.append(score(strategy="B3  greedy upper bound", passengers=passengers, flights=flights,
-                        assignments=b3_greedy_upper_bound(
+    panels.append(score(strategy="B3  value packing", passengers=passengers, flights=flights,
+                        assignments=b3_value_packing(
                             passengers, flights, preferences=rules)))
 
     note = None
@@ -125,10 +125,19 @@ def main(count: int, preferences_path: str | None) -> int:
             continue
         dw = panel.satisfaction_tier_weighted / b1.satisfaction_tier_weighted - 1
         db = panel.satisfaction_tier_blind / b1.satisfaction_tier_blind - 1
-        verdict = ("redistributes toward weighted tiers"
-                   if dw > 0 and db <= 0 else
-                   "better on both" if dw > 0 and db > 0 else "worse")
-        print(f"  {panel.strategy:<26} tier-weighted {dw:+7.1%}   tier-blind {db:+7.1%}   {verdict}")
+        ds = panel.satisfaction_per_soul / b1.satisfaction_per_soul - 1
+        # An arm that leads both per-booking scores while losing on souls is not winning,
+        # it is seating solo travellers. Naming that is the whole reason the third column
+        # exists, and it is why B3 stopped being called an upper bound.
+        verdict = (
+            "leads per booking, loses per soul — seats solos"
+            if dw > 0 and ds < 0 else
+            "redistributes toward weighted tiers" if dw > 0 and db <= 0 else
+            "better on all three" if dw > 0 and db > 0 and ds > 0 else "worse"
+        )
+        print(f"  {panel.strategy:<26} tier-weighted {dw:+7.1%}   tier-blind {db:+7.1%}"
+              f"   per-soul {ds:+7.1%}")
+        print(f"  {'':<26} {verdict}")
 
     if note:
         print(f"\n  B4 not scored: {note}")

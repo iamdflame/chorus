@@ -131,8 +131,18 @@ def b2_rules(passengers, flights, **_) -> Assignments:
 
 # -- B3 ------------------------------------------------------------------------
 
-def b3_greedy_upper_bound(passengers, flights, *, preferences, **_) -> Assignments:
-    """Best achievable by this allocator given these preferences.
+def b3_value_packing(passengers, flights, *, preferences, **_) -> Assignments:
+    """Value per seat consumed — a packing heuristic, not an upper bound.
+
+    It was called an upper bound and that was wrong. Ordering by score-per-seat
+    systematically prefers solo travellers: it seats 1,718 bookings at a mean party size
+    of 1.50 where urgency-ordering seats 1,050 at 2.50. Because satisfaction is summed
+    once per booking, that scores far higher while moving *fewer people home* — 2,585
+    souls against 2,629.
+
+    So its lead is a property of the metric, not of the strategy, which is why
+    `satisfaction_per_soul` is now reported beside the other two. Kept as an arm because
+    an exploit of the scoring function is worth showing rather than deleting.
 
     Value-ordered greedy, not a proven optimum. Called an upper *bound* rather than the
     optimum because seats are integral and parties are indivisible, so greedy can be beaten
@@ -204,5 +214,5 @@ ARMS: dict[str, tuple[str, Callable[..., Assignments]]] = {
     "B0": ("random", b0_random),
     "B1": ("first-come", b1_first_come),
     "B2": ("rules, zero LLM", b2_rules),
-    "B3": ("greedy upper bound", b3_greedy_upper_bound),
+    "B3": ("value packing (see note)", b3_value_packing),
 }

@@ -265,6 +265,31 @@ load-bearing fields collapses beautifully and answers the wrong question.**
 
 ---
 
+### The arm that was beating everything was exploiting the scorer
+
+`B3` was called a *greedy upper bound* — the best this allocator could do given these
+preferences — and it led every other arm on both satisfaction metrics. That label was wrong
+and the lead was not real.
+
+Ordering by value-per-seat systematically prefers solo travellers: 1,718 bookings at a mean
+party size of **1.50**, where urgency-ordering seats 1,050 at **2.50**. Satisfaction was
+summed once per *booking* while seats are consumed per *soul*, so a party of six scored the
+same as one person occupying one seat. B3 was not reasoning better; it was seating the
+cheapest bookings.
+
+| arm | sat·tier | sat·blind | **sat·soul** |
+| --- | ---: | ---: | ---: |
+| B1 first-come | 3,875.7 | 2,038.7 | 9,660.0 |
+| B2 rules, zero LLM | 4,509.5 | 1,554.3 | **11,156.7** |
+| B3 value packing | **5,497.8** | **2,634.5** | 7,156.8 |
+
+Counting by soul reverses it: B3 leads both per-booking columns by 29–42% and comes in
+**25.9% below first-come** on people actually moved home, while moving fewer souls in
+absolute terms (2,585 against 2,629). The arm is kept rather than deleted, because an
+exploit of your own scoring function is worth showing.
+
+---
+
 ## What collapse costs
 
 Every number above measures what collapse saves. This measures what it loses, which is the

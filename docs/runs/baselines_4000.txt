@@ -1,0 +1,24 @@
+
+  4,000 travellers · 10,086 souls · 2,888 seats · 1287 cohorts
+  scenario fingerprint bc76ad0eb2a809c9
+
+strategy                     souls bookings  sat·tier  sat·blind  sat·soul  mean wait    p95    gini  calls      cost
+---------------------------------------------------------------------------------------------------------------------
+B0  random                   2,888    1,134   2,677.2    1,374.9   6,755.8      17.39  31.60   0.292      0   $0.0000
+B1  first-come               2,888    1,148   3,875.7    2,038.7   9,660.0      17.63  31.60   0.285      0   $0.0000
+B2  rules, zero LLM          2,629    1,050   4,509.5    1,554.3  11,156.7      16.14  29.50   0.297      0   $0.0000
+B3  value packing            2,585    1,718   5,497.8    2,634.5   7,156.8      13.86  26.00   0.332      0   $0.0000
+
+  Seat supply is the binding constraint: every arm that fills the aircraft seats
+  the same souls. What changes is WHICH travellers move, so tier-blind is printed
+  beside tier-weighted and the trade-off is visible rather than buried.
+
+  B0  random                 tier-weighted  -30.9%   tier-blind  -32.6%   per-soul  -30.1%
+                             worse
+  B2  rules, zero LLM        tier-weighted  +16.4%   tier-blind  -23.8%   per-soul  +15.5%
+                             redistributes toward weighted tiers
+  B3  value packing          tier-weighted  +41.9%   tier-blind  +29.2%   per-soul  -25.9%
+                             leads per booking, loses per soul — seats solos
+
+  B4 not scored: data/preferences.json was recorded against scenario 7db0102d8477c99c, this is bc76ad0eb2a809c9 — refusing to score stale preferences
+

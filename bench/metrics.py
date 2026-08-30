@@ -69,6 +69,14 @@ class Panel:
     # the same population. Never compare these across populations of different sizes.
     satisfaction_tier_weighted: float = 0.0
     satisfaction_tier_blind: float = 0.0
+    # Satisfaction counted per *soul* rather than per booking.
+    #
+    # The other two sum once per booking, which quietly rewards seating solo travellers:
+    # a party of six occupies six seats and scores the same as one person in one seat. An
+    # arm that orders by value-per-seat exploits exactly that gap — it seated 1,718
+    # bookings against 1,050, scored far higher, and moved *fewer people home*. Counting
+    # by soul closes it, and both are printed so the difference stays visible.
+    satisfaction_per_soul: float = 0.0
     mean_wait: float = 0.0
     p95_wait: float = 0.0
     worst_wait: float = 0.0
@@ -105,6 +113,7 @@ def score(
 
     waits: list[float] = []
     weighted = 0.0
+    per_soul = 0.0
     blind = 0.0
     souls_seated = 0
     violations = 0
@@ -123,8 +132,10 @@ def score(
         # to move. Deliberately not a function of anything a strategy controls directly.
         urgency = _urgency_value(passenger)
         base = urgency * max(0.0, 1.0 - wait / 36.0)
-        weighted += base * TIER_WEIGHT.get(passenger.get("tier", "basic"), 1.0)
+        tier_weight = TIER_WEIGHT.get(passenger.get("tier", "basic"), 1.0)
+        weighted += base * tier_weight
         blind += base
+        per_soul += base * tier_weight * int(passenger.get("party_size", 1))
 
         if passenger.get("needs_assistance") and flight.get("aircraft_type") in (None, ""):
             violations += 1
@@ -142,6 +153,7 @@ def score(
         souls_stranded=sum(int(p.get("party_size", 1)) for p in stranded),
         satisfaction_tier_weighted=round(weighted, 1),
         satisfaction_tier_blind=round(blind, 1),
+        satisfaction_per_soul=round(per_soul, 1),
         mean_wait=round(mean(waits), 2) if waits else 0.0,
         p95_wait=percentile(waits, 0.95),
         worst_wait=round(max(waits), 2) if waits else 0.0,
@@ -182,6 +194,7 @@ def table(panels: list[Panel]) -> str:
         ("bookings", lambda p: p.bookings_seated, "{:>9,}"),
         ("sat·tier", lambda p: p.satisfaction_tier_weighted, "{:>10,.1f}"),
         ("sat·blind", lambda p: p.satisfaction_tier_blind, "{:>11,.1f}"),
+        ("sat·soul", lambda p: p.satisfaction_per_soul, "{:>10,.1f}"),
         ("mean wait", lambda p: p.mean_wait, "{:>11.2f}"),
         ("p95", lambda p: p.p95_wait, "{:>7.2f}"),
         ("gini", lambda p: p.gini_wait, "{:>8.3f}"),
