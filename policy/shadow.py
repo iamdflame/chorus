@@ -72,13 +72,40 @@ class ShadowReport:
     events: list[DriftEvent] = field(default_factory=list)
 
     @property
-    def drift_rate(self) -> float:
-        """Share of sampled rows the model no longer agrees with.
+    def answered(self) -> int:
+        """Samples that produced an answer. Failures are not evidence either way."""
+        return self.sampled - self.failed
 
-        nan when nothing was sampled. A drift rate of 0.0 from zero samples is the most
+    @property
+    def drift_rate(self) -> float:
+        """Share of *answered* samples the model no longer agrees with.
+
+        Failed samples are excluded from the denominator rather than counted as
+        agreement, which would let a rate-limited run report a reassuringly low drift
+        rate simply for having asked less.
+
+        nan when nothing was answered. A drift rate of 0.0 from zero samples is the most
         reassuring number this system could print and the least true, so it is not printed.
         """
-        return self.drifted / self.sampled if self.sampled else float("nan")
+        return self.drifted / self.answered if self.answered else float("nan")
+
+    def interval(self, confidence: float = 0.95) -> tuple[float, float]:
+        """Wilson score interval on the drift rate.
+
+        Twenty-seven samples do not measure a percentage to two decimal places, and
+        printing one as though they did is the kind of false precision this project
+        exists to avoid. The interval is reported beside every rate derived from a small
+        sample so nobody has to guess how much of it is noise.
+        """
+        n = self.answered
+        if not n:
+            return (float("nan"), float("nan"))
+        z = 1.959963985 if confidence >= 0.95 else 1.6448536269
+        phat = self.drifted / n
+        denom = 1 + z * z / n
+        centre = (phat + z * z / (2 * n)) / denom
+        spread = z * ((phat * (1 - phat) / n + z * z / (4 * n * n)) ** 0.5) / denom
+        return (max(0.0, centre - spread), min(1.0, centre + spread))
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -87,7 +114,9 @@ class ShadowReport:
             "drifted": self.drifted,
             "failed": self.failed,
             "cost_usd": round(self.cost_usd, 4),
+            "answered": self.answered,
             "drift_rate": self.drift_rate,
+            "drift_interval_95": list(self.interval()),
             "events": [e.to_dict() for e in self.events],
         }
 

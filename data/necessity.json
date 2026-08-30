@@ -1,22 +1,46 @@
 {
   "ledger": {
-    "period": "derive 60 \u2192 serve 2,000",
-    "policy_version": "3ac62a909b02",
-    "decisions": 2000,
-    "served_from_table": 205,
-    "served_from_model": 1795,
-    "table_share": 0.1025,
-    "necessity": 0.25,
-    "cost_usd": 0.0585,
-    "projected_naive_cost_usd": 0.07,
+    "period": "derive 4,000 \u2192 serve 20,000",
+    "policy_version": "f871b6de40d4",
+    "decisions": 20000,
+    "served_from_table": 17684,
+    "served_from_model": 2316,
+    "model_calls_made": 1271,
+    "cost_per_call_usd": 0.000912,
+    "table_share": 0.8842,
+    "necessity": 0.2962962962962963,
+    "cost_usd": 1.1841,
+    "projected_naive_cost_usd": 18.24,
     "shadow": {
-      "sampled": 4,
-      "confirmed": 3,
-      "drifted": 1,
-      "failed": 0,
-      "cost_usd": 0.0037,
-      "drift_rate": 0.25,
+      "sampled": 27,
+      "confirmed": 17,
+      "drifted": 8,
+      "failed": 2,
+      "cost_usd": 0.0228,
+      "drift_rate": 0.2962962962962963,
       "events": [
+        {
+          "key": "v2|passenger|basic|flexible|group|checked_bags|intercontinental|hotel|misconnect",
+          "fields": [
+            "max_wait_hours"
+          ],
+          "was": {
+            "max_wait_hours": 36,
+            "accept_downgrade": false,
+            "accept_split_party": false,
+            "accept_nearby_airport": false,
+            "needs_hotel": true,
+            "urgency_score": 25
+          },
+          "now": {
+            "max_wait_hours": 48,
+            "accept_downgrade": false,
+            "accept_split_party": false,
+            "accept_nearby_airport": false,
+            "needs_hotel": true,
+            "urgency_score": 25
+          }
+        },
         {
           "key": "v2|passenger|basic|same_day|solo|checked_bags|short|hotel|misconnect",
           "fields": [
@@ -38,16 +62,150 @@
             "needs_hotel": true,
             "urgency_score": 85
           }
+        },
+        {
+          "key": "v2|passenger|basic|urgent|family|assisted|intercontinental|nohotel|misconnect",
+          "fields": [
+            "accept_nearby_airport",
+            "max_wait_hours"
+          ],
+          "was": {
+            "max_wait_hours": 18,
+            "accept_downgrade": true,
+            "accept_split_party": false,
+            "accept_nearby_airport": true,
+            "needs_hotel": true,
+            "urgency_score": 85
+          },
+          "now": {
+            "max_wait_hours": 12,
+            "accept_downgrade": true,
+            "accept_split_party": false,
+            "accept_nearby_airport": false,
+            "needs_hotel": true,
+            "urgency_score": 85
+          }
+        },
+        {
+          "key": "v2|passenger|basic|urgent|group|checked_bags|short|hotel|misconnect",
+          "fields": [
+            "accept_split_party"
+          ],
+          "was": {
+            "max_wait_hours": 12,
+            "accept_downgrade": true,
+            "accept_split_party": true,
+            "accept_nearby_airport": true,
+            "needs_hotel": true,
+            "urgency_score": 85
+          },
+          "now": {
+            "max_wait_hours": 12,
+            "accept_downgrade": true,
+            "accept_split_party": false,
+            "accept_nearby_airport": true,
+            "needs_hotel": true,
+            "urgency_score": 85
+          }
+        },
+        {
+          "key": "v2|passenger|gold|same_day|family|checked_bags|long|hotel|misconnect",
+          "fields": [
+            "accept_nearby_airport"
+          ],
+          "was": {
+            "max_wait_hours": 12,
+            "accept_downgrade": false,
+            "accept_split_party": false,
+            "accept_nearby_airport": false,
+            "needs_hotel": true,
+            "urgency_score": 85
+          },
+          "now": {
+            "max_wait_hours": 12,
+            "accept_downgrade": false,
+            "accept_split_party": false,
+            "accept_nearby_airport": true,
+            "needs_hotel": true,
+            "urgency_score": 85
+          }
+        },
+        {
+          "key": "v2|passenger|gold|same_day|solo|checked_bags|intercontinental|hotel|origin",
+          "fields": [
+            "accept_split_party"
+          ],
+          "was": {
+            "max_wait_hours": 12,
+            "accept_downgrade": true,
+            "accept_split_party": true,
+            "accept_nearby_airport": true,
+            "needs_hotel": true,
+            "urgency_score": 85
+          },
+          "now": {
+            "max_wait_hours": 12,
+            "accept_downgrade": true,
+            "accept_split_party": false,
+            "accept_nearby_airport": true,
+            "needs_hotel": true,
+            "urgency_score": 90
+          }
+        },
+        {
+          "key": "v2|passenger|silver|flexible|family|checked_bags|short|hotel|origin",
+          "fields": [
+            "accept_nearby_airport",
+            "max_wait_hours"
+          ],
+          "was": {
+            "max_wait_hours": 36,
+            "accept_downgrade": false,
+            "accept_split_party": false,
+            "accept_nearby_airport": false,
+            "needs_hotel": true,
+            "urgency_score": 25
+          },
+          "now": {
+            "max_wait_hours": 24,
+            "accept_downgrade": false,
+            "accept_split_party": false,
+            "accept_nearby_airport": true,
+            "needs_hotel": true,
+            "urgency_score": 30
+          }
+        },
+        {
+          "key": "v2|passenger|silver|flexible|group|unencumbered|intercontinental|hotel|misconnect",
+          "fields": [
+            "accept_downgrade"
+          ],
+          "was": {
+            "max_wait_hours": 36,
+            "accept_downgrade": false,
+            "accept_split_party": false,
+            "accept_nearby_airport": true,
+            "needs_hotel": true,
+            "urgency_score": 30
+          },
+          "now": {
+            "max_wait_hours": 36,
+            "accept_downgrade": true,
+            "accept_split_party": false,
+            "accept_nearby_airport": true,
+            "needs_hotel": true,
+            "urgency_score": 30
+          }
         }
       ]
     }
   },
   "policy": {
-    "version": "3ac62a909b02",
+    "version": "f871b6de40d4",
     "schema_version": "v2",
     "ceiling": 2304,
-    "populated": 58,
-    "occupancy": 0.0252
+    "populated": 1263,
+    "occupancy": 0.5482
   },
-  "unseen_situations": 883
+  "unseen_situations": 694
 }

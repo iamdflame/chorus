@@ -46,7 +46,8 @@ from kernel.clock import FIXED
 from kernel.interposer import Mode
 from kernel.store import InMemoryEffectStore
 from policy.ledger import NecessityLedger
-from policy.shadow import shadow_sample
+from policy.compare import agrees
+from policy.shadow import sampled, shadow_sample
 from policy.table import distill
 from swarm.canonical import bind, project_passenger
 from swarm.runtime import MODEL, Swarm
@@ -146,6 +147,33 @@ async def main(derive: int, serve: int, rate: float, concurrency: int) -> int:
         table, sorted(table.rows), ask=ask, rate=rate, salt="chorus",
     )
     print()
+
+    # -- [4b] the noise floor --------------------------------------------------
+    # A disagreement between the table and a fresh call is only evidence of drift if the
+    # model agrees with *itself*. Temperature is 0, but batched serving is not bitwise
+    # deterministic, so some fraction of "drift" is the model differing from its own
+    # previous answer for no reason at all. Asking the same question twice measures that
+    # fraction, and necessity is only the part above it.
+    #
+    # Without this the ledger reports the model's own variance as evidence that the model
+    # is needed, which would be the most flattering possible way to be wrong.
+    print(f"\n  [4b] noise floor — asking the same questions twice\n")
+    sampled_keys = [k for k in sorted(table.rows) if sampled(k, rate=rate, salt="chorus")]
+    noise_seen = noise_diff = noise_failed = 0
+    noise_cost = 0.0
+    for i, key in enumerate(sampled_keys, 1):
+        first, cost_a = await ask(key)
+        second, cost_b = await ask(key)
+        noise_cost += cost_a + cost_b
+        print(f"\r      re-asked {i:>4}/{len(sampled_keys)}  ${noise_cost:.4f}",
+              end="", flush=True)
+        if first is None or second is None:
+            noise_failed += 1
+            continue
+        noise_seen += 1
+        noise_diff += not agrees(first, second)
+    print()
+    noise_rate = noise_diff / noise_seen if noise_seen else float("nan")
     if report.sampled and not report.cost_usd:
         print("\n  FAIL  shadow samples cost nothing, so they were replayed rather than "
               "asked.\n        A drift rate measured against a cache is not a "
@@ -164,6 +192,19 @@ async def main(derive: int, serve: int, rate: float, concurrency: int) -> int:
     )
     print(ledger.render(table))
 
+    lo, hi = report.interval()
+    print(f"  How much of that is real\n")
+    print(f"    raw disagreement with the table   {100 * report.drift_rate:>6.1f}%   "
+          f"({report.drifted}/{report.answered})")
+    if noise_seen:
+        print(f"    the model disagreeing with itself {100 * noise_rate:>6.1f}%   "
+              f"({noise_diff}/{noise_seen})")
+        adjusted = max(0.0, report.drift_rate - noise_rate)
+        print(f"    necessity above the noise floor   {100 * adjusted:>6.1f}%")
+    print(f"\n    95% interval on the raw rate      [{100 * lo:.1f}%, {100 * hi:.1f}%]")
+    print(f"    on {report.answered} answered samples — this is a direction, not a "
+          f"decimal.\n")
+
     if report.events:
         print("  Rows the model no longer agrees with:\n")
         for event in report.events[:5]:
@@ -177,6 +218,10 @@ async def main(derive: int, serve: int, rate: float, concurrency: int) -> int:
         "ledger": ledger.to_dict(),
         "policy": {k: v for k, v in table.to_dict().items() if k != "rows"},
         "unseen_situations": len(unseen),
+        "noise_floor": {
+            "compared": noise_seen, "disagreed": noise_diff, "failed": noise_failed,
+            "rate": noise_rate, "cost_usd": round(noise_cost, 4),
+        },
     }, indent=2))
     Path("data/policy.json").write_text(json.dumps(table.to_dict(), indent=2))
     print(f"  Written to {out} and data/policy.json\n")

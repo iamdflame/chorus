@@ -245,3 +245,25 @@ class TestCostProjection:
         led = NecessityLedger(served_from_table=50, served_from_model=0)
         assert led.cost_per_call == 0.0
         assert led.projected_naive_cost() == 0.0
+
+
+class TestSmallSampleHonesty:
+    def test_failed_samples_leave_the_denominator(self) -> None:
+        """Counting a rate-limited sample as agreement would let a throttled run report
+        a reassuringly low drift rate for having asked less."""
+        report = ShadowReport(sampled=27, confirmed=17, drifted=8, failed=2)
+        assert report.answered == 25
+        assert report.drift_rate == pytest.approx(8 / 25)
+
+    def test_a_small_sample_reports_a_wide_interval(self) -> None:
+        """27 samples do not measure a percentage to two decimal places."""
+        lo, hi = ShadowReport(sampled=27, confirmed=17, drifted=8, failed=2).interval()
+        assert lo < 0.20 and hi > 0.50
+
+    def test_a_large_sample_reports_a_tight_one(self) -> None:
+        lo, hi = ShadowReport(sampled=10_000, confirmed=9_800, drifted=200).interval()
+        assert hi - lo < 0.01
+
+    def test_no_answered_samples_gives_no_interval(self) -> None:
+        lo, hi = ShadowReport(sampled=3, failed=3).interval()
+        assert lo != lo and hi != hi  # nan, not a reassuring zero
