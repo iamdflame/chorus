@@ -4,13 +4,22 @@ import { SaturationChart } from "../SaturationChart";
 import { LINKS } from "../links";
 import { Link } from "../router";
 
-const FACTS = [
+interface Fact {
+  v: number;
+  dp: number;
+  label: string;
+  tone?: string;
+  prefix?: string;
+  suffix?: string;
+}
+
+const FACTS: Fact[] = [
   { v: 20000, dp: 0, label: "agents invoked", tone: undefined },
-  { v: 222, dp: 0, label: "model calls made", tone: "accent" },
-  { v: 19778, dp: 0, label: "served from the store", tone: undefined },
-  { v: 0.2137, dp: 4, prefix: "$", label: "cost incurred", tone: "accent" },
-  { v: 19.2539, dp: 4, prefix: "$", label: "cost at one call per agent", tone: undefined },
-  { v: 361.5, dp: 1, suffix: "s", label: "wall clock", tone: undefined },
+  { v: 1964, dp: 0, label: "model calls made", tone: "accent" },
+  { v: 0, dp: 0, label: "paid for twice", tone: "accent" },
+  { v: 17964, dp: 0, label: "served from the store", tone: undefined },
+  { v: 1.9394, dp: 4, prefix: "$", label: "cost incurred", tone: "accent" },
+  { v: 19.7495, dp: 4, prefix: "$", label: "cost at one call per agent", tone: undefined },
 ];
 
 export function Evidence() {

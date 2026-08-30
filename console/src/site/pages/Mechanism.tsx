@@ -17,7 +17,7 @@ const STEPS = [
     n: "03",
     title: "Let them collide",
     body: "Nothing in the runtime groups agents. Each is invoked independently with its own ADK session, unaware the others exist. The second agent to reach a given address is served from the store and never touches the model. The sharing is discovered, not assumed — which is why it holds for structure nobody anticipated.",
-    code: "20,000 invocations → 222 model calls → 19,778 served from the store",
+    code: "20,000 invocations → 1,964 model calls → 17,964 served from the store",
   },
 ];
 

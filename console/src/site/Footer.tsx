@@ -44,7 +44,7 @@ export function Footer() {
           <div className="footer-brand">
             <div className="mark"><Mark />CHORUS</div>
             <p className="footer-claim display h3">
-              Twenty&nbsp;thousand agents.<br /><em>Two hundred thoughts.</em>
+              Twenty&nbsp;thousand agents.<br /><em>Two thousand thoughts.</em>
             </p>
             <p className="footer-note">
               One agent per entity, for the price of the situations they are actually in.

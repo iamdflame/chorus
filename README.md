@@ -2,7 +2,7 @@
 
 # Chorus
 
-### Twenty thousand agents. Two hundred thoughts.
+### Twenty thousand agents. Two thousand thoughts.
 
 **Give every entity in a system its own permanent agent — and pay only for the diversity of their situations, not their population.**
 

@@ -1,13 +1,14 @@
 /** The swarm, drawn as what it actually is: cohorts, not individuals.
  *
- *  Twenty thousand agents, but only ~192 distinct situations — so the rendering unit is
+ *  Twenty thousand agents, but only ~1,965 distinct situations — so the rendering unit is
  *  the cohort, which is also the semantic unit. A cohort is the set of agents whose
  *  reasoning is provably identical, and it lights up in unison because it thinks in
- *  unison. Watching three hundred and sixty-eight points ignite together on a single
- *  model call is the claim made visible.
+ *  unison. Watching a hundred and twenty-eight points ignite together on a single model
+ *  call is the claim made visible — and, as the security write-up notes, it is also the
+ *  blast radius if that one call is ever poisoned.
  *
  *  Cohorts as display objects rather than 20,000 individual sprites: the animation is
- *  per-cohort by construction, so 192 containers with static geometry beat a particle
+ *  per-cohort by construction, so one container per cohort with static geometry beats a particle
  *  system that has to touch every point every frame — which matters on modest hardware. */
 
 import { Application, Container, Graphics } from "pixi.js";
@@ -78,7 +79,7 @@ export class Murmuration {
   // a second row on a narrow screen is enough to do it.
   private lastCohorts: Cohort[] = [];
   private observer: ResizeObserver | null = null;
-  // Rendering is on demand. The field is ~30,000 static circles across 192 Graphics, and
+  // Rendering is on demand. The field is ~30,000 static circles across ~2,000 Graphics, and
   // a continuously running ticker re-rasterises all of them every frame for a picture
   // that is not changing — enough to pin the main thread and make the page unclickable on
   // modest hardware. Frames are drawn only while something is actually animating.
@@ -108,7 +109,7 @@ export class Murmuration {
 
     let frame = 0;
     this.observer = new ResizeObserver(() => {
-      // Coalesced: a resize fires many times per drag, and re-tiling 192 cohorts on each
+      // Coalesced: a resize fires many times per drag, and re-tiling every cohort on each
       // one would drop frames for no benefit.
       cancelAnimationFrame(frame);
       frame = requestAnimationFrame(() => {

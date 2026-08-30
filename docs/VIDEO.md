@@ -25,7 +25,7 @@ Record at 1600x900 or larger. Unedited screen capture with voiceover — the rul
 
 > "Unless identical reasoning is computed once.
 >
-> This is Chorus. Twenty thousand agents. Two hundred thoughts."
+> This is Chorus. Twenty thousand agents. Two thousand thoughts."
 
 **On screen:** the Chorus console, idle, the treemap of cohorts filling the frame.
 

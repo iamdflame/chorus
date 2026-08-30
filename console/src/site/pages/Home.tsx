@@ -30,7 +30,7 @@ export function Home() {
           <p className="eyebrow">All Things Agentic · Fortified Enterprise Fleet</p>
           <h1 className="display h1">
             Twenty thousand agents.<br />
-            <em>Two hundred thoughts.</em>
+            <em>Two thousand thoughts.</em>
           </h1>
           <p className="lede hero-lede">
             Reasoning now costs less than a database query, so every entity in a system
@@ -50,9 +50,9 @@ export function Home() {
           <dl className="hero-stats stagger">
             {[
               { k: "agents", v: 20000, suffix: "" },
-              { k: "model calls", v: 222, suffix: "" },
-              { k: "cost", v: 0.2137, prefix: "$", dp: 4 },
-              { k: "collapse", v: 104, suffix: "×" },
+              { k: "model calls", v: 1964, suffix: "" },
+              { k: "cost", v: 1.9394, prefix: "$", dp: 4 },
+              { k: "collapse", v: 10.2, suffix: "×", dp: 1 },
             ].map((stat, i) => (
               <div key={stat.k} style={{ "--i": i } as React.CSSProperties}>
                 <dd className="fig">
