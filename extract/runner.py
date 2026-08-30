@@ -22,6 +22,7 @@ from typing import Any, Callable, Iterable
 from extract import keyword
 from extract.situation import INSTRUCTION, MODEL, SCHEMA, Extracted, parse
 from kernel.interposer import PRICE_IN_PER_M, PRICE_OUT_PER_M
+from swarm.canonical import Projection
 from swarm.pipeline import message_address
 
 # A stalled request otherwise holds its concurrency permit for the whole run. Bounding it
@@ -97,6 +98,7 @@ async def extract_many(
 
         promise: asyncio.Future[Extracted] = loop.create_future()
         by_address[address] = promise
+        got: Extracted | None = None
         async with gate:
             try:
                 response = await asyncio.wait_for(
@@ -128,19 +130,42 @@ async def extract_many(
                     run.quoted_genuine += ok
             except Exception as exc:  # noqa: BLE001 - a failure is a data point
                 run.failed += 1
-                got = Extracted(
-                    message_id=message.id,
-                    projection=keyword.extract(message.id, message.text).projection,
-                    error=f"{type(exc).__name__}: {exc}",
-                )
-            run.results[message.id] = got
-            promise.set_result(got)
+                got = _fallback(message, exc)
+            finally:
+                # Every traveller who wrote this same text is blocked on the promise, so
+                # it must be resolved on every path out of here — including one where the
+                # fallback itself raised. An unresolved promise hangs the entire run on a
+                # single bad message.
+                if got is None:
+                    got = _fallback(message, None)
+                if not promise.done():
+                    promise.set_result(got)
+                run.results[message.id] = got
             done += 1
             if on_progress:
                 on_progress(done, total)
 
     await asyncio.gather(*(one(m) for m in items))
     return run
+
+
+def _fallback(message: Any, exc: BaseException | None) -> Extracted:
+    """A best-effort situation for a message the model could not read.
+
+    The traveller still reaches the allocator; the failure is counted, never absorbed.
+    """
+    try:
+        projection = keyword.extract(message.id, message.text).projection
+    except Exception:  # noqa: BLE001 - the fallback must not have a failure mode
+        projection = Projection(
+            role="passenger", tier="basic", urgency="flexible",
+            party="solo", constraints="unencumbered",
+        )
+    return Extracted(
+        message_id=message.id,
+        projection=projection,
+        error=f"{type(exc).__name__}: {exc}" if exc else "unresolved",
+    )
 
 
 def replace_id(extracted: Extracted, message_id: str) -> Extracted:

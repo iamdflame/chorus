@@ -124,3 +124,34 @@ class TestReport:
         report.extraction.calls = 100
         report.elicitation.calls = 100
         assert report.blended_collapse == 1.0
+
+
+class TestExtractionFallback:
+    """A message the model cannot read must still reach the allocator."""
+
+    def test_fallback_reads_what_it_can(self) -> None:
+        from extract.runner import _fallback
+
+        class Msg:
+            id = "MSG-9"
+            text = "I need wheelchair assistance and I have two checked bags"
+
+        got = _fallback(Msg(), TimeoutError("slow"))
+        assert got.error and "TimeoutError" in got.error
+        assert got.projection.constraints != ""
+
+    def test_fallback_survives_an_unreadable_message(self) -> None:
+        """The fallback is the last line of defence and must not have a failure mode of
+        its own: a raise here would leave every waiter on that text hung forever."""
+        from extract.runner import _fallback
+
+        class Broken:
+            id = "MSG-10"
+
+            @property
+            def text(self) -> str:
+                raise RuntimeError("no text")
+
+        got = _fallback(Broken(), ValueError("upstream"))
+        assert got.error is not None
+        assert got.projection.role == "passenger"
