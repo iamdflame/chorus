@@ -1,0 +1,32 @@
+  served from the store               17,964
+  distinct thoughts                    1,964
+  collapse                             10.2x
+  ----------------------------------------------------------------------
+  cost incurred                      $1.9394
+  cost if one call per agent        $19.7495
+  saved                             $17.8101
+  wall clock                         3009.5s
+  preferences produced                19,998
+  ======================================================================
+
+                                FIRST COME         SWARM         DELTA
+  --------------------------------------------------------------------
+  passengers seated                  1,159         1,109           -50
+  souls seated                       2,888         2,888            +0
+  stranded                          18,841        18,891           +50
+  parties split                          0            11           +11
+  hotel rooms used                   1,800         1,800            +0
+  mean wait (hours)                  17.12         16.33         -0.79
+  weighted satisfaction            1,131.3       2,390.0      +1,258.7
+  --------------------------------------------------------------------
+  Seats are the binding constraint (2,888 of 51,000 souls fit), so both plans fill every seat and 'souls seated'
+  saturates. Under a fixed budget the question is which travellers move: the swarm scores
+  111% higher because it prioritises by self-assessed urgency rather than queue order.
+
+  snapshot                       data/swarm.json
+  preferences + plans           data/preferences.json
+
+  first errors: ["PAX-100822: _ResourceExhaustedError: \nOn how to mitigate this issue, please refer to:\n\nhttps://google.github.io/adk-docs/agents/models/google-gemini/#error-code-429-resource_exhausted\n\n\n429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'Resource exhausted. Please try again later. Please refer to https://cloud.google.com/vertex-ai/generative-ai/docs/error-code-429 for more details.', 'status': 'RESOURCE_EXHAUSTED'}}", 'PAX-118626: TimeoutError: ']
+
+  PASS  20,000 agents reasoned for $1.9394 instead of $19.7495 — 10x fewer thoughts than agents.
+

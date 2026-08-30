@@ -96,20 +96,34 @@ Run end to end against live `gemini-3.5-flash`, 20,000 independent agent invocat
 | | |
 | --- | ---: |
 | agents invoked | **20,000** |
-| model calls actually made | **222** |
-| served from the store | **19,778** |
-| **cost incurred** | **$0.2137** |
-| cost without the kernel | ~$19.25 <sup>†</sup> |
-| collapse | **90×** |
+| distinct situations | 1,964 |
+| model calls actually made | **1,964** |
+| **duplicate calls** | **0** |
+| suppressed in flight by single-flight | 70 |
+| served from the store | 17,964 |
+| failed | 2 |
+| **cost incurred** | **$1.9394** |
+| cost without the kernel | ~$19.75 <sup>†</sup> |
+| collapse | **10.2×** |
 
-<sub>† Projected from the measured per-call cost of the 222 real calls (`$0.2137 / 222 × 20,000`). Every other number on this page is measured, not projected. Regenerate: `.venv/bin/python scripts/prove_swarm.py --agents 20000`</sub>
+<sub>† Projected from the measured per-call cost of the 1,964 real calls. Every other number
+on this page is measured. Regenerate: `.venv/bin/python scripts/prove_swarm.py --agents 20000`</sub>
 
-<sub>Measured before single-flight. The 222 exceeded the 192 distinct situations for two
-reasons, and an earlier version of this README named only the first with more confidence
-than the evidence supported: some agents take a second turn before returning valid JSON,
-*and* agents in one cohort starting together all missed the store and all called the model.
-The second was the larger cause and is now fixed — `scripts/verify_concurrency.py` shows
-133 calls for 133 situations at concurrency 1, 4, 16 and 48, with zero duplicates.</sub>
+**The swarm made exactly one call per distinct situation and not one more.** `collapse` and
+`structural_ceiling` are both 10.2×, and `duplicate_calls` is 0 — the three numbers agree
+because there is nothing left between them.
+
+That is the part v1 could not claim. It made 222 calls for 192 situations, and an earlier
+version of this README explained the gap as retries with more confidence than the evidence
+supported: the larger cause was that agents in one cohort starting together all missed the
+store and all called the model. Single-flight closed it, `scripts/verify_concurrency.py`
+holds it closed at concurrency 1 through 48, and at twenty thousand agents the gap is now
+zero rather than smaller.
+
+The two failures were a rate-limit rejection and a timeout, and they are in the table
+because a run that hides its failures is reporting on survivors. The offline model predicted
+1,965 distinct situations and the live fleet produced 1,964 — the difference is the two
+travellers whose agents failed.
 
 **The number reported is always what was really spent.** `collapse` divides by calls
 actually paid for; `structural_ceiling` divides by distinct situations; `duplicate_calls`
@@ -305,8 +319,8 @@ flowchart TB
     SC --> CP --> RT
     RT -->|every model call| IP
     IP --> AD --> ST
-    ST -->|miss: 222| GEM
-    ST -->|hit: 19,778 of 20,000| RT
+    ST -->|miss: 1,964| GEM
+    ST -->|hit: 17,964 of 20,000| RT
     RT -->|preferences| AL
     AL --> QG
     ST --> FS
@@ -440,10 +454,14 @@ export GOOGLE_CLOUD_PROJECT=YOUR_PROJECT
 
 | Claim | Command |
 | --- | --- |
-| 20,000 agents → 1,965 situations | `scripts/verify_collapse.py` |
-| 222 calls, $0.2137, 90× | `scripts/prove_swarm.py --agents 20000` |
-| +92% weighted satisfaction | `python -m bench.run --agents 8000` |
+| 20,000 → 1,965 situations; 200,000 → 2,296 | `scripts/verify_collapse.py` |
+| 1,964 calls, $1.9394, 10.2×, 0 duplicates | `scripts/prove_swarm.py --agents 20000` |
+| All six arms, scored identically | `python -m bench.run --agents 8000` |
 | Not a cache (3-arm ablation) | `scripts/ablation.py --agents 2000` |
+| Collapse is lossy here, and by how much | `python -m bench.fidelity` |
+| Injection cannot reach a shared address | `scripts/verify_armor.py` |
+| Is the model earning its cost? | `scripts/necessity.py` |
+| The whole pipeline, end to end | `scripts/prove_pipeline.py` |
 | Replay is byte-identical | `scripts/verify_determinism.py` |
 | Same, on the live fleet | `scripts/verify_fleet_replay.py --disputes 3` |
 | No PII crosses the boundary | `pytest tests/test_projection_leakage.py` |
