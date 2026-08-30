@@ -1,9 +1,9 @@
 {
-  "version": "f871b6de40d4",
+  "version": "3a1c37e9977d",
   "schema_version": "v2",
   "ceiling": 2304,
-  "populated": 1263,
-  "occupancy": 0.5482,
+  "populated": 1261,
+  "occupancy": 0.5473,
   "rows": [
     {
       "key": "v2|passenger|basic|critical|family|assisted|intercontinental|hotel|origin",
@@ -141,7 +141,7 @@
         "derived_at": "2026-08-29T06:00:00+00:00",
         "served": 1
       },
-      "confirmations": 1,
+      "confirmations": 2,
       "disagreements": 0,
       "invalidated": false
     },
@@ -1441,7 +1441,7 @@
         "derived_at": "2026-08-29T06:00:00+00:00",
         "served": 3
       },
-      "confirmations": 0,
+      "confirmations": 1,
       "disagreements": 0,
       "invalidated": false
     },
@@ -1761,7 +1761,7 @@
         "derived_at": "2026-08-29T06:00:00+00:00",
         "served": 4
       },
-      "confirmations": 1,
+      "confirmations": 2,
       "disagreements": 0,
       "invalidated": false
     },
@@ -3601,7 +3601,7 @@
         "derived_at": "2026-08-29T06:00:00+00:00",
         "served": 4
       },
-      "confirmations": 0,
+      "confirmations": 1,
       "disagreements": 0,
       "invalidated": false
     },
@@ -8021,7 +8021,7 @@
         "derived_at": "2026-08-29T06:00:00+00:00",
         "served": 5
       },
-      "confirmations": 1,
+      "confirmations": 2,
       "disagreements": 0,
       "invalidated": false
     },
@@ -8862,8 +8862,8 @@
         "served": 2
       },
       "confirmations": 1,
-      "disagreements": 0,
-      "invalidated": false
+      "disagreements": 1,
+      "invalidated": true
     },
     {
       "key": "v2|passenger|gold|critical|solo|checked_bags|short|hotel|origin",
@@ -14461,7 +14461,7 @@
         "derived_at": "2026-08-29T06:00:00+00:00",
         "served": 2
       },
-      "confirmations": 1,
+      "confirmations": 2,
       "disagreements": 0,
       "invalidated": false
     },
@@ -16081,7 +16081,7 @@
         "derived_at": "2026-08-29T06:00:00+00:00",
         "served": 9
       },
-      "confirmations": 1,
+      "confirmations": 2,
       "disagreements": 0,
       "invalidated": false
     },
@@ -16321,7 +16321,7 @@
         "derived_at": "2026-08-29T06:00:00+00:00",
         "served": 2
       },
-      "confirmations": 1,
+      "confirmations": 2,
       "disagreements": 0,
       "invalidated": false
     },
@@ -16841,7 +16841,7 @@
         "derived_at": "2026-08-29T06:00:00+00:00",
         "served": 2
       },
-      "confirmations": 1,
+      "confirmations": 2,
       "disagreements": 0,
       "invalidated": false
     },
@@ -17661,7 +17661,7 @@
         "derived_at": "2026-08-29T06:00:00+00:00",
         "served": 5
       },
-      "confirmations": 1,
+      "confirmations": 2,
       "disagreements": 0,
       "invalidated": false
     },
@@ -18041,7 +18041,7 @@
         "derived_at": "2026-08-29T06:00:00+00:00",
         "served": 4
       },
-      "confirmations": 1,
+      "confirmations": 2,
       "disagreements": 0,
       "invalidated": false
     },
@@ -19581,7 +19581,7 @@
         "derived_at": "2026-08-29T06:00:00+00:00",
         "served": 4
       },
-      "confirmations": 1,
+      "confirmations": 2,
       "disagreements": 0,
       "invalidated": false
     },
@@ -21981,7 +21981,7 @@
         "derived_at": "2026-08-29T06:00:00+00:00",
         "served": 3
       },
-      "confirmations": 1,
+      "confirmations": 2,
       "disagreements": 0,
       "invalidated": false
     },
@@ -22301,7 +22301,7 @@
         "derived_at": "2026-08-29T06:00:00+00:00",
         "served": 2
       },
-      "confirmations": 1,
+      "confirmations": 2,
       "disagreements": 0,
       "invalidated": false
     },
@@ -22581,7 +22581,7 @@
         "derived_at": "2026-08-29T06:00:00+00:00",
         "served": 10
       },
-      "confirmations": 1,
+      "confirmations": 2,
       "disagreements": 0,
       "invalidated": false
     },
@@ -24621,7 +24621,7 @@
         "derived_at": "2026-08-29T06:00:00+00:00",
         "served": 7
       },
-      "confirmations": 1,
+      "confirmations": 2,
       "disagreements": 0,
       "invalidated": false
     },
@@ -24942,8 +24942,8 @@
         "served": 1
       },
       "confirmations": 1,
-      "disagreements": 0,
-      "invalidated": false
+      "disagreements": 1,
+      "invalidated": true
     },
     {
       "key": "v2|passenger|silver|urgent|solo|checked_bags|intercontinental|hotel|misconnect",
@@ -25321,7 +25321,7 @@
         "derived_at": "2026-08-29T06:00:00+00:00",
         "served": 1
       },
-      "confirmations": 1,
+      "confirmations": 2,
       "disagreements": 0,
       "invalidated": false
     },

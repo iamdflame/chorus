@@ -48,7 +48,7 @@ from kernel.store import InMemoryEffectStore
 from policy.ledger import NecessityLedger
 from policy.compare import agrees
 from policy.shadow import sampled, shadow_sample
-from policy.table import distill
+from policy.table import PolicyTable, distill
 from swarm.canonical import bind, project_passenger
 from swarm.runtime import MODEL, Swarm
 from swarm.scenario import build_scenario
@@ -56,45 +56,63 @@ from swarm.scenario import build_scenario
 CONTEXT = "A hub closure has stranded your flight. State your rebooking preferences."
 
 
-async def main(derive: int, serve: int, rate: float, concurrency: int) -> int:
+async def main(derive: int, serve: int, rate: float, concurrency: int,
+               reuse: str | None) -> int:
     projector = bind(project_passenger, FIXED)
 
     # -- [1] derive ------------------------------------------------------------
     scenario = build_scenario(passengers=derive)
     passengers = [asdict(p) for p in scenario.passengers]
-    print(f"\n  [1] deriving a policy from {derive:,} travellers\n")
 
-    swarm = Swarm(
-        store=InMemoryEffectStore(), branch_id=PRIMARY, mode=Mode.REPLAY,
-        concurrency=concurrency,
-    )
+    # A distilled policy outlives the run that derived it — that is the entire point of
+    # distilling one. Reusing a stored table lets the shadow and noise phases be repeated
+    # against the same policy without paying to re-derive it, and it exercises the
+    # round-trip through disk that a real deployment would use.
+    stored = Path(reuse) if reuse else None
+    if stored and stored.exists():
+        table = PolicyTable.from_dict(json.loads(stored.read_text()))
+        derive_calls = len(table.rows)
+        print(f"\n  [1] reusing policy v{table.version} from {stored} — "
+              f"{table.populated:,} rows, no re-derivation")
+        prior = json.loads(Path("data/necessity.json").read_text()) if Path(
+            "data/necessity.json").exists() else {}
+        derive_cost = float(prior.get("ledger", {}).get("cost_usd", 0.0))
+        metrics = None
+    else:
+        print(f"\n  [1] deriving a policy from {derive:,} travellers\n")
+        swarm = Swarm(
+            store=InMemoryEffectStore(), branch_id=PRIMARY, mode=Mode.REPLAY,
+            concurrency=concurrency,
+        )
 
-    def progress(i: int, total: int, m, *_) -> None:
-        print(f"\r      {i:>6,}/{total:,}  calls {m.model_calls:>5}  ${m.cost_usd:.4f}",
-              end="", flush=True)
+        def progress(i: int, total: int, m, *_) -> None:
+            print(f"\r      {i:>6,}/{total:,}  calls {m.model_calls:>5}  "
+                  f"${m.cost_usd:.4f}", end="", flush=True)
 
-    _, metrics = await swarm.run(
-        entities=passengers, projector=projector, role="passenger",
-        context=CONTEXT, round_id="necessity-derive", on_progress=progress,
-    )
-    print()
+        _, metrics = await swarm.run(
+            entities=passengers, projector=projector, role="passenger",
+            context=CONTEXT, round_id="necessity-derive", on_progress=progress,
+        )
+        print()
+        derive_calls, derive_cost = metrics.model_calls, metrics.cost_usd
 
     # A swarm that pays for answers the store already holds is not collapsing, and the
     # symptom is quiet: the run completes, the numbers look plausible, and the bill is
     # several times what it should be. That happened here once, from a mode that never
     # consults the store, so the invariant is asserted rather than assumed.
     distinct = len({projector(p).key() for p in passengers})
-    if metrics.model_calls > distinct * 1.1 + 5:
+    if metrics is not None and metrics.model_calls > distinct * 1.1 + 5:
         print(f"\n  FAIL  {metrics.model_calls:,} model calls for {distinct:,} distinct "
               f"situations.\n        The store is not being consulted — check the "
               f"interposer Mode.\n")
         return 1
 
     # -- [2] distill -----------------------------------------------------------
-    table = distill(swarm.last_cohorts.values(), clock=FIXED, model=MODEL)
+    if metrics is not None:
+        table = distill(swarm.last_cohorts.values(), clock=FIXED, model=MODEL)
     print(f"\n  [2] policy v{table.version} · {table.populated:,}/{table.ceiling:,} "
           f"cells populated ({100 * table.occupancy:.1f}%) "
-          f"from {metrics.model_calls:,} model calls")
+          f"from {derive_calls:,} model calls")
 
     # -- [3] serve a fresh, larger population ----------------------------------
     # A different crowd, not the one the table was derived from. Serving the same
@@ -184,8 +202,8 @@ async def main(derive: int, serve: int, rate: float, concurrency: int) -> int:
     ledger = NecessityLedger(
         served_from_table=from_table,
         served_from_model=from_model,
-        model_calls_made=metrics.model_calls,
-        model_cost_usd=metrics.cost_usd,
+        model_calls_made=derive_calls,
+        model_cost_usd=derive_cost,
         shadow=report,
         policy_version=table.version,
         period=f"derive {derive:,} → serve {serve:,}",
@@ -234,7 +252,9 @@ if __name__ == "__main__":
     ap.add_argument("--serve", type=int, default=20_000)
     ap.add_argument("--rate", type=float, default=0.02)
     ap.add_argument("--concurrency", type=int, default=16)
+    ap.add_argument("--reuse", default=None,
+                    help="path to a stored policy table; skips re-derivation")
     args = ap.parse_args()
     raise SystemExit(asyncio.run(
-        main(args.derive, args.serve, args.rate, args.concurrency)
+        main(args.derive, args.serve, args.rate, args.concurrency, args.reuse)
     ))

@@ -97,7 +97,7 @@ def ask(prompt: str, *, api_key: str | None = None, timeout: float = 60.0) -> Ge
         "contents": [{"parts": [{"text": prompt}]}],
         # No response_schema: Gemma rejects it. Temperature 0 for reproducibility, which
         # is the least this project can do given everything else is content-addressed.
-        "generationConfig": {"temperature": 0, "maxOutputTokens": 2000},
+        "generationConfig": {"temperature": 0, "maxOutputTokens": 3500},
     }).encode("utf-8")
 
     request = urllib.request.Request(

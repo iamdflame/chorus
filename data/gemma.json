@@ -1,0 +1,37 @@
+{
+  "sample": 120,
+  "keyword": {
+    "tier": 0.625,
+    "urgency": 0.4166666666666667,
+    "party": 0.525,
+    "constraints": 0.775,
+    "exact": 0.10833333333333334,
+    "mean_field": 0.5854166666666667
+  },
+  "gemini": {
+    "tier": 0.75,
+    "urgency": 0.825,
+    "party": 0.9833333333333333,
+    "constraints": 0.9833333333333333,
+    "exact": 0.5833333333333334,
+    "mean_field": 0.8854166666666666
+  },
+  "gemma": {
+    "tier": 0.75,
+    "urgency": 0.26666666666666666,
+    "party": 0.925,
+    "constraints": 0.975,
+    "exact": 0.19166666666666668,
+    "mean_field": 0.7291666666666666
+  },
+  "gemma_tokens": {
+    "thought": 99168,
+    "answer": 5050,
+    "prompt": 16027
+  },
+  "gemma_think_to_answer": 19.637227722772277,
+  "gemma_unparseable": 2,
+  "cross_family_agreement": 0.058333333333333334,
+  "gemini_exact_when_gemma_agrees": 0.5714285714285714,
+  "confidence_lift": -0.011904761904761973
+}

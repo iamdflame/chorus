@@ -31,23 +31,30 @@ VOCABULARY = {
     "constraints": ("assisted", "checked_bags", "unencumbered"),
 }
 
-# Deliberately terse, and the terseness is a finding rather than a style choice.
+# Compact, but not stripped — and the difference between those two turned out to matter
+# more than anything else in this comparison.
 #
-# Gemini reads the full rubric in `extract.situation.INSTRUCTION` and is more accurate for
-# it. Handed the same rubric, Gemma does not merely do worse — it **never terminates**:
-# 4,000 output tokens consumed entirely by deliberation, `finishReason: MAX_TOKENS`, no
-# answer at all, on every message tried. The compact form below finishes in roughly 726
-# thought tokens and parses cleanly.
+# Gemma cannot be handed `extract.situation.INSTRUCTION`, the rubric Gemini reads. Given it,
+# Gemma does not merely score worse; it **never terminates**: 4,000 output tokens consumed
+# by deliberation, `finishReason: MAX_TOKENS`, no answer at all, on every message tried.
 #
-# So the two models cannot be given the same prompt, and the comparison below is
-# consequently between each model at its own best, not between one prompt on two models.
-# That is the fairer test and it is also the only one available.
+# The obvious response was a bare field list, and that produced a badly misleading result.
+# Gemma scored 26.7% on urgency — worse than a regex — because a bare list names the four
+# bands without saying what they mean, so the model was guessing boundaries that Gemini had
+# been given. Restoring one line of definition per field took urgency to 91.7% on the same
+# messages. The first measurement was a fact about the prompt, not about the model.
+#
+# So the comparison is each model at its own best, which is the fairer test and also the
+# only one available.
 PROMPT = """Classify this traveller message. Answer with one JSON object and nothing else.
 
-tier: basic|silver|gold|platinum
-urgency: critical|urgent|same_day|flexible
-party: solo|pair|family|group
-constraints: assisted|checked_bags|unencumbered
+tier: basic|silver|gold|platinum  (mentions of status, loyalty, lounge = higher)
+urgency: critical = must travel within hours | urgent = later today |
+         same_day = by tomorrow | flexible = can wait a day or more
+         Judge by what is at stake, not by how upset they sound.
+party: solo=1 | pair=2 | family=3-4 | group=5+  (count everyone travelling together)
+constraints: assisted = anyone needs mobility/medical help | checked_bags = bags in hold |
+             unencumbered = cabin only.  Assistance outranks bags.
 
 Message: {text}
 
