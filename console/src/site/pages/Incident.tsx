@@ -19,17 +19,36 @@ const CELLS = 2304;
 
 export function Incident() {
   const [mode, setMode] = useState<Mode>("unarmed");
+  // Bumping this remounts the marks, which restarts the propagation from generation zero.
+  const [take, setTake] = useState(0);
+  const replay = (next: Mode) => { setMode(next); setTake((t) => t + 1); };
 
-  // 128 marks, laid out as the cohort actually is. Deterministic so the picture is the
-  // same every time somebody demonstrates it.
-  const marks = useMemo(
-    () => Array.from({ length: COHORT }, (_, i) => ({
+  // 128 marks, laid out as the cohort actually is, each carrying its causal generation.
+  //
+  // The delay is distance from patient zero, not position in the grid. That distinction is
+  // the whole point: this is a forward lightcone illuminating hop by hop from the
+  // compromised call, so the blast radius draws itself outward from a source rather than
+  // wiping across the block in reading order. An earlier version staggered by row and
+  // column, which looked like an animation and taught nothing.
+  const marks = useMemo(() => {
+    const raw = Array.from({ length: COHORT }, (_, i) => ({
+      i,
       x: 4 + (i % 16) * 6.1,
       y: 5 + Math.floor(i / 16) * 11.6,
-      delay: (i % 16) * 14 + Math.floor(i / 16) * 40,
-    })),
-    [],
-  );
+    }));
+    const zero = raw[0];
+    const far = Math.max(
+      ...raw.map((m) => Math.hypot(m.x - zero.x, m.y - zero.y)),
+    );
+    return raw.map((m) => {
+      const d = Math.hypot(m.x - zero.x, m.y - zero.y);
+      // Eight causal generations across the cohort, ~40ms apart, as the plan specifies.
+      const generation = Math.round((d / far) * 7);
+      return { ...m, generation, delay: generation * 40 };
+    });
+  }, []);
+
+  const generations = Math.max(...marks.map((m) => m.generation)) + 1;
 
   const affected = mode === "unarmed" ? COHORT : mode === "armed" ? 0 : COHORT;
   const contained = mode === "armed" ? 1 : mode === "posthoc" ? COHORT : 0;
@@ -64,14 +83,14 @@ export function Incident() {
                   aria-selected={mode === value}
                   className="incident-tab"
                   data-active={mode === value}
-                  onClick={() => setMode(value)}
+                  onClick={() => replay(value)}
                 >
                   {label}
                 </button>
               ))}
             </div>
 
-            <div className="incident-stage" data-mode={mode}>
+            <div className="incident-stage" data-mode={mode} key={take}>
               <svg viewBox="0 0 100 92" role="img"
                    aria-label={`Cohort of ${COHORT} entities, ${affected} affected`}>
                 {marks.map((m, i) => (
@@ -82,12 +101,21 @@ export function Incident() {
                     r={mode === "armed" && i === 0 ? 2.4 : 1.9}
                     className="incident-mark"
                     style={{ animationDelay: `${m.delay}ms` }}
+                    data-generation={m.generation}
                     data-role={i === 0 ? "patient-zero" : "member"}
                   />
                 ))}
               </svg>
 
               <dl className="incident-readout">
+                <div className="incident-chip-row">
+                  <span className="chip" data-state={mode === "posthoc" ? "scrubbed" : "replay"}>
+                    {mode === "posthoc" ? "lightcone" : "replay"}
+                  </span>
+                  <button className="incident-replay" onClick={() => setTake((t) => t + 1)}>
+                    Play again
+                  </button>
+                </div>
                 <div>
                   <dt>entities in cohort</dt>
                   <dd className="data">{COHORT}</dd>
@@ -99,6 +127,10 @@ export function Incident() {
                 <div>
                   <dt>contained</dt>
                   <dd className="data">{contained}</dd>
+                </div>
+                <div>
+                  <dt>causal generations</dt>
+                  <dd className="data">{mode === "armed" ? 0 : generations}</dd>
                 </div>
               </dl>
             </div>

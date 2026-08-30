@@ -520,7 +520,7 @@
 
 .incident-stage[data-mode="unarmed"] .incident-mark {
   fill: var(--breach);
-  animation: spread 420ms var(--ease-place) both;
+  animation: spread 340ms var(--spring-snap) both;
 }
 
 .incident-stage[data-mode="armed"] .incident-mark { fill: var(--reflect-dim); }
@@ -535,16 +535,45 @@
   fill: none;
   stroke: var(--counterfact);
   stroke-width: 0.7;
-  animation: spread 520ms var(--ease-place) both;
+  animation: spread 340ms var(--spring-snap) both;
 }
 
+/* Propagation. Each mark waits for its causal generation, then ignites and settles — so
+   the cone visibly travels outward from patient zero rather than fading in as a block.
+   Everything not yet reached sits at 15%, which is what makes the front readable. */
 @keyframes spread {
-  from { opacity: 0.15; }
-  to { opacity: 1; }
+  0%   { opacity: 0.15; r: 1.2; }
+  55%  { opacity: 1;    r: 2.6; }
+  100% { opacity: 1;    r: 1.9; }
 }
 
+.incident-chip-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.25rem;
+}
+
+.incident-replay {
+  background: transparent;
+  border: 1px solid var(--rule-hi);
+  border-radius: 999px;
+  color: var(--text-lo);
+  font: inherit;
+  font-size: var(--t-xs);
+  padding: 0.25rem 0.7rem;
+  cursor: pointer;
+  transition: color 160ms var(--ease-place), border-color 160ms var(--ease-place);
+}
+
+.incident-replay:hover { color: var(--text-hi); border-color: var(--filament); }
+
+/* Reduced motion: the cone arrives complete rather than travelling. The information is
+   identical — who was affected — and only the theatre is removed. Never a blank screen. */
 @media (prefers-reduced-motion: reduce) {
   .incident-mark { animation: none !important; opacity: 1; }
+  .incident-replay { display: none; }
 }
 
 .incident-readout { margin: 0; display: grid; gap: 0.9rem; }

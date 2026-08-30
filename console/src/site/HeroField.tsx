@@ -42,6 +42,7 @@ export function HeroField() {
     let width = 0;
     let height = 0;
 
+
     const layout = () => {
       dpr = Math.min(window.devicePixelRatio || 1, 2);
       const rect = canvas.getBoundingClientRect();
@@ -115,31 +116,32 @@ export function HeroField() {
       ctx.clearRect(0, 0, width, height);
       const t = now / 1000;
 
-      for (let i = 0; i < agents.length; i += 1) {
-        const a = agents[i];
-        const wobble = Math.sin(t * a.drift + a.phase) * 1.6;
-        const h = heat[a.cohort];
-        const s = inherited[a.cohort];
+      // Batched by cohort. Every agent in a cohort shares a colour by construction — that
+      // is what a cohort is — so the colour is computed 52 times a frame instead of 4,056,
+      // and `fillStyle` is assigned once per cohort rather than once per speck.
+      //
+      // A bitmap cache for the idle majority was tried here and removed. Measurement said
+      // the drawing is not the cost at all: an *empty* requestAnimationFrame loop on this
+      // page runs at 23.4fps in headless software rasterisation, and clear + 4,056 rects
+      // runs at 25.5 — the rects are free, and the cache measured marginally slower than
+      // this because a full-viewport drawImage costs more than the specks it replaced.
+      // The remaining ceiling is headless compositing of a full-viewport canvas, which a
+      // GPU-backed browser does not pay. Complexity no measurement supports does not ship.
+      for (let c = 0; c < COHORTS; c += 1) {
+        const h = heat[c];
+        const sh = inherited[c];
 
-        // Three states, and the colour is never the only thing that separates them:
-        // an unlit agent is a dim neutral speck, a reflected one takes the cool cast of
-        // light it did not pay for, and an ignited one goes incandescent AND grows. Size
-        // and hue move together so the field still reads without colour discrimination.
-        //
-        //   latent    #4A5566   waiting
-        //   reflect   #A8D5E5   served from the store, free
-        //   filament  #FF9D4D   a model call, and money leaving
         let r = 0x5c, g = 0x67, b = 0x7a, alpha = 0.8;
-        if (s > 0.01) {
-          alpha = 0.8 + s * 0.2;
-          r = Math.round(0x5c + (0xa8 - 0x5c) * s);
-          g = Math.round(0x67 + (0xd5 - 0x67) * s);
-          b = Math.round(0x7a + (0xe5 - 0x7a) * s);
+        if (sh > 0.01) {
+          alpha = 0.8 + sh * 0.2;
+          r = Math.round(0x5c + (0xa8 - 0x5c) * sh);
+          g = Math.round(0x67 + (0xd5 - 0x67) * sh);
+          b = Math.round(0x7a + (0xe5 - 0x7a) * sh);
         }
         if (h > 0.02) {
-          // Ignition ramps through the hot filament rather than through white: this is
-          // the only moment anything in the interface flashes, and it flashes exactly
-          // when money is spent, so the visual budget maps to the financial one.
+          // Ignition ramps through the hot filament rather than through white. It is the
+          // only moment anything in the interface flashes, and it flashes exactly when
+          // money is spent, so the visual budget maps to the financial one.
           const k = Math.min(h * 1.15, 1);
           r = Math.round(r + (0xff - r) * k);
           g = Math.round(g + (0xc4 - g) * k);
@@ -148,8 +150,17 @@ export function HeroField() {
         }
 
         ctx.fillStyle = `rgba(${r},${g},${b},${alpha})`;
-        const size = 1.5 + s * 0.5 + h * 2.4;
-        ctx.fillRect(a.x - size / 2, a.y + wobble - size / 2, size, size);
+        const size = 1.5 + sh * 0.5 + h * 2.4;
+        const half = size / 2;
+        const from = c * PER_COHORT;
+        const alive = h > 0.02 || sh > 0.01;
+        for (let i = from; i < from + PER_COHORT; i += 1) {
+          const a = agents[i];
+          // Wobble only where something is happening: an idle speck drifting 1.6px is
+          // invisible at this size and costs a sine per agent per frame to produce.
+          const y = alive ? a.y + Math.sin(t * a.drift + a.phase) * 1.6 : a.y;
+          ctx.fillRect(a.x - half, y - half, size, size);
+        }
       }
 
       raf = requestAnimationFrame(frame);
