@@ -48,16 +48,16 @@
   pointer-events: none;
 }
 
-.hero-inner { position: relative; z-index: 2; padding-block: clamp(84px, 14vh, 150px); }
-.hero-lede { margin-top: 30px; max-width: 56ch; }
-.hero-actions { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 40px; }
+.hero-inner { position: relative; z-index: 2; padding-block: clamp(62px, 10vh, 124px); }
+.hero-lede { margin-top: 26px; max-width: 56ch; }
+.hero-actions { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 34px; }
 
 .hero-stats {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(132px, max-content));
   gap: clamp(28px, 5vw, 68px);
-  margin: clamp(52px, 8vh, 86px) 0 0;
-  padding-top: 30px;
+  margin: clamp(34px, 5.5vh, 66px) 0 0;
+  padding-top: 24px;
   border-top: 1px solid var(--rule);
 }
 .hero-stats dd { margin: 0; font-size: clamp(28px, 3.4vw, 46px); line-height: 1; }

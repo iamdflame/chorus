@@ -47,7 +47,11 @@
 /* -- stage ---------------------------------------------------------------- */
 
 .cx-stage { position: relative; overflow: hidden; }
-.cx-stage canvas { display: block; }
+/* Absolutely positioned so the canvas can never contribute to its host's size. The
+   renderer sizes to the host, and the host is a flexible grid row — in normal flow the
+   canvas grows the row, which resizes the canvas, which grows the row. That feedback loop
+   keeps the page in permanent reflow and nothing on it ever becomes clickable. */
+.cx-stage canvas { position: absolute; inset: 0; display: block; }
 
 /* -- cohort card ---------------------------------------------------------- */
 /* Anchored bottom-left, opposite the readout's emphasis, and translucent so the field

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { LINKS } from "./links";
 import { Link, useRoute } from "./router";
 
 const ROUTES = [
@@ -45,7 +46,7 @@ export function Nav() {
         </nav>
 
         <div className="nav-actions">
-          <a className="nav-link" href="https://github.com" target="_blank" rel="noreferrer">
+          <a className="nav-link" href={LINKS.repo} target="_blank" rel="noreferrer">
             Source
           </a>
           <Link to="/console" className="btn" data-variant={path === "/console" ? undefined : "ghost"}>

@@ -1,5 +1,6 @@
 import { Counter } from "../Counter";
 import { SaturationChart } from "../SaturationChart";
+import { LINKS } from "../links";
 import { Link } from "../router";
 
 const FACTS = [
@@ -83,7 +84,7 @@ export function Evidence() {
           </h2>
           <div className="hero-actions" style={{ marginTop: 34 }}>
             <Link to="/console" className="btn">Open the console <span className="arrow">→</span></Link>
-            <a className="btn" data-variant="ghost" href="https://github.com" target="_blank" rel="noreferrer">
+            <a className="btn" data-variant="ghost" href={LINKS.repo} target="_blank" rel="noreferrer">
               Read the source
             </a>
           </div>

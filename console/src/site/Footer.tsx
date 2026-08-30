@@ -1,3 +1,4 @@
+import { LINKS } from "./links";
 import { Link } from "./router";
 
 type FooterLink = { label: string; to: string } | { label: string; href: string };
@@ -25,10 +26,11 @@ const COLUMNS: { title: string; links: FooterLink[] }[] = [
   {
     title: "Reading",
     links: [
-      { label: "Architecture", href: "https://github.com" },
-      { label: "Determinism proof", href: "https://github.com" },
-      { label: "Swarm proof", href: "https://github.com" },
-      { label: "README", href: "https://github.com" },
+      { label: "Architecture", href: LINKS.architecture },
+      { label: "The projection", href: LINKS.projection },
+      { label: "The interposer", href: LINKS.kernel },
+      { label: "Swarm proof", href: LINKS.swarmProof },
+      { label: "README", href: LINKS.readme },
     ],
   },
 ];
