@@ -3,6 +3,8 @@ import { Footer } from "./site/Footer";
 import { Nav } from "./site/Nav";
 import { Evidence } from "./site/pages/Evidence";
 import { Home } from "./site/pages/Home";
+import { Incident } from "./site/pages/Incident";
+import { LedgerPage } from "./site/pages/Ledger";
 import { Mechanism } from "./site/pages/Mechanism";
 import { RouterProvider, useRoute } from "./site/router";
 
@@ -27,6 +29,8 @@ function Routes() {
       <main>
         {path === "/mechanism" ? <Mechanism />
           : path === "/evidence" ? <Evidence />
+          : path === "/ledger" ? <LedgerPage />
+          : path === "/incident" ? <Incident />
           : <Home />}
       </main>
       <Footer />

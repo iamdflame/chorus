@@ -452,3 +452,125 @@
   color: var(--text-faint);
   margin-top: 0.3rem;
 }
+
+/* ── Incident ────────────────────────────────────────────────────────────────
+ * The only place --breach appears in the entire product, which is why it lands. */
+
+.incident {
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  background: var(--chassis);
+}
+
+.incident-controls {
+  display: flex;
+  border-bottom: 1px solid var(--rule);
+  overflow-x: auto;
+}
+
+.incident-tab {
+  flex: 1 0 auto;
+  padding: 0.85rem 1.1rem;
+  background: transparent;
+  border: 0;
+  border-right: 1px solid var(--rule);
+  color: var(--text-lo);
+  font: inherit;
+  font-size: var(--t-sm);
+  cursor: pointer;
+  transition: color 160ms var(--ease-place), background 160ms var(--ease-place);
+}
+
+.incident-tab:last-child { border-right: 0; }
+.incident-tab:hover { color: var(--text-hi); }
+
+.incident-tab[data-active="true"] {
+  color: var(--text-hi);
+  background: var(--chassis-hi);
+  font-variation-settings: "wght" 600, "wdth" 92, "ROND" 0;
+  box-shadow: inset 0 -2px 0 var(--filament);
+}
+
+.incident-stage {
+  display: grid;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 52rem) {
+  .incident-stage { grid-template-columns: 1fr 15rem; align-items: center; }
+}
+
+.incident-stage svg {
+  width: 100%;
+  height: auto;
+  /* A 100-unit viewBox stretched to 1,300px turns r=1.5 into a 20px disc, which reads as
+     a dot grid rather than a crowd. Capped so the cohort stays dense at any width. */
+  max-width: 34rem;
+  justify-self: center;
+}
+
+/* Latent members of the cohort. Shape carries the state as well as colour: a compromised
+   mark is filled and larger, a contained one is an open ring. */
+.incident-mark {
+  fill: var(--reflect-dim);
+  transition: fill 260ms var(--ease-place), r 260ms var(--spring-snap);
+}
+
+.incident-stage[data-mode="unarmed"] .incident-mark {
+  fill: var(--breach);
+  animation: spread 420ms var(--ease-place) both;
+}
+
+.incident-stage[data-mode="armed"] .incident-mark { fill: var(--reflect-dim); }
+
+.incident-stage[data-mode="armed"] .incident-mark[data-role="patient-zero"] {
+  fill: none;
+  stroke: var(--breach);
+  stroke-width: 0.8;
+}
+
+.incident-stage[data-mode="posthoc"] .incident-mark {
+  fill: none;
+  stroke: var(--counterfact);
+  stroke-width: 0.7;
+  animation: spread 520ms var(--ease-place) both;
+}
+
+@keyframes spread {
+  from { opacity: 0.15; }
+  to { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .incident-mark { animation: none !important; opacity: 1; }
+}
+
+.incident-readout { margin: 0; display: grid; gap: 0.9rem; }
+.incident-readout dt {
+  font-family: var(--data);
+  font-size: var(--t-xs);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+.incident-readout dd {
+  margin: 0.15rem 0 0;
+  font-size: var(--t-xl);
+  color: var(--text-hi);
+  font-variation-settings: "wght" 400;
+}
+.incident-readout div[data-tone="breach"] dd { color: var(--breach); }
+
+.incident-note {
+  margin: 0;
+  padding: 1.1rem 1.5rem 1.4rem;
+  border-top: 1px solid var(--rule);
+  color: var(--text);
+  max-width: 76ch;
+}
+
+.prose-head { padding-block: calc(var(--nav-h) + 4rem) 1rem; }
+.prose { max-width: var(--measure); }
+.prose p { margin: 0 0 1.1rem; }
