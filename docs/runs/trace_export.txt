@@ -1,0 +1,20 @@
+
+  12 spans across 1 trace(s)
+  7 executed · 5 replayed at zero duration · 0 quarantined
+  $0.0059 attributed to the calls that actually happened
+
+  passenger_agent:agent_enter  executed      0ms  links=1  $0.0000
+  passenger_agent:model_call   executed  22650ms  links=1  $0.0010
+  passenger_agent:agent_enter  replayed      0ms  links=1  $0.0000
+  passenger_agent:model_call   executed  25465ms  links=1  $0.0010
+  passenger_agent:agent_enter  replayed      0ms  links=1  $0.0000
+  passenger_agent:model_call   executed  37408ms  links=1  $0.0010
+  passenger_agent:agent_enter  replayed      0ms  links=1  $0.0000
+  passenger_agent:model_call   executed  28116ms  links=1  $0.0010
+  passenger_agent:agent_enter  replayed      0ms  links=1  $0.0000
+  passenger_agent:model_call   executed  33822ms  links=1  $0.0010
+  passenger_agent:agent_enter  replayed      0ms  links=1  $0.0000
+  passenger_agent:model_call   executed  24969ms  links=1  $0.0010
+
+  (showing 20 of 12; --cloud sends all of them to Cloud Trace)
+
