@@ -50,6 +50,9 @@ class EffectKind(str, Enum):
     STATE_READ = "state_read"
     STATE_WRITE = "state_write"
     USER_MESSAGE = "user_message"
+    # A tool call the gateway refused. Recorded rather than logged, so a refusal is
+    # content-addressed, replayable and diffable across branches like anything else.
+    GATEWAY_DENIED = "gateway_denied"
     CLOCK = "clock"
     RANDOM = "random"
 

@@ -160,6 +160,7 @@ class LightconePlugin(BasePlugin):
         store: EffectStore,
         branch_id: str = PRIMARY,
         mode: Mode = Mode.RECORD,
+        gateway: Any | None = None,
         registry: ReversibilityRegistry | None = None,
         name: str = "lightcone",
         seed_parents: tuple[str, ...] = (),
@@ -200,6 +201,10 @@ class LightconePlugin(BasePlugin):
         self.recorded: list[Effect] = []
         # Addresses already persisted by write-through, so flush does not rewrite them.
         self._written: set[str] = set()
+        # Policy gate for tool calls. None means no gateway is configured and every call
+        # is permitted — stated rather than implied, because a gateway that silently
+        # defaults to open is worse than none at all.
+        self.gateway = gateway
         self.diverged: list[str] = []
         # Every model-call address this plugin resolved, whether it paid for the answer
         # or was handed one. Distillation needs the address regardless of who paid: a row
@@ -479,6 +484,29 @@ class LightconePlugin(BasePlugin):
         if reads and self._state_fingerprint is not None:
             request["reads"] = {"collections": list(reads),
                                 "state": self._state_fingerprint(reads)}
+        if self.gateway is not None:
+            from gateway.policy import Request as GatewayRequest, denied_result
+
+            decision = self.gateway.check(GatewayRequest(
+                agent=agent, tool=tool.name, args=tool_args,
+                branch_id=self.branch_id, determinism=determinism,
+            ))
+            if not decision.allowed:
+                # The refusal is an effect. It has an address, a causal position and a
+                # reason, so replaying reproduces it at the same point and forking with a
+                # relaxed policy shows exactly which refusals disappear.
+                refusal, _ = self._open(
+                    agent=agent,
+                    kind=EffectKind.GATEWAY_DENIED,
+                    determinism=Determinism.PURE,
+                    request={"tool": tool.name, "args": tool_args,
+                             "rule": decision.rule},
+                )
+                self._advance(agent, refusal.id)
+                result = denied_result(decision, tool.name)
+                self._close(refusal, {"result": result})
+                return result
+
         effect, cached = self._open(
             agent=agent,
             kind=EffectKind.TOOL_CALL,
