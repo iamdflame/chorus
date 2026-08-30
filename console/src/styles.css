@@ -1,230 +1,167 @@
 /* Chorus console.
-   Dark, quiet, and almost entirely empty. The graph is the only thing on screen with any
-   weight; every control is a thin line of type at the edge of the frame.
+   One screen, one idea. Tokens come from site/tokens.css — this file must never redefine
+   them; it is imported last, so a duplicate :root block here would silently override the
+   entire design system. */
 
-   Tokens come from site/tokens.css — this file must not redefine them. It is imported
-   last, so a duplicate :root block here silently overrides the entire design system,
-   which is exactly what it used to do. */
+:root { --pad: clamp(18px, 2.4vw, 34px); }
 
-:root {
-  /* Console-only aliases onto the shared palette. */
-  --ground-lift: var(--ground-1);
-  --rule-bright: var(--rule-lit);
-  --accent-dim: var(--accent-deep);
-  --staged: var(--warn);
-  --irreversible: var(--danger);
-  --delegation: #8b7bff;
-  --pad: 24px;
-}
-
-/* The site scrolls; only the console route locks the viewport, and it does that through
-   .console-frame. A global `overflow: hidden` here made the whole marketing site
-   unscrollable — the page rendered at exactly one viewport tall. */
 #root { min-height: 100%; }
 
-::selection { background: var(--accent); color: var(--ground); }
+/* The console owns everything below the site nav. Fixed rather than flowed because the
+   renderer sizes to its host, and a host whose height depends on page flow gives it a
+   moving target. */
+.console-frame { position: fixed; inset: 72px 0 0; }
 
-/* -- shell ---------------------------------------------------------------- */
+.cx {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  height: 100%;
+}
 
-.console-shell { display: flex; flex-direction: column; height: 100%; }
+/* -- control bar ---------------------------------------------------------- */
 
-.topbar {
-  display: flex; align-items: baseline; gap: 28px;
-  padding: 18px var(--pad) 16px;
+.cx-bar {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 14px var(--pad);
   border-bottom: 1px solid var(--rule);
-  flex: 0 0 auto;
 }
 
-.wordmark {
-  font-size: 13px; letter-spacing: 0.42em; text-transform: uppercase;
-  color: var(--ink-bright); font-weight: 500;
+.cx-scenario {
+  margin: 0;
+  font-size: 12px;
+  color: var(--ink-dim);
+  letter-spacing: 0.02em;
 }
-.wordmark span { color: var(--accent); }
-
-.tagline { color: var(--ink-dim); font-size: 11px; letter-spacing: 0.06em; }
-
-.spacer { flex: 1; }
-
-.stage { position: relative; flex: 1 1 auto; min-height: 0; }
-.stage canvas { display: block; }
-
-/* -- branch rail ---------------------------------------------------------- */
-
-.rail { display: flex; align-items: center; gap: 2px; }
-
-.branch-chip {
-  appearance: none; border: 1px solid transparent; background: none;
-  color: var(--ink-dim); font: inherit; font-size: 11px;
-  padding: 5px 11px; cursor: pointer; letter-spacing: 0.04em;
-  transition: color 140ms ease, border-color 140ms ease;
+.cx-scenario b { color: var(--ink-bright); font-weight: 400; }
+.cx-scenario i {
+  display: inline-block;
+  width: 3px; height: 3px; border-radius: 50%;
+  background: var(--rule-lit);
+  margin: 0 12px;
+  vertical-align: middle;
 }
-.branch-chip:hover { color: var(--ink-bright); }
-.branch-chip[data-active="true"] {
-  color: var(--ground); background: var(--accent); border-color: var(--accent);
-}
-.branch-chip[data-primary="true"]:not([data-active="true"]) { color: var(--ink); }
+.cx-bar .btn { margin-left: auto; padding: 10px 18px; }
 
-/* -- controls ------------------------------------------------------------- */
+/* -- stage ---------------------------------------------------------------- */
 
-.action {
-  appearance: none; background: none; border: 1px solid var(--rule-bright);
-  color: var(--ink); font: inherit; font-size: 11px; letter-spacing: 0.08em;
-  text-transform: uppercase; padding: 7px 14px; cursor: pointer;
-  transition: color 140ms ease, border-color 140ms ease, background 140ms ease;
-}
-.action:hover:not(:disabled) { color: var(--accent); border-color: var(--accent-dim); }
-.action:disabled { opacity: 0.32; cursor: default; }
-.action[data-variant="primary"] {
-  border-color: var(--accent); color: var(--accent);
-}
-.action[data-variant="primary"]:hover:not(:disabled) {
-  background: var(--accent); color: var(--ground);
-}
+.cx-stage { position: relative; overflow: hidden; }
+.cx-stage canvas { display: block; }
 
-/* -- readouts ------------------------------------------------------------- */
+/* -- cohort card ---------------------------------------------------------- */
+/* Anchored bottom-left, opposite the readout's emphasis, and translucent so the field
+   stays legible behind it. Pinning it (by clicking) firms it up. */
 
-/* The readout is the page's one loud element. Everything else is a thin line of type at
-   the edge of the frame, so the numbers can carry real weight without competing. */
-.readout { display: flex; gap: 40px; align-items: flex-end; }
-.metric { display: flex; flex-direction: column; gap: 2px; }
-.metric-label {
-  font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-dim);
-}
-.metric-value {
-  font-size: 40px; line-height: 0.92; color: var(--ink-bright);
-  font-variant-numeric: tabular-nums; letter-spacing: -0.035em; font-weight: 300;
-}
-.metric-value[data-tone="accent"] { color: var(--accent); }
-.metric-value[data-tone="staged"] { color: var(--staged); }
-.metric-value[data-tone="danger"] { color: var(--irreversible); }
-
-/* -- inspector ------------------------------------------------------------ */
-
-.inspector {
-  position: absolute; top: var(--pad); width: 336px;
-  transition: left 220ms ease, right 220ms ease;
-  background: color-mix(in srgb, var(--ground-lift) 92%, transparent);
-  border: 1px solid var(--rule-bright);
+.cx-card {
+  position: absolute;
+  top: var(--pad);
+  width: min(340px, calc(100% - var(--pad) * 2));
   padding: 18px 20px 20px;
-  max-height: calc(100% - var(--pad) * 2); overflow-y: auto;
+  background: color-mix(in srgb, var(--ground) 88%, transparent);
+  border: 1px solid var(--rule);
+  backdrop-filter: blur(10px);
+  animation: card-in 260ms var(--ease) both;
 }
-/* Sit opposite the selection so the panel never covers the cone it is describing.
-   Left placement clears the lane labels. */
-.inspector[data-side="right"] { right: var(--pad); left: auto; }
-.inspector[data-side="left"] { left: 148px; right: auto; }
-.inspector h2 {
-  margin: 0 0 14px; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;
-  color: var(--ink-dim); font-weight: 500;
+.cx-card[data-pinned="true"] {
+  border-color: var(--accent-deep);
+  background: color-mix(in srgb, var(--ground) 96%, transparent);
 }
-.kv { display: grid; grid-template-columns: 96px 1fr; gap: 5px 12px; font-size: 11px; }
-.kv dt { color: var(--ink-dim); }
-.kv dd { margin: 0; color: var(--ink-bright); word-break: break-word; }
-
-.cone-banner {
-  margin: 16px 0 0; padding: 12px 0 0; border-top: 1px solid var(--rule);
-  font-size: 11px; color: var(--ink);
-}
-.cone-count { color: var(--accent); font-size: 26px; display: block; margin-bottom: 2px; }
-
-.staged-item {
-  font-size: 10px; color: var(--staged); padding: 4px 0;
-  border-bottom: 1px solid var(--rule); word-break: break-word;
+@keyframes card-in {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: none; }
 }
 
-/* -- footer --------------------------------------------------------------- */
+.cx-card h2 {
+  margin: 0 0 13px;
+  font-size: 9px;
+  font-weight: 400;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+.cx-card h2 + * { margin-top: 0; }
 
-.footer {
-  display: flex; align-items: flex-end; gap: 34px;
-  padding: 18px var(--pad) 20px; border-top: 1px solid var(--rule); flex: 0 0 auto;
-}
-
-.legend {
-  display: flex; gap: 15px; font-size: 10px; color: var(--ink-dim);
-  padding-bottom: 3px; letter-spacing: 0.02em;
-}
-.legend i {
-  display: inline-block; width: 7px; height: 7px; border-radius: 50%;
-  margin-right: 6px; vertical-align: middle;
-}
-
-.log {
-  font-size: 11px; color: var(--ink-dim); white-space: nowrap;
-  overflow: hidden; text-overflow: ellipsis; flex: 1; padding-bottom: 3px;
-}
-.log b { color: var(--accent); font-weight: 400; }
-
-.empty {
-  position: absolute; inset: 0; display: grid; place-content: center;
-  text-align: center; color: var(--ink-dim); gap: 10px;
-}
-.empty strong { color: var(--ink-bright); font-weight: 400; font-size: 15px; }
-
-/* -- search view ---------------------------------------------------------- */
-
-.search-view {
-  position: absolute; inset: 0; display: grid;
-  grid-template-columns: minmax(0, 1fr) 360px; gap: 0;
-}
-.search-plot { width: 100%; height: 100%; padding: 8px 0 0 8px; }
-
-.axis-label {
-  fill: var(--ink-dim); font-family: var(--mono); font-size: 10px;
-  letter-spacing: 0.06em;
-}
-.axis-note {
-  fill: var(--irreversible); font-family: var(--mono); font-size: 10px;
-  letter-spacing: 0.08em; opacity: 0.85;
-}
-
-.search-panel {
-  border-left: 1px solid var(--rule); padding: 22px 24px; overflow-y: auto;
-}
-.search-panel h2 {
-  margin: 0 0 12px; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;
-  color: var(--ink-dim); font-weight: 500;
-}
-.search-blurb {
-  margin: 0 0 18px; font-size: 11px; line-height: 1.65; color: var(--ink-dim);
-}
-.search-panel .kv dd[data-tone="good"] { color: var(--accent); }
-
-.clause {
-  margin: 0 0 12px; padding: 12px 14px; border-left: 2px solid var(--accent);
-  background: var(--ground-lift); font-size: 11px; line-height: 1.6;
+.cx-facets { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 18px; }
+.cx-facets span {
+  padding: 4px 9px;
+  border: 1px solid var(--rule-lit);
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
   color: var(--ink-bright);
 }
-.rationale {
-  margin: 0 0 16px; font-size: 10px; line-height: 1.6; color: var(--ink-dim);
-  font-style: italic;
+
+.cx-kv {
+  display: grid;
+  grid-template-columns: 74px 1fr;
+  gap: 7px 14px;
+  margin: 0 0 18px;
+  font-size: 12px;
+}
+.cx-kv dt { color: var(--ink-faint); }
+.cx-kv dd { margin: 0; color: var(--ink-bright); }
+.cx-kv dd[data-status="thinking"] { color: var(--hot); }
+.cx-kv dd[data-status="thought"]  { color: var(--accent); }
+.cx-kv dd[data-status="shared"]   { color: var(--accent-deep); }
+
+.cx-thought {
+  margin: 0 0 14px;
+  padding: 13px 15px;
+  max-height: 210px;
+  overflow: auto;
+  background: var(--ground-1);
+  border-left: 2px solid var(--accent-deep);
+  font-size: 11.5px;
+  line-height: 1.6;
+  color: var(--ink-bright);
 }
 
-.mode-rail { display: flex; gap: 2px; }
+.cx-foot { margin: 0; font-size: 11px; color: var(--ink-faint); }
 
-/* -- swarm stage ---------------------------------------------------------- */
+/* -- readout -------------------------------------------------------------- */
+/* The one loud element on the screen. Everything else is a thin line of type at the edge
+   of the frame, so the numbers can carry real weight without competing. */
 
-/* Both stages stay mounted; each owns a WebGL context that is expensive to recreate,
-   so switching modes hides a renderer rather than tearing it down.
-
-   Hidden with `visibility`, never `display: none`. A display-hidden host measures zero,
-   and Pixi's resize plugin then thrashes the canvas between zero and full size every
-   frame — which keeps the whole page in perpetual reflow and makes controls permanently
-   un-clickable. Absolute positioning inside a sized wrapper keeps both hosts at stable
-   dimensions whether or not they are on screen. */
-.stages { position: relative; flex: 1 1 auto; min-height: 0; }
-.swarm-stage, .stage {
-  position: absolute; inset: 0; overflow: hidden;
-}
-.swarm-stage[data-visible="false"], .stage[data-visible="false"] {
-  visibility: hidden;
-  pointer-events: none;
+.cx-readout {
+  display: flex;
+  align-items: flex-end;
+  gap: clamp(22px, 3.4vw, 52px);
+  padding: 18px var(--pad) 20px;
+  border-top: 1px solid var(--rule);
 }
 
-/* -- console as a route --------------------------------------------------- */
-/* The console owns everything below the nav. Fixed rather than flowed because its canvas
-   sizes to its host, and a host whose height depends on page flow gives the renderer a
-   moving target. */
-.console-frame {
-  position: fixed;
-  inset: 72px 0 0;
+.cx-metric { display: flex; flex-direction: column; gap: 2px; }
+.cx-metric-value {
+  font-size: clamp(22px, 2.6vw, 36px);
+  line-height: 0.94;
+  letter-spacing: -0.035em;
+  color: var(--ink-bright);
 }
-.console-frame .console-shell { height: 100%; }
+.cx-metric-value[data-tone="accent"] { color: var(--accent); }
+.cx-metric-value[data-tone="muted"]  { color: var(--ink-faint); }
+.cx-metric-label {
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.cx-note {
+  margin: 0 0 4px auto;
+  font-size: 11px;
+  color: var(--ink-dim);
+  text-align: right;
+  max-width: 46ch;
+}
+
+@media (max-width: 820px) {
+  .cx-readout { flex-wrap: wrap; gap: 20px; }
+  .cx-note { margin-left: 0; text-align: left; width: 100%; }
+  .cx-card { position: absolute; inset: auto var(--pad) var(--pad) var(--pad); width: auto; }
+}
+
+/* The card sits opposite the cohort it describes; anchored top-left it covered the very
+   cell you had just pointed at. */
+.cx-card { transition: left 220ms var(--ease), right 220ms var(--ease); }
+.cx-card[data-side="left"]  { left: var(--pad);  right: auto; }
+.cx-card[data-side="right"] { right: var(--pad); left: auto; }

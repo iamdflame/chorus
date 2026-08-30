@@ -202,7 +202,7 @@ class Swarm:
         role: str,
         context: str,
         round_id: str,
-        on_progress: Callable[[int, int, SwarmMetrics, str, bool], None] | None = None,
+        on_progress: Callable[[int, int, SwarmMetrics, str, bool, dict[str, Any] | None], None] | None = None,
     ) -> tuple[dict[str, dict[str, Any]], SwarmMetrics]:
         """Invoke every entity's agent. Sharing is discovered, never assumed."""
         started = time.perf_counter()
@@ -237,7 +237,7 @@ class Swarm:
                     # the difference between them is the entire claim.
                     on_progress(
                         metrics.agents_invoked, len(entities), metrics,
-                        projection.key(), plugin.misses > 0,
+                        projection.key(), plugin.misses > 0, answer,
                     )
 
         # Sequential batches rather than one giant gather: 8,000 coroutines all holding

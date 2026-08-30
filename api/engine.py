@@ -399,7 +399,10 @@ class Engine:
 
             queue: asyncio.Queue = asyncio.Queue()
 
-            def progress(done: int, total: int, metrics, cohort: str, thought: bool) -> None:
+            def progress(
+                done: int, total: int, metrics, cohort: str, thought: bool,
+                answer: dict[str, Any] | None = None,
+            ) -> None:
                 # One event per agent would flood the stream; cohorts are emitted the
                 # first time they resolve, and aggregate counters ride along every 25.
                 first_time = cohort not in resolved
@@ -409,6 +412,9 @@ class Engine:
                     queue.put_nowait({
                         "event": "progress", "done": done, "total": total,
                         "cohort": cohort, "thought": thought, "first": first_time,
+                        # Only on the first resolution: the console shows one thought per
+                        # cohort, and repeating it on every hit would be pure stream noise.
+                        "preference": answer if first_time else None,
                         **metrics.to_dict(),
                     })
 

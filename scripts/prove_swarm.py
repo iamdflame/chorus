@@ -67,7 +67,8 @@ async def main(count: int, concurrency: int) -> int:
 
     swarm = Swarm(store=store, branch_id=PRIMARY, mode=Mode.REPLAY, concurrency=concurrency)
 
-    def progress(done: int, total: int, m, cohort: str = "", thought: bool = False) -> None:
+    def progress(done: int, total: int, m, cohort: str = "", thought: bool = False,
+                 answer: dict | None = None) -> None:
         if done % 10 == 0 or done == total:
             print(f"\r  [{bar(done, total)}] {done:>5,}/{total:,}  "
                   f"model calls {m.model_calls:>4}  cache {m.cache_hits:>5}  "
