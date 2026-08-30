@@ -35,31 +35,7 @@ export interface Graph {
   stats: Record<string, unknown>;
 }
 
-export interface Lightcone {
-  root: string;
-  forward: string[];
-  backward: string[];
-  forward_count: number;
-  backward_count: number;
-  agents_touched: string[];
-  irreversible_downstream: { id: string; agent: string; action: string }[];
-  cost_downstream_usd: number;
-}
 
-export interface Diff {
-  left: string;
-  right: string;
-  causal: Record<string, number>;
-  state_changes: Record<string, { left: unknown; right: unknown }>;
-  money: {
-    left: { refund_count: number; refund_total_usd: number; emails_sent: number; tickets_open: number };
-    right: { refund_count: number; refund_total_usd: number; emails_sent: number; tickets_open: number };
-    delta_refund_usd: number;
-    delta_refund_count: number;
-  };
-  staged_actions: { id: string; agent: string; action: string }[];
-  staged_count: number;
-}
 
 async function json<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(path, {
@@ -96,32 +72,6 @@ export const api = {
     json<{ agents: number; cohorts: { key: string; size: number; label: string }[];
            scenario: Record<string, number> }>(`/api/swarm/cohorts?agents=${agents}`),
   graph: (branch: string) => json<Graph>(`/api/branches/${branch}/graph`),
-  effect: (branch: string, id: string) =>
-    json<Record<string, unknown>>(`/api/branches/${branch}/effects/${id}`),
-  lightcone: (branch: string, id: string) =>
-    json<Lightcone>(`/api/branches/${branch}/effects/${id}/lightcone`),
-  diff: (left: string, right: string) => json<Diff>(`/api/branches/${left}/diff/${right}`),
-  world: (branch: string, collection: string, atSeq?: number) =>
-    json<Record<string, any>>(
-      `/api/branches/${branch}/world/${collection}` + (atSeq ? `?at_seq=${atSeq}` : ""),
-    ),
-  fork: (branch: string, body: { name: string; at_seq: number; perturbation?: unknown }) =>
-    json<Branch>(`/api/branches/${branch}/fork`, { method: "POST", body: JSON.stringify(body) }),
-  editPolicy: (branch: string, clause: string, text: string) =>
-    json<Record<string, unknown>>(`/api/branches/${branch}/policies/${clause}`, {
-      method: "PATCH",
-      body: JSON.stringify({ text }),
-    }),
-  adopt: (clause_id: string, text: string) =>
-    json<Record<string, unknown>>("/api/policies/adopt", {
-      method: "POST",
-      body: JSON.stringify({ clause_id, text }),
-    }),
-  merge: (branch: string, into = "primary", force = false) =>
-    json<Record<string, unknown>>(`/api/branches/${branch}/merge`, {
-      method: "POST",
-      body: JSON.stringify({ into, force }),
-    }),
 };
 
 /** Shared SSE reader. Both replay and search stream over POST, which EventSource
@@ -157,39 +107,6 @@ export async function streamSwarm(
   signal?: AbortSignal,
 ): Promise<void> {
   const res = await fetch("/api/swarm", {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify(body),
-    signal,
-  });
-  await readEvents(res, onEvent);
-}
-
-/** Stream a policy search: candidates fork, replay against real history, and settle
- *  onto a cost frontier one at a time. */
-export async function streamSearch(
-  body: { dispute_ids?: string[]; generations?: number; population?: number },
-  onEvent: (event: Record<string, any>) => void,
-  signal?: AbortSignal,
-): Promise<void> {
-  const res = await fetch("/api/search", {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify(body),
-    signal,
-  });
-  await readEvents(res, onEvent);
-}
-
-/** Stream a replay. Server-Sent Events over POST, so it is read manually rather than
- *  with EventSource — the payload matters and EventSource cannot POST. */
-export async function streamReplay(
-  branch: string,
-  body: { dispute_ids?: string[]; limit?: number },
-  onEvent: (event: Record<string, any>) => void,
-  signal?: AbortSignal,
-): Promise<void> {
-  const res = await fetch(`/api/branches/${branch}/replay`, {
     method: "POST",
     headers: { "content-type": "application/json" },
     body: JSON.stringify(body),
