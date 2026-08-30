@@ -2,8 +2,6 @@
 
 **Twenty thousand agents. Two hundred thoughts.**
 
-[![proofs](https://github.com/iamdflame/chorus/actions/workflows/ci.yml/badge.svg)](https://github.com/iamdflame/chorus/actions/workflows/ci.yml)
-
 **Live:** https://chorus-512017284899.us-central1.run.app
 **Source:** https://github.com/iamdflame/chorus
 **Track:** The Fortified Enterprise Fleet
@@ -157,7 +155,7 @@ Firestore    durable timeline, keyed by content address
 
 `kernel/` is framework-agnostic and dependency-light. ADK appears in exactly one file
 (`kernel/interposer.py`), and Google Cloud in exactly one (`kernel/firestore_store.py`),
-so the determinism proof runs offline in CI against an in-memory reference — and the
+so the determinism proof runs offline against an in-memory reference — and the
 Firestore backend is validated by *behaving identically to it*, including agreeing on the
 causal root hash.
 
@@ -231,6 +229,23 @@ echo "GOOGLE_API_KEY=your-key-here" > .env      # https://aistudio.google.com/ap
 cd console && npm install && npm run build               # build the front end
 open http://127.0.0.1:8080
 ```
+
+**The proofs.** These five commands are exactly what
+[`.github/workflows/ci.yml`](.github/workflows/ci.yml) runs on every push. They need no
+cloud account and spend nothing — which is the reason the kernel imports neither ADK nor
+Google Cloud.
+
+```bash
+python -m pytest tests/ -q               # 52 tests
+python scripts/verify_determinism.py     # replay reaches the model 0 times, same root hash
+python scripts/verify_collapse.py        # distinct thoughts saturate; identity never leaks
+npx --prefix console tsc -b --noEmit     # typecheck
+npm run build --prefix console           # build
+```
+
+*The workflow is committed and correct — all five steps pass locally — but GitHub Actions
+is currently blocked on this account for a billing reason unrelated to the code, so there
+is no badge here rather than a red one.*
 
 **Tests:**
 
