@@ -59,6 +59,25 @@ MIN_PRODUCER_TEXT = 16
 
 
 class Mode(str, Enum):
+    """How the interposer treats the effect store.
+
+    The names are about *provenance*, not about speed, and the distinction has bitten
+    this project once already, so it is spelled out:
+
+    RECORD
+        Never consult the store. Every call executes and is recorded. This is what you
+        want when producing a clean recording to replay against later — and it is the
+        wrong mode for a swarm, because collapse *is* the store lookup. Two scripts were
+        written with it and paid full price for answers the store already held.
+    REPLAY
+        Consult the store; execute and record on a miss. This is the mode that makes a
+        swarm cheap, and it is what every collapse number in this repository is measured
+        under.
+    REPLAY_STRICT
+        Consult the store; a miss is an error. Determinism proofs use this, because a
+        miss there means execution diverged where it was asserted not to.
+    """
+
     RECORD = "record"
     REPLAY = "replay"
     REPLAY_STRICT = "replay_strict"

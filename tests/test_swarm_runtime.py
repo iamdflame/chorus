@@ -96,3 +96,45 @@ async def test_identical_situations_do_not_each_reach_the_model():
         f"{metrics.model_calls} calls for {distinct} distinct situations — "
         "more calls than situations means duplicate work survived coalescing"
     )
+
+
+class TestModeSemantics:
+    """RECORD never consults the store and REPLAY does.
+
+    Two scripts were written with RECORD and paid full price for answers already held.
+    The failure is quiet — the run completes and the numbers look plausible — so the
+    distinction is pinned here rather than left to a docstring.
+    """
+
+    def test_record_ignores_the_store(self) -> None:
+        import asyncio
+
+        from kernel.branch import PRIMARY
+        from kernel.interposer import Mode
+        from kernel.store import InMemoryEffectStore
+        from swarm.canonical import bind, project_passenger
+        from swarm.scenario import build_scenario
+        from swarm.runtime import Swarm
+        from tests.instruments import CountingLlm
+        from dataclasses import asdict
+
+        passengers = [asdict(p) for p in build_scenario(passengers=400).passengers]
+        distinct = len({bind(project_passenger, FIXED)(p).key() for p in passengers})
+
+        async def run(mode: Mode) -> int:
+            swarm = Swarm(store=InMemoryEffectStore(), branch_id=PRIMARY, mode=mode,
+                          concurrency=1)
+            model = CountingLlm()
+            for role in swarm.agents:
+                swarm.agents[role].model = model
+            await swarm.run(
+                entities=passengers, projector=bind(project_passenger, FIXED),
+                role="passenger", context="ORD closed.", round_id="mode-test",
+            )
+            return model.calls
+
+        recorded = asyncio.run(run(Mode.RECORD))
+        replayed = asyncio.run(run(Mode.REPLAY))
+        assert recorded == len(passengers), "RECORD must execute every call"
+        assert replayed == distinct, "REPLAY must pay once per distinct situation"
+        assert replayed < recorded

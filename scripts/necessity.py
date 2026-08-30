@@ -64,7 +64,7 @@ async def main(derive: int, serve: int, rate: float, concurrency: int) -> int:
     print(f"\n  [1] deriving a policy from {derive:,} travellers\n")
 
     swarm = Swarm(
-        store=InMemoryEffectStore(), branch_id=PRIMARY, mode=Mode.RECORD,
+        store=InMemoryEffectStore(), branch_id=PRIMARY, mode=Mode.REPLAY,
         concurrency=concurrency,
     )
 
@@ -77,6 +77,17 @@ async def main(derive: int, serve: int, rate: float, concurrency: int) -> int:
         context=CONTEXT, round_id="necessity-derive", on_progress=progress,
     )
     print()
+
+    # A swarm that pays for answers the store already holds is not collapsing, and the
+    # symptom is quiet: the run completes, the numbers look plausible, and the bill is
+    # several times what it should be. That happened here once, from a mode that never
+    # consults the store, so the invariant is asserted rather than assumed.
+    distinct = len({projector(p).key() for p in passengers})
+    if metrics.model_calls > distinct * 1.1 + 5:
+        print(f"\n  FAIL  {metrics.model_calls:,} model calls for {distinct:,} distinct "
+              f"situations.\n        The store is not being consulted — check the "
+              f"interposer Mode.\n")
+        return 1
 
     # -- [2] distill -----------------------------------------------------------
     table = distill(swarm.last_cohorts.values(), clock=FIXED, model=MODEL)
@@ -109,7 +120,7 @@ async def main(derive: int, serve: int, rate: float, concurrency: int) -> int:
     print(f"\n  [4] shadow-sampling {100 * rate:.0f}% of the table against live "
           f"{MODEL}\n")
     shadow_swarm = Swarm(
-        store=InMemoryEffectStore(), branch_id=PRIMARY, mode=Mode.RECORD,
+        store=InMemoryEffectStore(), branch_id=PRIMARY, mode=Mode.REPLAY,
         concurrency=concurrency,
     )
     by_key = {}

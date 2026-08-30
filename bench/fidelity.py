@@ -136,7 +136,7 @@ async def elicit(
     passengers: list[dict[str, Any]], projector: Any, *, label: str, concurrency: int
 ) -> tuple[dict[str, dict[str, Any]], Any]:
     swarm = Swarm(
-        store=InMemoryEffectStore(), branch_id=PRIMARY, mode=Mode.RECORD,
+        store=InMemoryEffectStore(), branch_id=PRIMARY, mode=Mode.REPLAY,
         concurrency=concurrency,
     )
     done = {"n": 0}
