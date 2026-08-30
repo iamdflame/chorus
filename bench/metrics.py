@@ -63,6 +63,10 @@ class Panel:
     souls_seated: int = 0
     bookings_stranded: int = 0
     souls_stranded: int = 0
+    # Totals over seated travellers, not per-passenger means. A strategy that seats more
+    # people therefore scores higher even if it serves each of them slightly worse, which
+    # is the intended reading — total welfare — but only comparable between arms run on
+    # the same population. Never compare these across populations of different sizes.
     satisfaction_tier_weighted: float = 0.0
     satisfaction_tier_blind: float = 0.0
     mean_wait: float = 0.0

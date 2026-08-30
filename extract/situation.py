@@ -120,6 +120,17 @@ class Extracted:
     def min_confidence(self) -> float:
         return min(self.confidence.values()) if self.confidence else 0.0
 
+    def min_confidence_over(self, fields: tuple[str, ...]) -> float:
+        """Lowest confidence among a chosen subset of fields.
+
+        Routing must not weigh the model's uncertainty about an answer it is not going to
+        use. Where the booking record is authoritative the extracted value is discarded,
+        so doubt about it cannot put the traveller in the wrong bucket, and letting it
+        force an escalation buys nothing and costs a full-price call.
+        """
+        picked = [self.confidence[f] for f in fields if f in self.confidence]
+        return min(picked) if picked else 0.0
+
     @property
     def mean_confidence(self) -> float:
         values = list(self.confidence.values())

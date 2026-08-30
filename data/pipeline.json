@@ -1,0 +1,46 @@
+{
+  "entities": 30,
+  "distinct_messages": 30,
+  "distinct_situations": 27,
+  "escalated": 0,
+  "extraction": {
+    "calls": 30,
+    "cached": 0,
+    "cost_usd": 0.0771
+  },
+  "elicitation": {
+    "calls": 27,
+    "cached": 0,
+    "cost_usd": 0.0247
+  },
+  "total_calls": 57,
+  "naive_calls": 60,
+  "blended_collapse": 1.1,
+  "elicitation_collapse": 1.1,
+  "extraction_failed": 0,
+  "quotation_rate": 0.9833333333333333,
+  "routed": {
+    "collapse": 27,
+    "escalate": 0,
+    "ask": 3
+  },
+  "panel": {
+    "strategy": "Chorus",
+    "bookings_seated": 26,
+    "souls_seated": 86,
+    "bookings_stranded": 4,
+    "souls_stranded": 16,
+    "satisfaction_tier_weighted": 128.2,
+    "satisfaction_tier_blind": 67.5,
+    "mean_wait": 2.83,
+    "p95_wait": 3.2,
+    "worst_wait": 7.6,
+    "gini_wait": 0.1479,
+    "parties_split": 0,
+    "constraint_violations": 0,
+    "model_calls": 57,
+    "coalesced": 0,
+    "cost_usd": 0.1017,
+    "notes": []
+  }
+}

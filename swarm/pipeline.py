@@ -42,6 +42,19 @@ from swarm.canonical import Projection
 # worse than an expensive right one.
 ESCALATION_THRESHOLD = 0.55
 
+# Which half of the projection each source owns.
+#
+# The split is not a convenience, it is a claim about who knows what. Loyalty tier, haul,
+# hotel entitlement and misconnect status are held as fact by the airline; no sentence a
+# traveller writes can change them, and asking a model to guess a value already in the
+# database is waste twice over — it pays for the guess, then escalates when the guess is
+# unsure. Urgency, party composition and constraints are the opposite: the booking form
+# recorded what someone ticked at purchase, while the message is where a traveller says
+# their mother is eighty-four and cannot manage stairs. The record never captured that,
+# and it is the whole reason an unbounded input needs a model to read it.
+MESSAGE_SOURCED = ("urgency", "party", "constraints")
+RECORD_SOURCED = ("tier", "haul", "hotel_entitled", "misconnect")
+
 
 @dataclass
 class StageCost:
@@ -127,12 +140,18 @@ def route(extracted: Extracted) -> str:
     unsure of must not be answered from a cohort's shared thought, because the cohort may
     be the wrong one — so it is reasoned about individually, at full price. That cost is
     reported rather than absorbed.
+
+    Confidence is read over `MESSAGE_SOURCED` only. An earlier version took the minimum
+    across every field, which meant the model's doubt about loyalty tier — a value it
+    almost never sees stated, is right to be unsure of, and whose extracted answer is
+    discarded in favour of the booking record — escalated 23 travellers in 24. The
+    threshold was not the bug; asking the wrong question was.
     """
     if extracted.error:
         return "escalate"
     if extracted.clarifying_question:
         return "ask"
-    if extracted.min_confidence < ESCALATION_THRESHOLD:
+    if extracted.min_confidence_over(MESSAGE_SOURCED) < ESCALATION_THRESHOLD:
         return "escalate"
     return "collapse"
 
