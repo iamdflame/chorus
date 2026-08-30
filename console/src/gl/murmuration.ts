@@ -166,9 +166,10 @@ export class Murmuration {
       const rx = Math.max(cell.w / 2 - 3, 1.5);
       const ry = Math.max(cell.h / 2 - 3, 1.5);
       const drawn = Math.min(cohort.size, 300); // beyond this the cloud reads as solid
-      // Floor the dot size: a cohort of four in a tiny cell must still be a visible mark,
-      // not a sub-pixel smudge that reads as empty space.
-      const dotSize = Math.max(Math.min(rx, ry) / 12, 1.1);
+      // Floored so a cohort of four stays a visible mark rather than a sub-pixel smudge,
+      // and capped so a cohort of hundreds reads as a population rather than as gravel —
+      // the dots are agents, and an agent should never look like a boulder.
+      const dotSize = Math.min(Math.max(Math.min(rx, ry) / 12, 1.1), 2.4);
       for (let i = 0; i < drawn; i += 1) {
         const angle = random() * Math.PI * 2;
         const radius = Math.sqrt(random());

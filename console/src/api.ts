@@ -92,6 +92,9 @@ export interface SearchCandidateDTO {
 
 export const api = {
   branches: () => json<Branch[]>("/api/branches"),
+  cohorts: (agents = 20000) =>
+    json<{ agents: number; cohorts: { key: string; size: number; label: string }[];
+           scenario: Record<string, number> }>(`/api/swarm/cohorts?agents=${agents}`),
   graph: (branch: string) => json<Graph>(`/api/branches/${branch}/graph`),
   effect: (branch: string, id: string) =>
     json<Record<string, unknown>>(`/api/branches/${branch}/effects/${id}`),

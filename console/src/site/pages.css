@@ -1,0 +1,210 @@
+/* Page-level composition. */
+
+.page { position: relative; z-index: 1; padding-top: 72px; }
+
+/* -- hero ----------------------------------------------------------------- */
+
+.hero {
+  position: relative;
+  min-height: min(92vh, 940px);
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  border-bottom: 1px solid var(--rule);
+}
+
+.hero-field {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  /* Masked to fall away behind the headline and hold density on the right, where there
+     is no text — the type must never fight the artwork, but the artwork must still be
+     unmistakably there. */
+  mask-image:
+    linear-gradient(100deg, transparent 4%, #000 34%, #000 100%),
+    radial-gradient(ellipse 96% 84% at 68% 50%, #000 32%, transparent 88%);
+  mask-composite: intersect;
+  -webkit-mask-composite: source-in;
+  opacity: 1;
+}
+
+.hero-fade {
+  position: absolute;
+  inset: auto 0 0;
+  height: 190px;
+  background: linear-gradient(to bottom, transparent, var(--ground));
+  pointer-events: none;
+}
+
+.hero-inner { position: relative; z-index: 2; padding-block: clamp(84px, 14vh, 150px); }
+.hero-lede { margin-top: 30px; max-width: 56ch; }
+.hero-actions { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 40px; }
+
+.hero-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(132px, max-content));
+  gap: clamp(28px, 5vw, 68px);
+  margin: clamp(52px, 8vh, 86px) 0 0;
+  padding-top: 30px;
+  border-top: 1px solid var(--rule);
+}
+.hero-stats dd { margin: 0; font-size: clamp(28px, 3.4vw, 46px); line-height: 1; }
+.hero-stats dt {
+  margin-top: 9px;
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+/* -- generic sections ----------------------------------------------------- */
+
+.two-up {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: clamp(26px, 4vw, 64px);
+  margin-top: 44px;
+}
+
+.pillars {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(272px, 1fr));
+  gap: clamp(30px, 4vw, 62px);
+}
+.pillars article { border-top: 1px solid var(--rule-lit); padding-top: 26px; }
+.pillar-n {
+  display: block;
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  color: var(--accent);
+  margin-bottom: 20px;
+}
+.pillars h3 { margin: 0 0 16px; }
+
+.closer { text-align: left; }
+
+/* -- chart ---------------------------------------------------------------- */
+
+.chart { margin: 54px 0 0; }
+.chart svg { width: 100%; height: auto; display: block; overflow: visible; }
+.chart figcaption b { color: var(--ink-bright); font-weight: 400; }
+.chart figcaption {
+  margin-top: 22px;
+  font-size: 12px;
+  color: var(--ink-faint);
+  max-width: 62ch;
+}
+
+.chart-grid { stroke: var(--rule); stroke-width: 1; }
+.chart-tick {
+  fill: var(--ink-faint);
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+}
+.chart-value {
+  fill: var(--ink-bright);
+  font-family: var(--mono);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+.chart-label {
+  fill: var(--ink-dim);
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+}
+.chart-label.accent { fill: var(--accent); font-size: 13px; }
+.chart-label.naive { fill: var(--danger); opacity: 0.75; }
+
+.chart-callout { stroke: var(--accent); stroke-width: 1; stroke-dasharray: 2 4; opacity: 0.6; }
+.chart-line { fill: none; stroke: var(--accent); stroke-width: 2.5; stroke-linecap: round; }
+.chart-dot { fill: var(--ground); stroke: var(--accent); stroke-width: 2.5; }
+
+/* The line draws itself as the figure scrolls through, so the flattening is something
+   you watch happen rather than a shape already sitting there. */
+@supports (animation-timeline: view()) {
+  .chart-line {
+    stroke-dasharray: 1400;
+    stroke-dashoffset: 1400;
+    animation: draw linear both;
+    animation-timeline: view();
+    animation-range: entry 18% cover 52%;
+  }
+  .chart-dot, .chart-value {
+    animation: pop linear both;
+    animation-timeline: view();
+    animation-range: entry 26% cover 58%;
+  }
+  .chart-area { animation: fade linear both; animation-timeline: view(); animation-range: entry 20% cover 56%; }
+}
+@keyframes draw { to { stroke-dashoffset: 0; } }
+@keyframes pop  { from { opacity: 0; } to { opacity: 1; } }
+@keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+
+/* -- comparison table ----------------------------------------------------- */
+
+.compare { margin-top: 46px; }
+.compare table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.compare th {
+  text-align: right;
+  padding: 0 0 16px;
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  border-bottom: 1px solid var(--rule-lit);
+}
+.compare th:first-child { text-align: left; }
+.compare td { padding: 18px 0; border-bottom: 1px solid var(--rule); text-align: right; }
+.compare td:first-child { text-align: left; color: var(--ink-dim); }
+.compare tr.hot td { color: var(--ink-bright); }
+.compare tr.hot td:nth-child(3) { color: var(--accent); font-size: 17px; }
+.compare .up { color: var(--accent); font-size: 12px; }
+.compare .flat { color: var(--ink-faint); font-size: 12px; }
+.compare-note { margin-top: 26px; }
+
+/* -- prose pages ---------------------------------------------------------- */
+
+.prose-head { padding-block: clamp(64px, 11vh, 128px) 0; }
+.prose-head .lede { margin-top: 26px; }
+
+.steps { display: grid; gap: 1px; background: var(--rule); margin-top: 52px; }
+.step {
+  background: var(--ground);
+  padding: clamp(26px, 3.4vw, 44px);
+  display: grid;
+  grid-template-columns: 88px minmax(0, 1fr);
+  gap: clamp(18px, 3vw, 44px);
+  align-items: start;
+}
+.step-n { font-size: 11px; letter-spacing: 0.22em; color: var(--accent); padding-top: 6px; }
+.step h3 { margin: 0 0 14px; }
+.step code {
+  display: block;
+  margin-top: 20px;
+  padding: 16px 18px;
+  background: var(--ground-1);
+  border-left: 2px solid var(--accent-deep);
+  font-size: 12.5px;
+  color: var(--ink-bright);
+  overflow-x: auto;
+  white-space: pre;
+}
+
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 1px; background: var(--rule); margin-top: 48px; }
+.fact { background: var(--ground); padding: 30px 26px; }
+.fact dd { margin: 0; font-size: clamp(26px, 3vw, 40px); line-height: 1; }
+.fact dt { margin-top: 12px; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-faint); }
+.fact[data-tone="accent"] dd { color: var(--accent); }
+
+@media (max-width: 760px) {
+  .step { grid-template-columns: 1fr; gap: 14px; }
+  .compare table { font-size: 12.5px; }
+}

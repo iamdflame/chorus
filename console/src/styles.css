@@ -1,49 +1,32 @@
-/* Lightcone console.
-   Dark, quiet, and almost entirely empty. The causal graph is the only thing on screen
-   with any weight; every control is a thin line of type at the edge of the frame. */
+/* Chorus console.
+   Dark, quiet, and almost entirely empty. The graph is the only thing on screen with any
+   weight; every control is a thin line of type at the edge of the frame.
+
+   Tokens come from site/tokens.css — this file must not redefine them. It is imported
+   last, so a duplicate :root block here silently overrides the entire design system,
+   which is exactly what it used to do. */
 
 :root {
-  --ground: #07080a;
-  --ground-lift: #0c0e12;
-  --rule: #16181d;
-  --rule-bright: #232730;
-
-  --ink-faint: #3f4450;
-  --ink-dim: #565c69;
-  --ink: #98a1b0;
-  --ink-bright: #e6eaf1;
-
-  /* One accent. Semantic colours below carry meaning, not decoration. */
-  --accent: #5ef0c8;
-  --accent-dim: #1e5c4e;
-  --staged: #f5a524;
-  --irreversible: #ff5c5c;
+  /* Console-only aliases onto the shared palette. */
+  --ground-lift: var(--ground-1);
+  --rule-bright: var(--rule-lit);
+  --accent-dim: var(--accent-deep);
+  --staged: var(--warn);
+  --irreversible: var(--danger);
   --delegation: #8b7bff;
-
-  --mono: "JetBrains Mono", "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
-
   --pad: 24px;
 }
 
-* { box-sizing: border-box; }
-
-html, body, #root {
-  height: 100%;
-  margin: 0;
-  background: var(--ground);
-  color: var(--ink);
-  font-family: var(--mono);
-  font-size: 13px;
-  line-height: 1.5;
-  -webkit-font-smoothing: antialiased;
-  overflow: hidden;
-}
+/* The site scrolls; only the console route locks the viewport, and it does that through
+   .console-frame. A global `overflow: hidden` here made the whole marketing site
+   unscrollable — the page rendered at exactly one viewport tall. */
+#root { min-height: 100%; }
 
 ::selection { background: var(--accent); color: var(--ground); }
 
 /* -- shell ---------------------------------------------------------------- */
 
-.shell { display: flex; flex-direction: column; height: 100%; }
+.console-shell { display: flex; flex-direction: column; height: 100%; }
 
 .topbar {
   display: flex; align-items: baseline; gap: 28px;
@@ -235,3 +218,13 @@ html, body, #root {
   visibility: hidden;
   pointer-events: none;
 }
+
+/* -- console as a route --------------------------------------------------- */
+/* The console owns everything below the nav. Fixed rather than flowed because its canvas
+   sizes to its host, and a host whose height depends on page flow gives the renderer a
+   moving target. */
+.console-frame {
+  position: fixed;
+  inset: 72px 0 0;
+}
+.console-frame .console-shell { height: 100%; }

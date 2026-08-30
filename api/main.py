@@ -17,7 +17,7 @@ from typing import Any
 
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse
+from fastapi.responses import FileResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
@@ -263,6 +263,32 @@ def adopt(request: AdoptRequest) -> dict[str, Any]:
 
 # -- swarm --------------------------------------------------------------------
 
+@app.get("/api/swarm/cohorts")
+def swarm_cohorts(agents: int = 20000) -> dict[str, Any]:
+    """The cohort layout for a population, without running anything.
+
+    Pure bucketing, no model calls, no cost — so the console can render the field at rest
+    before a single agent has been woken.
+    """
+    from dataclasses import asdict
+
+    from swarm.canonical import collapse, project_passenger
+    from swarm.scenario import build_scenario
+
+    scenario = build_scenario(passengers=agents)
+    passengers = [asdict(p) for p in scenario.passengers]
+    grouped = collapse(passengers, project_passenger)
+    return {
+        "agents": len(passengers),
+        "scenario": scenario.summary(),
+        "cohorts": [
+            {"key": key, "size": len(members),
+             "label": key.split("|", 1)[1] if "|" in key else key}
+            for key, members in sorted(grouped.items(), key=lambda kv: len(kv[1]), reverse=True)
+        ],
+    }
+
+
 @app.post("/api/swarm")
 async def swarm(request: SwarmRequest) -> StreamingResponse:
     """Run the swarm, streaming progress.
@@ -287,4 +313,24 @@ async def swarm(request: SwarmRequest) -> StreamingResponse:
 # -- console ------------------------------------------------------------------
 
 if CONSOLE_DIR.exists():
-    app.mount("/", StaticFiles(directory=str(CONSOLE_DIR), html=True), name="console")
+    # Hashed asset files are served directly and cached hard; they are immutable by
+    # construction, so a year is safe and a rebuild busts it via the filename.
+    app.mount(
+        "/assets",
+        StaticFiles(directory=str(CONSOLE_DIR / "assets")),
+        name="assets",
+    )
+
+    @app.get("/{path:path}", include_in_schema=False)
+    def spa(path: str) -> FileResponse:
+        """Serve the console shell for any non-API path.
+
+        The front end routes on the client, so /mechanism and /evidence have no file
+        behind them. A plain StaticFiles mount 404s on those, which breaks every deep
+        link, every refresh and every link anyone shares — the routes work only if you
+        arrive at / first and click. Real files are still served when they exist.
+        """
+        candidate = (CONSOLE_DIR / path).resolve()
+        if path and candidate.is_file() and candidate.is_relative_to(CONSOLE_DIR.resolve()):
+            return FileResponse(candidate)
+        return FileResponse(CONSOLE_DIR / "index.html")

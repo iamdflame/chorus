@@ -1,0 +1,221 @@
+/* Chorus design system.
+   The population is the visual language: everything is built from the same atoms as the
+   product — many small marks, cohorts, ignition. Serif carries the claim, mono carries
+   the evidence. That contrast is the whole editorial idea; dev-tool sites are almost
+   always all-sans or all-mono, so a serif voice for the argument reads as deliberate. */
+
+@import url("https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@300;400;500&display=swap");
+
+:root {
+  /* Ground is near-black, never pure: pure black kills the sense of depth the dot field
+     depends on, and clips on OLED. */
+  --ground: #06070a;
+  --ground-1: #0a0c11;
+  --ground-2: #10131a;
+
+  --rule: #171b22;
+  --rule-lit: #232935;
+
+  --ink-faint: #454c5a;
+  --ink-dim: #6b7484;
+  --ink: #a3adbd;
+  --ink-bright: #eef1f6;
+
+  /* One accent. Semantic colours below carry meaning, not decoration. */
+  --accent: #5ef0c8;
+  --accent-deep: #1f7a66;
+  --accent-glow: #5ef0c833;
+  --hot: #ffffff;
+  --warn: #f5a524;
+  --danger: #ff5c5c;
+
+  --serif: "Instrument Serif", "Times New Roman", serif;
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  --gutter: clamp(20px, 5vw, 88px);
+  --measure: 68ch;
+  --shell: 1440px;
+
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+* { box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+  /* Anchors land below the fixed nav rather than under it. */
+  scroll-padding-top: 92px;
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: 14px;
+  font-weight: 300;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection { background: var(--accent); color: var(--ground); }
+
+/* -- the grid ------------------------------------------------------------- */
+/* Structural texture, not decoration: it establishes the module everything else aligns
+   to, and gives the dark ground a sense of surface so the dot fields read as sitting on
+   something rather than floating in void. */
+
+.grid-field {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image:
+    linear-gradient(to right, var(--rule) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--rule) 1px, transparent 1px);
+  background-size: 88px 88px;
+  opacity: 0.5;
+  mask-image: radial-gradient(ellipse 120% 90% at 50% 0%, #000 20%, transparent 78%);
+}
+
+/* -- type ----------------------------------------------------------------- */
+
+.display {
+  font-family: var(--serif);
+  font-weight: 400;
+  color: var(--ink-bright);
+  letter-spacing: -0.015em;
+  line-height: 0.94;
+  margin: 0;
+}
+.display em { font-style: italic; color: var(--accent); }
+
+.h1 { font-size: clamp(46px, 8.2vw, 132px); }
+.h2 { font-size: clamp(34px, 5.4vw, 78px); }
+.h3 { font-size: clamp(25px, 3vw, 42px); }
+
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin: 0 0 22px;
+}
+
+.lede {
+  font-size: clamp(15px, 1.35vw, 18px);
+  line-height: 1.7;
+  color: var(--ink);
+  max-width: var(--measure);
+  margin: 0;
+}
+.lede strong { color: var(--ink-bright); font-weight: 400; }
+
+.fig {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.04em;
+  font-weight: 300;
+  color: var(--ink-bright);
+}
+
+/* -- layout --------------------------------------------------------------- */
+
+.shell { max-width: var(--shell); margin: 0 auto; padding-inline: var(--gutter); }
+
+.section {
+  position: relative;
+  z-index: 1;
+  padding-block: clamp(84px, 13vh, 172px);
+  border-top: 1px solid var(--rule);
+}
+.section:first-of-type { border-top: 0; }
+
+/* -- scroll-driven reveals ------------------------------------------------ */
+/* Native scroll-driven animation: runs on the compositor, no observers, no scroll
+   listeners, no main-thread work. Degrades to simply visible where unsupported, which is
+   the correct failure — content must never depend on animation to be readable. */
+
+@supports (animation-timeline: view()) {
+  .reveal {
+    animation: reveal-in linear both;
+    animation-timeline: view();
+    animation-range: entry 5% cover 26%;
+  }
+  .reveal-late { animation-range: entry 12% cover 40%; }
+}
+
+@keyframes reveal-in {
+  from { opacity: 0; transform: translateY(26px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* Staggered children, so a row of figures assembles rather than appearing at once. */
+.stagger > * { --i: 0; }
+@supports (animation-timeline: view()) {
+  .stagger > * {
+    animation: reveal-in linear both;
+    animation-timeline: view();
+    animation-range: entry calc(4% + var(--i) * 3%) cover calc(24% + var(--i) * 4%);
+  }
+}
+
+/* -- controls ------------------------------------------------------------- */
+
+.btn {
+  --btn-fg: var(--ground);
+  --btn-bg: var(--accent);
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 22px;
+  border: 1px solid var(--btn-bg);
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  font: inherit;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 260ms var(--ease), background 220ms var(--ease),
+              color 220ms var(--ease), border-color 220ms var(--ease);
+}
+.btn:hover { transform: translateY(-2px); }
+.btn[data-variant="ghost"] {
+  --btn-bg: transparent;
+  --btn-fg: var(--ink-bright);
+  border-color: var(--rule-lit);
+}
+.btn[data-variant="ghost"]:hover { border-color: var(--accent); color: var(--accent); }
+.btn .arrow { transition: transform 260ms var(--ease); }
+.btn:hover .arrow { transform: translateX(4px); }
+
+/* -- view transitions ----------------------------------------------------- */
+/* Native cross-route transitions. The old view fades under the new one rather than
+   cross-dissolving, so navigation reads as moving forward instead of swapping. */
+
+@view-transition { navigation: auto; }
+
+::view-transition-old(root) {
+  animation: fade-out 220ms var(--ease-in-out) both;
+}
+::view-transition-new(root) {
+  animation: rise-in 420ms var(--ease) both;
+}
+@keyframes fade-out { to { opacity: 0; } }
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: none; }
+}
