@@ -263,6 +263,22 @@ def adopt(request: AdoptRequest) -> dict[str, Any]:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
 
 
+# -- registry -----------------------------------------------------------------
+
+@app.get("/api/registry")
+def registry() -> dict[str, Any]:
+    """The agent registry: what is published, at what version, allowed to touch what.
+
+    An enterprise cannot approve what it cannot enumerate. Versions are content-derived,
+    so editing a prompt moves the version on its own, and each card states the fields its
+    agent is permitted to see — which `tests/test_registry.py` checks is actually true of
+    the projection rather than merely written down.
+    """
+    from fleet.registry import build_registry
+
+    return build_registry()
+
+
 # -- swarm --------------------------------------------------------------------
 
 @lru_cache(maxsize=8)

@@ -1,0 +1,55 @@
+name: proofs
+
+# The determinism and collapse properties are the whole claim, so they are checked on
+# every push rather than asserted in a README. Everything here runs offline against the
+# in-memory reference backend — no cloud credentials, no model spend — which is exactly
+# why the kernel was kept free of both.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  proofs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install
+        run: pip install -r requirements.txt
+
+      - name: Tests
+        # Firestore tests skip themselves without GOOGLE_CLOUD_PROJECT, so the suite is
+        # green offline and gains two more assertions when run against a real project.
+        run: python -m pytest tests/ -q
+
+      - name: Determinism proof
+        # Records a fleet, replays it, and fails if the replay reaches the model even
+        # once or reproduces a different causal root hash.
+        run: python scripts/verify_determinism.py
+
+      - name: Collapse proof
+        # Asserts distinct situations stay bounded while population grows — the
+        # saturation property, checked without spending a token.
+        run: python scripts/verify_collapse.py
+
+  console:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - run: npm install --prefix console --no-audit --no-fund
+      - name: Typecheck
+        run: npx --prefix console tsc -b --noEmit
+        working-directory: console
+      - name: Build
+        run: npm run build --prefix console

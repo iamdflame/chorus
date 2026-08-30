@@ -2,8 +2,11 @@
 
 **Twenty thousand agents. Two hundred thoughts.**
 
+[![proofs](https://github.com/iamdflame/chorus/actions/workflows/ci.yml/badge.svg)](https://github.com/iamdflame/chorus/actions/workflows/ci.yml)
+
 **Live:** https://chorus-512017284899.us-central1.run.app
 **Source:** https://github.com/iamdflame/chorus
+**Track:** The Fortified Enterprise Fleet
 
 Reasoning now costs less than a database query, so every entity in a system can have its
 own permanent agent — one per passenger, per machine, per account, running for weeks and
@@ -14,6 +17,8 @@ Unless identical reasoning is computed once.
 
 Chorus gives each entity a real, independent agent, and discovers that most of them are
 thinking the same thought. Measured on a live scenario:
+
+Reproduce any row: `python scripts/verify_collapse.py`
 
 | agents | distinct situations | collapse |
 |---|---|---|
@@ -28,7 +33,7 @@ agents costs five more distinct situations. **The cost of a swarm is bounded by 
 diversity of its situations, not by its size** — which is what makes per-entity agents
 economically possible for the first time.
 
-Run end to end against live `gemini-3.5-flash`, 20,000 independent agent invocations:
+Run end to end against live `gemini-3.5-flash` — `python scripts/prove_swarm.py --agents 20000`:
 
 | | |
 |---|---|
@@ -42,6 +47,25 @@ The measured 222 exceeds the 192 distinct situations because a handful of agents
 second turn before returning valid JSON — those are genuinely different requests at a
 different causal position, so they correctly miss. The number reported is what was really
 spent, not the projection.
+
+---
+
+## Track: The Fortified Enterprise Fleet
+
+> *"Build a scalable network of institutional agents… demonstrate how agents are cataloged
+> for cross-department use, how they safely maintain context across weeks of asynchronous
+> operations, and how they interact with production data without violating enterprise
+> compliance, data sovereignty, or security policies."*
+
+| Track component | In Chorus | Verify |
+|---|---|---|
+| **Agent Registry** — publishing, versioning, discovering | `fleet/registry.py`. Versions are **content-derived**: a hash of instruction, model, generation settings, tools and role, so editing a prompt moves the version on its own. A hand-maintained number is a promise someone eventually forgets to keep. | `GET /api/registry` · `pytest tests/test_registry.py` |
+| **Model Armor** — block PII leaks | The canonical projection is the guardrail. An agent receives bucketed situation only; name, id, email, order and destination never reach a model. Deterministic, not probabilistic — a rule cannot have an off day. | `python scripts/verify_collapse.py` asserts a renamed passenger projects identically |
+| **Agent Gateway** — unified routing and policy enforcement | Every model call and tool call in the system routes through one ADK `BasePlugin`. Nothing reaches a model or the world without passing the quarantine gate. | `kernel/interposer.py` |
+| **Memory Bank** — persistent, secure cross-session context | Firestore effect store, keyed by content address, holding a 21-day recorded history. Replay resolves through it across sessions and across branches. | `pytest tests/test_firestore.py` (needs a project) |
+| **Agent Identity** — zero-trust access | The container authenticates as its own service account with `aiplatform.user` and `datastore.user` only. No key is baked into the image or passed on the command line. | `infra/deploy.sh` |
+| **Agent Runtime** — long-running async execution | `swarm/runtime.py` drives 20,000 independent ADK invocations under a concurrency gate, streaming progress over SSE. | `python scripts/prove_swarm.py --agents 20000` |
+| **Agent Observability** — reasoning-chain traces | Every crossing is recorded as a causal effect with explicit parents, so a reasoning chain is a queryable DAG rather than a log. *OpenTelemetry export is not yet wired — see Honest limits.* | `kernel/dag.py` |
 
 ---
 
@@ -141,7 +165,7 @@ causal root hash.
 
 | Requirement | Used |
 |---|---|
-| Gemini 3.5+ | `gemini-3.5-flash` for all six agents, the policy proposer, and embeddings |
+| Gemini 3.5+ | `gemini-3.5-flash` for every agent and the policy proposer, via Vertex AI. Retrieval embeddings use `gemini-embedding-001` — Flash does not emit embeddings |
 | Google agent framework | **ADK** (`google-adk` 2.8) — `BasePlugin` interposition, `SequentialAgent`, runtime `transfer_to_agent` |
 | Google Cloud infrastructure | **Firestore** (native mode) as the durable effect store |
 
@@ -254,3 +278,12 @@ cheaper than what you run today.
   ordering under concurrent fan-out is not automatically deterministic; effects are
   sequenced by causal position rather than wall clock, and the DAG comparison is
   order-insensitive.
+- **Agent Observability is partial.** Reasoning chains are recorded as a causal DAG with
+  explicit parents and are queryable, but they are not yet exported in OpenTelemetry
+  format to Cloud Trace. The track names OTel specifically; this is the largest remaining
+  gap and it is a format gap rather than a capability one.
+- Pub/Sub is a declared dependency and the dispute fleet fans out over it, but the 20,000
+  agent swarm runs in-process under a concurrency gate rather than across workers.
+- The dispute fleet and the policy optimiser predate the swarm. Their kernel, storage and
+  quarantine are shared and exercised by the same tests, but the console only surfaces the
+  swarm — the rest is reachable through the API and the proof scripts.
