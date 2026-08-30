@@ -3,6 +3,7 @@
 **Twenty thousand agents. Two hundred thoughts.**
 
 **Live:** https://chorus-512017284899.us-central1.run.app
+**Source:** https://github.com/iamdflame/chorus
 
 Reasoning now costs less than a database query, so every entity in a system can have its
 own permanent agent — one per passenger, per machine, per account, running for weeks and
@@ -178,7 +179,7 @@ Verified on the live deployment: 300 agents, 122 model calls, 178 served from th
 Requires Python 3.11+, Node 20+, and a Gemini API key.
 
 ```bash
-git clone <this repo> && cd lightcone
+git clone https://github.com/iamdflame/chorus && cd chorus
 
 python3 -m venv .venv
 .venv/bin/pip install -r requirements.txt
