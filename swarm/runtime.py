@@ -40,6 +40,11 @@ from kernel.store import EffectStore
 from swarm.canonical import Projection
 
 MODEL = "gemini-3.5-flash"
+
+# One agent that never returns holds a concurrency permit for the lifetime of the
+# run, quietly reducing throughput to whatever parallelism is left. Bounded, and a
+# timeout counts as a failed agent -- visible in the denominator rather than lost.
+AGENT_TIMEOUT = 90.0
 APP_NAME = "chorus-irrops"
 
 PASSENGER_INSTRUCTION = """You represent one traveller stranded by a hub closure. You are \
@@ -252,7 +257,10 @@ class Swarm:
             async with self.gate:
                 projection = projector(entity)
                 try:
-                    answer, plugin = await self._invoke(role, projection, context, anchor)
+                    answer, plugin = await asyncio.wait_for(
+                        self._invoke(role, projection, context, anchor),
+                        timeout=AGENT_TIMEOUT,
+                    )
                 except Exception as exc:  # noqa: BLE001 - one agent must not end the swarm
                     # Counted before returning. Previously a failed agent never reached
                     # the increment, so it disappeared from the denominator and every

@@ -42,6 +42,10 @@ from intake.corpus import load_corpus
 
 FIELDS = ("tier", "urgency", "party", "constraints")
 PRICE_IN, PRICE_OUT = 1.35, 8.10
+# A hung call holds its concurrency slot indefinitely and silently reduces the run to
+# whatever parallelism survives. Bounded, and a timeout is recorded as a failed
+# extraction rather than disappearing.
+CALL_TIMEOUT = 45.0
 
 
 def accuracy(results: list[tuple[dict, Extracted]]) -> dict[str, float]:
@@ -78,12 +82,24 @@ async def run_model(messages, limit: int, concurrency: int):
         nonlocal cost, done
         async with gate:
             try:
-                response = await asyncio.to_thread(
-                    client.models.generate_content,
-                    model=MODEL,
-                    contents=f"{INSTRUCTION}\n\nMessage:\n{message.text}",
-                    config={"response_mime_type": "application/json",
-                            "response_schema": SCHEMA, "temperature": 0.0},
+                response = await asyncio.wait_for(
+                    asyncio.to_thread(
+                        client.models.generate_content,
+                        model=MODEL,
+                        contents=f"{INSTRUCTION}\n\nMessage:\n{message.text}",
+                        config={
+                            "response_mime_type": "application/json",
+                            "response_schema": SCHEMA,
+                            "temperature": 0.0,
+                            # Extraction is structured reading, not deliberation: the
+                            # answer is in the text and the schema constrains the shape.
+                            # The default (medium) spent 12s a call for a task that does
+                            # not benefit from it, and per-agent budget is a decision this
+                            # project makes deliberately everywhere else.
+                            "thinking_config": {"thinking_level": "low"},
+                        },
+                    ),
+                    timeout=CALL_TIMEOUT,
                 )
                 got = parse(message.id, json.loads(response.text))
                 usage = response.usage_metadata

@@ -1,0 +1,11 @@
+  2,000 messages · 2,000 distinct texts · 8 languages
+  Ground truth known by construction: each message was written from a situation.
+  extractor                       tier     urgency       party constraints       exact        mean
+  ------------------------------------------------------------------------------------------------------------
+  keyword (free)                 40.8%       46.7%       50.9%       78.0%        7.8%       54.1%  
+  keyword (same sample)          54.7%       44.7%       54.7%       78.0%       10.0%       58.0%  
+  gemini-3.5-flash               68.0%       80.7%       98.7%       98.7%       52.0%       86.5%  $0.3833
+  evidence spans genuinely quoted from the message: 599/600 (100%)
+  model minus keyword:  mean field +28.5%   exact match +42.0%
+  PASS  the model reads 28.5% more fields correctly and gets +42.0% more
+        situations entirely right. Unbounded input is where it earns its place.
