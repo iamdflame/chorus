@@ -444,6 +444,28 @@ The property that makes replay cheap makes containment exact. That was not plann
 
 ---
 
+Least privilege is a claim until something attacks it, so the check attempts the forbidden
+action from each agent's own identity and reports what happened:
+
+```
+identity    expect action                                     result
+-------------------------------------------------------------------------------
+extractor   ALLOW  call Gemini (its entire job)               OK (ALLOW)
+elicitor    ALLOW  call Gemini (its entire job)               OK (ALLOW)
+allocator   DENY   call Gemini (allocation needs no model)    OK (DENY)
+extractor   DENY   write to Firestore (it only reads)         OK (DENY)
+elicitor    DENY   write to Firestore (it only reads)         OK (DENY)
+```
+
+Two probes must be **ALLOWED**, and the script fails if every probe is denied — an identity
+that can do nothing proves only that it is broken, and a wall of denials is the easiest
+security result in the world to fake. With no identity to impersonate it reports that it
+proved nothing and exits non-zero, rather than passing quietly.
+
+<sub>`./infra/identity.sh` to create them, `./scripts/verify_controls.sh` to attack them.</sub>
+
+---
+
 ## Observability: the DAG was already a trace
 
 Causality was recorded because replay required it, so the trace is a projection of data that
@@ -663,6 +685,7 @@ export GOOGLE_CLOUD_PROJECT=YOUR_PROJECT
 | Escalation recovers 82% at a third the cost | `scripts/escalation_sweep.py` |
 | 39,996 spans, 1,965 executed | `scripts/trace_run.py` |
 | Injection cannot reach a shared address | `scripts/verify_armor.py` |
+| The allocator cannot call a model, and is denied | `scripts/verify_controls.sh` |
 | Is the model earning its cost? | `scripts/necessity.py` |
 | The whole pipeline, end to end | `scripts/prove_pipeline.py` |
 | Replay is byte-identical | `scripts/verify_determinism.py` |

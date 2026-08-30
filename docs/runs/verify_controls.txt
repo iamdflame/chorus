@@ -1,0 +1,14 @@
+
+  Tool allowlist, enforced by IAM — project gen-lang-client-0152279379
+
+  identity    expect action                                     result
+  -------------------------------------------------------------------------------
+  extractor   ALLOW  call Gemini (its entire job)               OK (ALLOW)
+  elicitor    ALLOW  call Gemini (its entire job)               OK (ALLOW)
+  allocator   DENY   call Gemini (allocation needs no model)    OK (DENY)
+  extractor   DENY   write to Firestore (it only reads)         OK (DENY)
+  elicitor    DENY   write to Firestore (it only reads)         OK (DENY)
+
+  PASS  5 controls behaved exactly as declared.
+        Two of them are ALLOW — an identity that can do nothing proves nothing.
+
