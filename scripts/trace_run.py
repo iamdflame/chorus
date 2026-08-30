@@ -86,6 +86,9 @@ def main(snapshot: str, cloud: bool, limit: int, expand: bool) -> int:
             print("  opentelemetry-exporter-gcp-trace is not installed.")
             print("  pip install opentelemetry-exporter-gcp-trace\n")
             return 1
+        # CloudTraceSpanExporter warns that it is deprecated in favour of an OTLP
+        # endpoint. It is kept because it works today against a real project and the
+        # migration is a deployment concern rather than a claim this project makes.
         exporter = CloudTraceSpanExporter(project_id=project)
         written = export(effects, exporter, resource=resource)
         exporter.shutdown()

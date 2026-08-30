@@ -8,3 +8,4 @@ playwright==1.62.0
 pytest==9.1.1
 pytest-asyncio==1.4.0
 uvicorn==0.52.4
+opentelemetry-exporter-gcp-trace>=1.15.0

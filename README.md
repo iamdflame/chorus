@@ -362,6 +362,99 @@ The practical consequence for an enterprise: **the shared store contains no pers
 
 ---
 
+## Cache poisoning in a collapsed fleet
+
+Collapse creates a vulnerability class that does not exist in an uncollapsed fleet, and it is
+created by the mechanism that makes the system cheap:
+
+> One successful injection in an uncollapsed fleet compromises one agent. In a collapsed
+> fleet it compromises **every entity sharing that projection**, because sharing the answer
+> is what the system was built to do. **The blast radius is the collapse ratio.**
+
+Working the mechanism through carefully gives a sharper result than the alarming version.
+A shared answer is addressed by `H(kind, role, causal parents, request)`, and the request for
+an elicitation contains **only** a projection whose every field is drawn from a closed
+vocabulary. No attacker-controlled byte participates in a shared address. An attacker
+therefore cannot place a chosen response where another traveller will look — **cache
+poisoning is not merely filtered, it is unaddressable.**
+
+The corollary is the design constraint the whole system rests on, and it cuts both ways:
+
+> Any design that lets free text into shared reasoning either **loses collapse entirely** —
+> because the text makes every address unique — or **becomes poisonable**. There is no
+> version that keeps both.
+
+What an attacker *can* still do is mislabel themselves into a cohort they do not belong to.
+That is a real attack with a blast radius of exactly one: they join a cohort, they do not
+change what it believes.
+
+```
+[1] screen        7/7 obvious injections blocked
+    false positives on 2,000 genuine messages: 0.00%
+    (the weak layer, and it is not what the containment rests on)
+
+[2] airlock       0 attacker-controlled bytes in any shared prompt
+    7/7 attacks landed on a cell a real traveller also occupies,
+    and addressed identically to them
+
+[3] mislabelling  an attacker can move themselves between cohorts: yes
+    blast radius of that attack: 1 (their own booking)
+
+[4] containment   a compromised call reached 128 travellers
+    cohorts quarantined: 1 of 2 — the healthy one keeps serving
+```
+
+<sub>Regenerate: `python scripts/verify_armor.py` — it runs in CI, offline, on every push.</sub>
+
+The pattern screen is the **weakest** layer and the code says so: matching on natural language
+is defeated by paraphrase, and any claim that a regex list stops prompt injection should not
+survive contact with an adversary. Writing it, a test caught a real evasion — deleting
+zero-width characters is not enough, because an attacker using them as word separators leaves
+one long token a word-boundary pattern sails past. Every reading the tokeniser might produce
+is now screened.
+
+When a compromise *is* found by other means — a bad model version, a leaked credential — the
+forward lightcone of the poisoned call **is** the blast radius, computed rather than guessed.
+The property that makes replay cheap makes containment exact. That was not planned.
+
+---
+
+## Observability: the DAG was already a trace
+
+Causality was recorded because replay required it, so the trace is a projection of data that
+already exists rather than parallel bookkeeping that can disagree with it.
+
+| Chorus | OpenTelemetry |
+| --- | --- |
+| Effect | Span |
+| `causal_parents` | Span **links** — a true DAG, not a parent chain |
+| `branch_id` | trace id — a fork is a separate timeline |
+| replay hit | span event, **zero duration** |
+| quarantined effect | span event with the reason |
+| `cost_usd`, tokens | span attributes |
+
+```
+39,996 spans across 1 trace
+1,965 executed · 38,031 replayed at zero duration · 0 quarantined
+$1.9392 attributed to the calls that actually happened
+```
+
+Two decisions worth stating. **Links, not parents** — OpenTelemetry's parent-child relation is
+a tree and agent causality is not, so forcing it would drop edges or invent them. **Identifiers
+derive from content** — replaying a run produces a byte-identical trace, and two machines
+exporting the same run cannot disagree about it, which is not normally something telemetry can
+claim.
+
+One gap was worth closing rather than glossing: the store keeps one effect per address, so a
+trace built from it alone shows 1,966 spans for a run of 20,000 agents — true about storage,
+misleading about work. The manifest records the ordered addresses each invocation visited, so
+the real sequence is reconstructed exactly. Nothing is synthesised; only the fan-out the store
+deliberately does not duplicate.
+
+<sub>`python scripts/trace_run.py` for the console, `--cloud` to send it to Cloud Trace.</sub>
+
+---
+
 ## Architecture
 
 ```mermaid
@@ -438,7 +531,9 @@ Firestore    durable timeline, keyed by content address
 | **Memory across weeks** | 21-day recorded history in Firestore, keyed by content address; branches fork it in O(1) and time-travel to any sequence number | [`world/`](world/), [`kernel/firestore_store.py`](kernel/firestore_store.py) |
 | **Security — data handling & PII** | Identity never crosses the model boundary; enforced structurally, not by policy | [`swarm/canonical.py`](swarm/canonical.py) |
 | **Governance — policy enforcement** | Quarantine gate: irreversible actions are staged, not dispatched, until a policy adopts the timeline | [`kernel/quarantine.py`](kernel/quarantine.py) |
-| **Telemetry — reasoning-chain traces** | Every effect emits an OTel span keyed by its content address; the Worldline view is that trace, rendered | [`kernel/dag.py`](kernel/dag.py) |
+| **Telemetry — reasoning-chain traces** | Effects map to OTel spans with `causal_parents` as **links**, so the trace is a DAG rather than a tree; replays render at zero duration. 39,996 spans exported to Cloud Trace | [`obs/otel.py`](obs/otel.py), [`scripts/trace_run.py`](scripts/trace_run.py) |
+| **Security — prompt injection** | Collapse amplifies injection by the collapse ratio, so the airlock is structural: no attacker-controlled byte reaches a shared address. Proved in CI | [`armor/`](armor/), [`scripts/verify_armor.py`](scripts/verify_armor.py) |
+| **Governance — is the model earning its cost?** | Shadow sampling re-asks the model against its own cache and reports the disagreement rate as REASONING NECESSITY | [`policy/`](policy/), [`scripts/necessity.py`](scripts/necessity.py) |
 
 ### Required technologies
 
