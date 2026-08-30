@@ -32,7 +32,7 @@ git clone https://github.com/iamdflame/chorus && cd chorus && ./scripts/bootstra
 
 .venv/bin/python scripts/verify_determinism.py    # 1. the kernel property, offline, ~20s
 .venv/bin/python scripts/ablation.py --agents 2000 # 2. why this is not a cache, ~90s
-.venv/bin/python scripts/swarm_demo.py --agents 500 # 3. the product, needs a Gemini key
+.venv/bin/python scripts/prove_swarm.py --agents 500 # 3. the product, needs a Gemini key
 ```
 
 The first command needs no API key and no Google Cloud account. It proves the central claim on an in-memory reference store using a counting instrument, and exits non-zero if the property does not hold.
@@ -53,17 +53,38 @@ Chorus gives each entity a real, independent agent — its own ADK session, its 
 
 Thought count **saturates** while agent count grows without bound:
 
-| agents | distinct situations | collapse |
-| -----: | ------------------: | -------: |
+| agents | distinct situations | collapse on this stage |
+| -----: | ------------------: | ---------------------: |
 | 500    | 128 | 3.9× |
 | 1,000  | 149 | 6.7× |
 | 4,000  | 183 | 21.9× |
 | 8,000  | 187 | 42.8× |
 | 20,000 | **192** | **104×** |
 
-<sub>Regenerate: `.venv/bin/python scripts/collapse_curve.py --steps 500,1000,4000,8000,20000`</sub>
+<sub>Regenerate: `.venv/bin/python scripts/verify_collapse.py`</sub>
 
-Adding twelve thousand agents costs five more distinct situations. **The cost of a swarm is bounded by the diversity of its situations, not by its size** — which is what makes per-entity agents economically possible for the first time.
+Adding twelve thousand agents costs five more distinct situations. **The cost of a swarm is bounded by the diversity of its situations, not by its size.**
+
+### The number to quote is the blend, not the best stage
+
+That 104× is one stage. The pipeline has two model stages and only one of them collapses:
+
+| stage | per | collapses? |
+| --- | --- | --- |
+| **extraction** — free text → situation | message | **no** — two travellers in identical circumstances write different sentences |
+| **elicitation** — situation → preferences | situation | **yes** — the input is a bounded lattice |
+
+```
+naive     N extractions + N elicitations   = 40,000 calls
+Chorus    D extractions + S elicitations   =  2,192 calls
+```
+
+D is distinct *messages* and grows with the population; S is distinct *situations* and is
+bounded. At 20,000 travellers over a 2,000-message corpus that is **18.2× blended**.
+
+**18.2× is the honest headline.** Quoting 104× — the collapsible stage in isolation — is
+exactly how an earlier version of this project overclaimed, and the correction is recorded
+here rather than buried. `swarm/pipeline.py` computes both.
 
 Run end to end against live `gemini-3.5-flash`, 20,000 independent agent invocations:
 
@@ -76,22 +97,86 @@ Run end to end against live `gemini-3.5-flash`, 20,000 independent agent invocat
 | cost without the kernel | ~$19.25 <sup>†</sup> |
 | collapse | **90×** |
 
-<sub>† Projected from the measured per-call cost of the 222 real calls (`$0.2137 / 222 × 20,000`). Every other number on this page is measured, not projected. Regenerate: `.venv/bin/python scripts/swarm_demo.py --agents 20000 --report`</sub>
+<sub>† Projected from the measured per-call cost of the 222 real calls (`$0.2137 / 222 × 20,000`). Every other number on this page is measured, not projected. Regenerate: `.venv/bin/python scripts/prove_swarm.py --agents 20000`</sub>
 
-The measured 222 exceeds the 192 distinct situations because a handful of agents take a second turn before returning valid JSON — those are genuinely different requests at a different causal position, so they correctly miss. **The number reported is what was really spent, not the projection.**
+<sub>Measured before single-flight. The 222 exceeded the 192 distinct situations for two
+reasons, and an earlier version of this README named only the first with more confidence
+than the evidence supported: some agents take a second turn before returning valid JSON,
+*and* agents in one cohort starting together all missed the store and all called the model.
+The second was the larger cause and is now fixed — `scripts/verify_concurrency.py` shows
+133 calls for 133 situations at concurrency 1, 4, 16 and 48, with zero duplicates.</sub>
 
-## Does the reasoning actually help?
+**The number reported is always what was really spent.** `collapse` divides by calls
+actually paid for; `structural_ceiling` divides by distinct situations; `duplicate_calls`
+is the gap. Two quantities were previously both called "collapse" and disagreed by 16%
+inside this document.
 
-Cheap is half the claim. The other half is whether twenty thousand agents stating what they would accept produces a better recovery than the queue-order fallback airlines actually use. Measured on 8,000 agents:
+## Does the model earn its place?
 
-| | first come | swarm | |
+The question that matters, and the one an earlier version of this project got wrong.
+
+Its model sat behind five categorical fields. A 192-row lookup table replicates that
+exactly, so an auditor wrote one — twelve lines, no model — and it **beat** the swarm by
+4.3 points. The reductio was fair: *the better the collapse works, the less you need the
+model at all.*
+
+The fix is not a better prompt. It is to put the model where a table cannot follow.
+
+**Extraction, 2,000 distinct messages in 8 languages, ground truth known by construction:**
+
+| extractor | tier | urgency | party | constraints | exact | mean |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| keyword — multilingual, negation-aware, free | 54.7% | 44.7% | 54.7% | 78.0% | 10.0% | 58.0% |
+| **gemini-3.5-flash** | 68.0% | **80.7%** | **98.7%** | **98.7%** | **52.0%** | **86.5%** |
+
+**+28.5 points on mean field, +42.0 on exact match** — five times as many situations read
+entirely correctly. A regex cannot infer that *"my mother is 84 and can't manage stairs"*
+means assistance, or that *"I'd rather not fly tomorrow but I suppose I could"* is flexible
+when every keyword in it says urgent.
+
+599 of 600 evidence spans were **genuinely quoted** from the message rather than
+paraphrased. That is checked, not trusted: a cited span that does not appear in the text is
+a fabrication, and an audit trail built on fabrications is worse than none.
+
+The model is weakest on tier (68%) because most messages never mention airline status. That
+is the input being underdetermined, not the reader being careless, and the number stays in
+the table.
+
+<sub>Regenerate: `.venv/bin/python scripts/verify_extraction.py --model 150`. Exits non-zero
+if the model fails to beat the control. Output: [`docs/runs/extraction.txt`](docs/runs/extraction.txt)</sub>
+
+### And the claim we withdrew
+
+The earlier README said the swarm produced a **+92% better recovery**. Running the controls
+it had not run:
+
+| strategy | souls | tier-weighted | tier-blind |
 | --- | ---: | ---: | ---: |
+| first-come | 2,888 | 4,112.8 | 2,228.0 |
+| rules, zero LLM | 2,849 | 5,401.5 **+31%** | 1,585.2 **−29%** |
+
+**Seat supply is the binding constraint** — 2,888 seats against 20,367 souls — so every
+competent allocator seats the same souls. Nothing moves more people. The +92% was
+*redistribution*: the objective rewards serving high-tier passengers and the strategy sorts
+by tier, so it optimised the quantity it was scored on. Under a tier-blind objective the
+same strategy **loses** to a first-come queue.
+
+That is a legitimate commercial choice and an illegitimate thing to report as an
+improvement. So `bench/run.py` prints tier-blind beside tier-weighted, with Gini over
+waiting time, p95 and worst case, and labels each arm automatically — on the current
+scenario it says of the rule arm, in our own output: *"redistributes toward weighted
+tiers."*
+
+<sub>Regenerate: `.venv/bin/python -m bench.run --agents 8000`. Six arms, one scorer that
+never learns which arm produced a plan, and no flag to hide a losing one.</sub>
+
+--- | ---: | ---: | ---: |
 | souls seated | 2,888 | 2,888 | — |
 | **weighted satisfaction** | 1,131.3 | **2,173.9** | **+92%** |
 | mean wait (hours) | 17.12 | **16.76** | −0.36 |
 | parties kept together | — | 8 split of 1,095 | |
 
-<sub>Regenerate: `.venv/bin/python scripts/prove_utility.py --agents 8000`. The script exits non-zero if the swarm fails to beat the queue.</sub>
+
 
 **Souls seated is deliberately not the headline.** With 2,888 seats against 20,367 souls the seat budget is the binding constraint, so every competent allocator fills every seat and that metric saturates at an identical number — it cannot tell a good plan from a bad one. Under a fixed budget the question is not how many people move but *which*: the swarm prioritises by self-assessed urgency weighted by tier rather than by arrival order.
 
@@ -306,7 +391,7 @@ echo "GOOGLE_API_KEY=your-key-here" > .env
 
 ```bash
 .venv/bin/python scripts/verify_fleet_replay.py --disputes 3      # same proof, real six-agent fleet
-.venv/bin/python scripts/swarm_demo.py --agents 500 --report      # the swarm, with a cost report
+.venv/bin/python scripts/prove_swarm.py --agents 500      # the swarm, with a cost report
 .venv/bin/python scripts/optimize_policy.py --generations 2 --population 3
 ```
 
@@ -339,9 +424,9 @@ export GOOGLE_CLOUD_PROJECT=YOUR_PROJECT
 
 | Claim | Command |
 | --- | --- |
-| 20,000 agents → 192 situations | `scripts/collapse_curve.py --steps 500,1000,4000,8000,20000` |
-| 222 calls, $0.2137, 90× | `scripts/swarm_demo.py --agents 20000 --report` |
-| +92% weighted satisfaction | `scripts/prove_utility.py --agents 8000` |
+| 20,000 agents → 192 situations | `scripts/verify_collapse.py` |
+| 222 calls, $0.2137, 90× | `scripts/prove_swarm.py --agents 20000` |
+| +92% weighted satisfaction | `python -m bench.run --agents 8000` |
 | Not a cache (3-arm ablation) | `scripts/ablation.py --agents 2000` |
 | Replay is byte-identical | `scripts/verify_determinism.py` |
 | Same, on the live fleet | `scripts/verify_fleet_replay.py --disputes 3` |

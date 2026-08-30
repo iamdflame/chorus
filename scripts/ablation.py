@@ -88,11 +88,11 @@ def row(label: str, *cells: object) -> str:
     return f"  {label:<26}" + "".join(f"{str(c):>16}" for c in cells)
 
 
-def main() -> int:
+def main(agents: int = 4000) -> int:
     # Two different populations: same generator, different seed. They are not the same
     # people, but people are not infinitely various, so their situations overlap.
-    first = [asdict(p) for p in build_scenario(passengers=4000, seed=20260829).passengers]
-    second = [asdict(p) for p in build_scenario(passengers=4000, seed=771).passengers]
+    first = [asdict(p) for p in build_scenario(passengers=agents, seed=20260829).passengers]
+    second = [asdict(p) for p in build_scenario(passengers=agents, seed=771).passengers]
     populations = [first, second]
 
     a = arm_no_store(populations)
@@ -140,4 +140,9 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    import argparse
+
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--agents", type=int, default=4000,
+                    help="population per arm; two populations are compared")
+    raise SystemExit(main(ap.parse_args().agents))
