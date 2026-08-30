@@ -544,6 +544,8 @@ change what it believes.
 
 <sub>Regenerate: `python scripts/verify_armor.py` — it runs in CI, offline, on every push.</sub>
 
+Written up in full: [**Cache poisoning in collapsed agent fleets**](docs/blog/cache-poisoning-in-collapsed-agent-fleets.md).
+
 The pattern screen is the **weakest** layer and the code says so: matching on natural language
 is defeated by paraphrase, and any claim that a regex list stops prompt injection should not
 survive contact with an adversary. Writing it, a test caught a real evasion — deleting
