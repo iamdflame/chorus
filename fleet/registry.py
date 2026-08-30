@@ -109,7 +109,8 @@ class AgentCard:
 
 # Exactly the keys Projection.to_dict emits, so tests/test_registry.py can assert the
 # card and the projection agree rather than approximately agree.
-PASSENGER_SEES = ("role", "tier", "urgency", "party", "constraints")
+PASSENGER_SEES = ("role", "tier", "urgency", "party", "constraints",
+                  "haul", "hotel_entitled", "misconnect")
 PASSENGER_NEVER_SEES = (
     "name", "passenger_id", "email", "order_id", "destination",
     "original_flight", "scheduled_departure",
@@ -139,7 +140,8 @@ SWARM_AGENTS = (
         model="gemini-3.5-flash",
         thinking_level="low",
         temperature=0.0,
-        sees=("role", "tier", "urgency", "party", "constraints"),
+        sees=("role", "tier", "urgency", "party", "constraints",
+              "haul", "hotel_entitled", "misconnect"),
         never_sees=("name", "crew_id", "employee_number"),
     ),
 )

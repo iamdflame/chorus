@@ -59,6 +59,8 @@ def test_the_prompt_contains_only_bucketed_vocabulary(population):
         "critical", "urgent", "same_day", "flexible",
         "solo", "pair", "family", "group",
         "unencumbered", "checked_bags", "assisted",
+        "short", "long", "intercontinental",
+        True, False,
     }
     for passenger in population[:120]:
         values = set(project_passenger(passenger, clock=FIXED).to_dict().values()) - {"passenger"}
@@ -87,9 +89,12 @@ def test_two_travellers_in_the_same_situation_are_indistinguishable(population):
             collisions += 1
             assert seen[key] == prompt, "same situation produced different prompts"
         seen[key] = prompt
-    assert collisions > 200, (
+    # The v2 lattice is twelve times finer than v1, so the sharing rate is necessarily
+    # lower. It must still be substantial: a projection nobody shares is a projection that
+    # has stopped doing its job.
+    assert collisions > len(population) * 0.15, (
         f"only {collisions} of {len(population)} travellers shared a situation; "
-        "the projection is too fine to be worth anything"
+        "the projection has become too fine to be worth anything"
     )
 
 

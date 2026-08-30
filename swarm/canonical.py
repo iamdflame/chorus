@@ -68,18 +68,45 @@ def constraint_band(*, checked_bags: int, needs_assistance: bool) -> str:
     return "unencumbered"
 
 
+#: Bumped whenever the shape of a projection changes. It is part of the key, so a bump
+#: invalidates every recorded thought cleanly rather than silently mixing answers computed
+#: under different schemas — the worst kind of cache bug, because the wrong answer is
+#: well-formed.
+SCHEMA_VERSION = "v2"
+
+
 @dataclass(frozen=True, slots=True)
 class Projection:
-    """A passenger's decision-relevant situation, and nothing else."""
+    """A passenger's decision-relevant situation, and nothing else.
+
+    v1 carried four fields while the elicitation prompt asked about hotels, alternate
+    airports and misconnections — none of which the projection contained. That is **false
+    sharing**: a traveller to London and one to Dallas received the same reasoning about
+    whether a nearby airport would do, because as far as the address was concerned they
+    were the same person. Sharing is only sound when the situations are genuinely
+    equivalent, and equivalence has to include everything the decision depends on.
+
+    Fixing it costs collapse, and should. A projection that omits load-bearing fields
+    collapses beautifully and answers the wrong question.
+    """
 
     role: str
-    tier: str
-    urgency: str
-    party: str
-    constraints: str
+    tier: str            # 4
+    urgency: str         # 4
+    party: str           # 4
+    constraints: str     # 3
+    haul: str = "short"  # 3  — the prompt asks about alternate airports
+    hotel_entitled: bool = False   # 2  — the prompt asks whether they need a hotel
+    misconnect: bool = False       # 2  — 38% of travellers, previously invisible
+    schema_version: str = SCHEMA_VERSION
 
     def key(self) -> str:
-        return f"{self.role}|{self.tier}|{self.urgency}|{self.party}|{self.constraints}"
+        return "|".join((
+            self.schema_version, self.role, self.tier, self.urgency, self.party,
+            self.constraints, self.haul,
+            "hotel" if self.hotel_entitled else "nohotel",
+            "misconnect" if self.misconnect else "origin",
+        ))
 
     def to_prompt(self) -> str:
         return (
@@ -87,14 +114,33 @@ class Projection:
             f"- loyalty tier: {self.tier}\n"
             f"- urgency: {self.urgency}\n"
             f"- party: {self.party}\n"
-            f"- constraints: {self.constraints}"
+            f"- constraints: {self.constraints}\n"
+            f"- journey: {self.haul}\n"
+            f"- overnight accommodation covered: "
+            f"{'yes' if self.hotel_entitled else 'no'}\n"
+            f"- disrupted mid-journey: {'yes' if self.misconnect else 'no'}"
         )
 
     def to_dict(self) -> dict[str, Any]:
         return {
             "role": self.role, "tier": self.tier, "urgency": self.urgency,
             "party": self.party, "constraints": self.constraints,
+            "haul": self.haul, "hotel_entitled": self.hotel_entitled,
+            "misconnect": self.misconnect,
         }
+
+
+def haul_band(region: str) -> str:
+    """How far they are going, which is what makes an alternate airport acceptable or not.
+
+    Not the destination itself: the destination decides which seat they are matched to and
+    would make every traveller unique. The *class* of journey is what changes the decision.
+    """
+    if region in ("europe", "asia", "south_america"):
+        return "intercontinental"
+    if region == "domestic_long":
+        return "long"
+    return "short"
 
 
 def project_passenger(passenger: dict[str, Any], *, clock: Clock) -> Projection:
@@ -127,6 +173,9 @@ def project_passenger(passenger: dict[str, Any], *, clock: Clock) -> Projection:
             checked_bags=int(passenger.get("checked_bags", 0)),
             needs_assistance=bool(passenger.get("needs_assistance", False)),
         ),
+        haul=haul_band(str(passenger.get("region", ""))),
+        hotel_entitled=bool(passenger.get("has_hotel_entitlement", False)),
+        misconnect=bool(passenger.get("is_misconnect", False)),
     )
 
 

@@ -41,13 +41,22 @@ TIERS = 4          # basic, silver, gold, platinum
 URGENCY = 4        # critical, urgent, same_day, flexible
 PARTY = 4          # solo, pair, family, group
 CONSTRAINTS = 3    # unencumbered, checked_bags, assisted
-CEILING = TIERS * URGENCY * PARTY * CONSTRAINTS
+HAUL = 3           # short, long, intercontinental
+HOTEL = 2          # entitled or not
+MISCONNECT = 2     # disrupted mid-journey or originating
+CEILING = TIERS * URGENCY * PARTY * CONSTRAINTS * HAUL * HOTEL * MISCONNECT
 
-SCALES = (500, 1_000, 2_000, 4_000, 8_000, 20_000)
+# Extended past 20,000 deliberately. The v1 projection saturated by 20,000, but it did
+# so by discarding fields the elicitation prompt then asked about — false sharing bought
+# an early plateau. The corrected lattice is twelve times larger, so saturation happens
+# later, and testing only where the old one saturated would quietly assert a property this
+# projection does not yet have at that scale.
+SCALES = (20_000, 50_000, 100_000, 200_000)
 
 
 def main() -> int:
-    print(f"\n  Bucket product: {TIERS} x {URGENCY} x {PARTY} x {CONSTRAINTS} = {CEILING}")
+    print(f"\n  Bucket product: {TIERS} x {URGENCY} x {PARTY} x {CONSTRAINTS} x "
+          f"{HAUL} x {HOTEL} x {MISCONNECT} = {CEILING:,}")
     print("  No population can require more distinct thoughts than this.\n")
     print(f"  {'agents':>9}  {'distinct':>9}  {'collapse':>10}")
     print("  " + "-" * 32)
@@ -67,13 +76,20 @@ def main() -> int:
             failures.append(f"{n:,} agents produced {distinct} distinct situations, above the "
                             f"bucket ceiling of {CEILING} — the projection is leaking detail")
 
-    # Saturation: the last doubling must add almost nothing. Growth that merely slows is
-    # not the claim; the claim is that the curve flattens.
-    (_, second_last), (_, last) = measured[-2], measured[-1]
+    # Saturation: doubling the population must add almost nothing. Growth that merely
+    # slows is not the claim; the claim is that the curve flattens.
+    (before_n, second_last), (last_n, last) = measured[-2], measured[-1]
     growth = last - second_last
-    if growth > 12:
-        failures.append(f"distinct count grew by {growth} over the final 12,000 agents; "
-                        "that is not saturation")
+    if growth > CEILING * 0.02:
+        failures.append(
+            f"distinct count grew by {growth} between {before_n:,} and {last_n:,} agents; "
+            "that is not saturation"
+        )
+    if last / CEILING < 0.95:
+        failures.append(
+            f"only {last / CEILING:.0%} of the lattice is occupied at {last_n:,} agents, "
+            "so the ceiling has not been demonstrated — it is still an assertion"
+        )
 
     # Collapse must actually improve with scale, or there is no argument for a swarm.
     if measured[-1][0] / measured[-1][1] <= measured[0][0] / measured[0][1]:
@@ -89,7 +105,8 @@ def main() -> int:
                         "into reasoning, and no two agents will ever share a thought")
 
     print()
-    print(f"  final growth over last 12,000 agents: +{growth} distinct situations")
+    print(f"  growth from {before_n:,} to {last_n:,} agents: +{growth} distinct situations")
+    print(f"  lattice occupied: {last / CEILING:.0%}")
     print(f"  identity-invariant projection: "
           f"{project_passenger(sample, clock=FIXED).key() == project_passenger(renamed, clock=FIXED).key()}")
 
@@ -99,9 +116,12 @@ def main() -> int:
             print(f"  FAIL  {f}")
         print()
         return 1
-    print(f"  PASS  distinct thoughts saturate at {measured[-1][1]} against a derived "
-          f"ceiling of {CEILING};\n        {measured[-1][0]:,} agents collapse "
-          f"{measured[-1][0] / measured[-1][1]:.0f}x, and identity never reaches the model.\n")
+    print(f"  PASS  distinct thoughts saturate at {measured[-1][1]:,} against a derived "
+          f"ceiling of {CEILING:,}\n        ({measured[-1][1] / CEILING:.0%} occupied); "
+          f"{measured[-1][0]:,} agents collapse "
+          f"{measured[-1][0] / measured[-1][1]:.0f}x, and identity never reaches the model.")
+    print("\n  Past this point cost stops growing entirely: the lattice is full, so every\n"
+          "  further agent is free. Collapse then rises linearly with population forever.\n")
     return 0
 
 
