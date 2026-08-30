@@ -48,7 +48,15 @@
   pointer-events: none;
 }
 
-.hero-inner { position: relative; z-index: 2; padding-block: clamp(62px, 10vh, 124px); }
+.hero-inner {
+  position: relative;
+  z-index: 2;
+  /* The nav is fixed and overlays the hero, so the top padding has to clear it first.
+     A bare viewport-relative value collides with the nav on any short window — which is
+     every laptop in a browser with tabs and a bookmark bar. */
+  padding-top: calc(72px + clamp(20px, 5vh, 62px));
+  padding-bottom: clamp(50px, 8vh, 110px);
+}
 .hero-lede { margin-top: 26px; max-width: 56ch; }
 .hero-actions { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 34px; }
 

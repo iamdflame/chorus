@@ -34,15 +34,27 @@
   text-decoration: none;
   white-space: nowrap;
 }
-.mark-dot {
-  width: 7px; height: 7px; border-radius: 50%;
-  background: var(--accent);
-  box-shadow: 0 0 0 4px var(--accent-glow);
+.mark-glyph { flex: 0 0 auto; overflow: visible; }
+.mark-core { fill: var(--accent); }
+.mark-satellite { fill: var(--ink-faint); transition: fill 220ms var(--ease); }
+
+/* The satellites brighten in sequence on hover — the cohort inheriting the thought,
+   at the scale of a logo. */
+.mark:hover .mark-satellite {
+  fill: var(--accent-deep);
+  transition-delay: calc(var(--i) * 40ms);
+}
+
+.mark-glyph[data-animated="true"] .mark-core {
   animation: mark-pulse 3.6s var(--ease-in-out) infinite;
+  transform-origin: 12px 12px;
 }
 @keyframes mark-pulse {
-  0%, 100% { box-shadow: 0 0 0 4px var(--accent-glow); }
-  50%      { box-shadow: 0 0 0 9px transparent; }
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.72; transform: scale(0.88); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mark-glyph[data-animated="true"] .mark-core { animation: none; }
 }
 
 .nav-links { display: flex; gap: 4px; margin-left: 14px; }
@@ -172,7 +184,11 @@
 .footer-live { display: inline-flex; align-items: center; gap: 9px; }
 .footer-live i {
   width: 6px; height: 6px; border-radius: 50%; background: var(--accent);
-  animation: mark-pulse 3.6s var(--ease-in-out) infinite;
+  animation: live-pulse 3.6s var(--ease-in-out) infinite;
+}
+@keyframes live-pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.35; }
 }
 
 @media (max-width: 860px) {

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { LINKS } from "./links";
+import { Mark } from "./Mark";
 import { Link, useRoute } from "./router";
 
 const ROUTES = [
@@ -28,7 +29,7 @@ export function Nav() {
     <header className="nav" data-lifted={lifted} data-open={open}>
       <div className="nav-inner shell">
         <Link to="/" className="mark" aria-label="Chorus home">
-          <span className="mark-dot" aria-hidden="true" />
+          <Mark />
           CHORUS
         </Link>
 

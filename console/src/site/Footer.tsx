@@ -1,4 +1,5 @@
 import { LINKS } from "./links";
+import { Mark } from "./Mark";
 import { Link } from "./router";
 
 type FooterLink = { label: string; to: string } | { label: string; href: string };
@@ -41,7 +42,7 @@ export function Footer() {
       <div className="shell">
         <div className="footer-top">
           <div className="footer-brand">
-            <div className="mark"><span className="mark-dot" aria-hidden="true" />CHORUS</div>
+            <div className="mark"><Mark />CHORUS</div>
             <p className="footer-claim display h3">
               Twenty&nbsp;thousand agents.<br /><em>Two hundred thoughts.</em>
             </p>
