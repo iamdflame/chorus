@@ -104,9 +104,10 @@ export function Ledger() {
           <div>
             <dt>policy</dt>
             <dd className="mono">
-              v{data.policy.version}{" "}
+              v{data.policy.version}
               <span className="muted">
-                {num(data.policy.populated)}/{num(data.policy.ceiling)} cells
+                {num(data.policy.populated)} of {num(data.policy.ceiling)} cells
+                populated
               </span>
             </dd>
           </div>

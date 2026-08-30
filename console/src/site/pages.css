@@ -284,9 +284,20 @@
 
 .ledger-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(15rem, 100%), 1fr));
+  /* Six cells, so the column count is fixed at each breakpoint rather than left to
+     auto-fit. auto-fit gave five columns on a wide viewport and stranded the sixth alone
+     on a second row beside three empty ones. */
+  grid-template-columns: 1fr;
   gap: 0;
   margin: 0;
+}
+
+@media (min-width: 40rem) {
+  .ledger-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (min-width: 64rem) {
+  .ledger-grid { grid-template-columns: repeat(3, 1fr); }
 }
 
 .ledger-grid > div {
@@ -308,6 +319,18 @@
   font-family: var(--mono);
   font-size: 1.05rem;
   overflow-wrap: anywhere;
+}
+
+/* A qualifier is not part of the value. Without the separation "17,547 87.7%" reads as
+   one number that happens to contain a space. */
+.ledger-grid dd .muted {
+  display: block;
+  margin-top: 0.15rem;
+  font-size: 0.85rem;
+}
+
+.ledger-drift {
+  scrollbar-width: thin;
 }
 
 .ledger-proof {
