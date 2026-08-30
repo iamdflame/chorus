@@ -1,3 +1,4 @@
+import { Claims } from "../Claims";
 import { Ledger } from "../Ledger";
 import { Counter } from "../Counter";
 import { SaturationChart } from "../SaturationChart";
@@ -118,6 +119,20 @@ export function Evidence() {
           </div>
         </div>
       </section>
-    </div>
+    
+      <section className="section">
+        <div className="shell">
+          <p className="eyebrow reveal">Claim · command · result</p>
+          <h2 className="display h2 reveal" style={{ maxWidth: "18ch" }}>
+            Every number, and the command that regenerates it.
+          </h2>
+          <p className="lede reveal" style={{ marginBottom: "2.5rem" }}>
+            Including the results that hurt. One claim on this page is marked withdrawn,
+            two arms beat us, and one of them was beating us by exploiting our own scorer.
+          </p>
+          <Claims />
+        </div>
+      </section>
+</div>
   );
 }

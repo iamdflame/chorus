@@ -749,3 +749,99 @@
   overflow-x: auto;
   white-space: nowrap;
 }
+
+/* ── Claims ──────────────────────────────────────────────────────────────────
+ * Claim, command, result. The rows that beat us carry a marker rather than a
+ * footnote, because every judge has been lied to by a leaderboard today. */
+
+.claims { display: grid; gap: 3.5rem; }
+
+.claim { border-top: 1px solid var(--rule); padding-top: 1.5rem; }
+
+.claim-head {
+  font-size: var(--t-lg);
+  max-width: 26ch;
+  margin: 0 0 0.75rem;
+}
+
+.claim-cmd {
+  margin: 0 0 1.25rem;
+  font-size: var(--t-xs);
+  color: var(--reflect);
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+/* Wide tables scroll inside their own container; the page never scrolls sideways. */
+.claim-table-wrap { overflow-x: auto; }
+
+.claim-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--t-sm);
+  min-width: 30rem;
+}
+
+.claim-table th,
+.claim-table td {
+  text-align: right;
+  padding: 0.55rem 0.75rem;
+  border-bottom: 1px solid var(--rule);
+  white-space: nowrap;
+}
+
+.claim-table thead th {
+  font-family: var(--data);
+  font-size: var(--t-xs);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  font-variation-settings: "wght" 450;
+}
+
+.claim-table tbody th {
+  text-align: left;
+  color: var(--text);
+  font-variation-settings: "wght" 450, "wdth" 96, "ROND" 0;
+  padding-left: 0;
+}
+
+.claim-table td { color: var(--text-hi); }
+
+.claim-table tr[data-note="ours"] td { color: var(--filament); }
+
+/* Not dimmed, not apologised for. The arm that beats us is set at full strength in the
+   emission colour reserved for a result we did not produce. */
+.claim-table tr[data-note="beats-us"] td,
+.claim-table tr[data-note="exploit"] td { color: var(--reflect); }
+
+.claim-flag {
+  font-family: var(--data);
+  font-size: var(--t-xs);
+  color: var(--reflect);
+  letter-spacing: 0.06em;
+}
+
+.claim-verdicts {
+  margin: 1.25rem 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.6rem;
+  max-width: 76ch;
+}
+
+.claim-verdicts li {
+  position: relative;
+  padding-left: 1.1rem;
+  color: var(--text);
+  font-size: var(--t-sm);
+  line-height: 1.55;
+}
+
+.claim-verdicts li::before {
+  content: "→";
+  position: absolute;
+  left: 0;
+  color: var(--text-faint);
+}
