@@ -1,3 +1,4 @@
+import { Ledger } from "../Ledger";
 import { Counter } from "../Counter";
 import { SaturationChart } from "../SaturationChart";
 import { LINKS } from "../links";
@@ -25,6 +26,24 @@ export function Evidence() {
           real ADK sessions, real tool dispatch and real recorded effects. The proof
           scripts are in the repository and reproduce these figures.
         </p>
+      </section>
+
+      <section className="section">
+        <div className="shell">
+          <p className="eyebrow reveal">Is the model earning its cost?</p>
+          <h2 className="display h2 reveal" style={{ maxWidth: "17ch" }}>
+            We measure it continuously instead of asserting it.
+          </h2>
+          <p className="lede reveal" style={{ maxWidth: "62ch" }}>
+            Every agent project claims its model is essential. Measuring that honestly
+            means running the model against your own cache and publishing how often it
+            agreed — and being willing to find out that most of the workload is a lookup
+            table.
+          </p>
+          <div className="reveal" style={{ marginTop: "2rem" }}>
+            <Ledger />
+          </div>
+        </div>
       </section>
 
       <section className="section">

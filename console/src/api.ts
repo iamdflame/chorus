@@ -36,6 +36,35 @@ export interface Graph {
 }
 
 
+export interface Shadow {
+  sampled: number;
+  answered: number;
+  confirmed: number;
+  drifted: number;
+  failed: number;
+  drift_rate: number;
+  drift_interval_95: [number, number];
+  events: { key: string; fields: string[] }[];
+}
+
+export interface Necessity {
+  available: boolean;
+  reason?: string;
+  ledger?: {
+    period: string;
+    decisions: number;
+    served_from_table: number;
+    served_from_model: number;
+    model_calls_made: number;
+    table_share: number;
+    cost_usd: number;
+    projected_naive_cost_usd: number;
+    shadow: Shadow | null;
+  };
+  policy?: { version: string; populated: number; ceiling: number; occupancy: number };
+  noise_floor?: { compared: number; disagreed: number; rate: number };
+}
+
 
 async function json<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(path, {
@@ -72,6 +101,10 @@ export const api = {
     json<{ agents: number; cohorts: { key: string; size: number; label: string }[];
            scenario: Record<string, number> }>(`/api/swarm/cohorts?agents=${agents}`),
   graph: (branch: string) => json<Graph>(`/api/branches/${branch}/graph`),
+  /** The Necessity Ledger from the last recorded run. Returns `available: false`
+   *  rather than zeros when no run exists — a necessity of 0% from a measurement
+   *  that never happened is the most reassuring number here and the least true. */
+  necessity: () => json<Necessity>("/api/necessity"),
 };
 
 /** Shared SSE reader. Both replay and search stream over POST, which EventSource

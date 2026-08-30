@@ -115,8 +115,16 @@ async def main(sample: int, concurrency: int) -> int:
 
     pairs, tokens, failures = await run_gemma(messages, concurrency)
     ratio = tokens["thought"] / max(tokens["answer"], 1)
-    report("gemma-4-26b-a4b-it", accuracy(pairs),
-           f"{failures} unparseable")
+    report("gemma-4-26b-a4b-it", accuracy(pairs), f"{failures} unparseable")
+
+    # A message Gemma never finished thinking about is scored against a fallback
+    # projection, which measures the token budget rather than the model. Both numbers are
+    # printed: the first is what you would get in production, the second is what the model
+    # can do when it answers at all.
+    answered = [(t, g) for t, g in pairs if not g.error]
+    if answered and len(answered) < len(pairs):
+        report("  └ when it answers", accuracy(answered),
+               f"{len(answered)}/{len(pairs)} messages")
 
     print(f"\n  Gemma spent {tokens['thought']:,} tokens thinking to produce "
           f"{tokens['answer']:,} tokens of answer — {ratio:.0f}x.")
@@ -141,6 +149,30 @@ async def main(sample: int, concurrency: int) -> int:
         and all(g[1].projection.to_dict().get(f) == m.truth.get(f) for f in FIELDS)
     )
     agreed = len(messages) - len(disagree_ids)
+
+    # Per field rather than all-four-at-once. Requiring four simultaneous agreements
+    # leaves 15 samples to reason from, which cannot support a claim in either direction;
+    # per field there are 120 apiece, and the question — does a second family agreeing
+    # predict a correct reading — is answered field by field where it is actually used.
+    print(f"\n  Does Gemma agreeing predict Gemini being right?\n")
+    print(f"  {'field':<16}{'agree':>9}{'gemini right':>15}{'when agreed':>14}{'lift':>9}")
+    print(f"  {'-' * 63}")
+    lifts = {}
+    for field in FIELDS:
+        agreed_n = right_agreed = right_all = 0
+        for m, g, p_ in zip(messages, gemini, pairs):
+            gv = g[1].projection.to_dict().get(field)
+            pv = p_[1].projection.to_dict().get(field)
+            correct = gv == m.truth.get(field)
+            right_all += correct
+            if gv == pv:
+                agreed_n += 1
+                right_agreed += correct
+        base = right_all / len(messages)
+        cond = right_agreed / agreed_n if agreed_n else float("nan")
+        lifts[field] = cond - base
+        print(f"  {field:<16}{agreed_n:>6}/{len(messages):<3}{100 * base:>13.1f}%"
+              f"{100 * cond:>13.1f}%{100 * (cond - base):>+8.1f}")
 
     print(f"\n  Cross-family agreement (all four fields)   "
           f"{100 * agree / len(messages):>6.1f}%   ({agree}/{len(messages)})")
@@ -168,6 +200,9 @@ async def main(sample: int, concurrency: int) -> int:
         "cross_family_agreement": agree / len(messages),
         "gemini_exact_when_gemma_agrees": (right_when_agreeing / agreed) if agreed else None,
         "confidence_lift": lift,
+        "per_field_lift": lifts,
+        "gemma_when_answering": accuracy(answered) if answered else None,
+        "gemma_answered": len(answered),
     }, indent=2))
     print(f"\n  Written to {out}\n")
     return 0

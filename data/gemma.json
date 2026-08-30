@@ -1,37 +1,52 @@
 {
-  "sample": 120,
+  "sample": 200,
   "keyword": {
     "tier": 0.625,
-    "urgency": 0.4166666666666667,
-    "party": 0.525,
+    "urgency": 0.45,
+    "party": 0.555,
     "constraints": 0.775,
-    "exact": 0.10833333333333334,
-    "mean_field": 0.5854166666666667
+    "exact": 0.12,
+    "mean_field": 0.60125
   },
   "gemini": {
-    "tier": 0.75,
-    "urgency": 0.825,
-    "party": 0.9833333333333333,
-    "constraints": 0.9833333333333333,
-    "exact": 0.5833333333333334,
-    "mean_field": 0.8854166666666666
+    "tier": 0.725,
+    "urgency": 0.795,
+    "party": 0.975,
+    "constraints": 0.985,
+    "exact": 0.545,
+    "mean_field": 0.87
   },
   "gemma": {
-    "tier": 0.75,
-    "urgency": 0.26666666666666666,
-    "party": 0.925,
-    "constraints": 0.975,
-    "exact": 0.19166666666666668,
-    "mean_field": 0.7291666666666666
+    "tier": 0.66,
+    "urgency": 0.765,
+    "party": 0.935,
+    "constraints": 0.86,
+    "exact": 0.475,
+    "mean_field": 0.805
   },
   "gemma_tokens": {
-    "thought": 99168,
-    "answer": 5050,
-    "prompt": 16027
+    "thought": 159070,
+    "answer": 8498,
+    "prompt": 44751
   },
-  "gemma_think_to_answer": 19.637227722772277,
-  "gemma_unparseable": 2,
-  "cross_family_agreement": 0.058333333333333334,
-  "gemini_exact_when_gemma_agrees": 0.5714285714285714,
-  "confidence_lift": -0.011904761904761973
+  "gemma_think_to_answer": 18.71852200517769,
+  "gemma_unparseable": 35,
+  "cross_family_agreement": 0.11,
+  "gemini_exact_when_gemma_agrees": 0.6363636363636364,
+  "confidence_lift": 0.09136363636363631,
+  "per_field_lift": {
+    "tier": 0.09384057971014492,
+    "urgency": 0.10765486725663709,
+    "party": 0.00030864197530866555,
+    "constraints": 0.015000000000000013
+  },
+  "gemma_when_answering": {
+    "tier": 0.7393939393939394,
+    "urgency": 0.8606060606060606,
+    "party": 0.9696969696969697,
+    "constraints": 0.9696969696969697,
+    "exact": 0.5757575757575758,
+    "mean_field": 0.8848484848484849
+  },
+  "gemma_answered": 165
 }

@@ -232,3 +232,102 @@
   .step { grid-template-columns: minmax(0, 1fr); gap: 14px; }
   .compare table { font-size: 12.5px; }
 }
+
+/* ── Necessity Ledger ──────────────────────────────────────────────────────
+   The number a CFO funding an agent programme actually wants, and which almost
+   nobody can produce. It is set large because it is allowed to be unflattering:
+   if most of the workload is a lookup table, the panel says so in the biggest
+   type on the page rather than in a footnote. */
+
+.ledger {
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  background: color-mix(in oklab, var(--ground) 92%, var(--ink) 8%);
+}
+
+.ledger-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 0.85rem 1.25rem;
+  border-bottom: 1px solid var(--rule);
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.ledger-hero {
+  padding: 2.5rem 1.25rem 2rem;
+  text-align: center;
+  border-bottom: 1px solid var(--rule);
+}
+
+.ledger-figure {
+  font-family: var(--mono);
+  font-size: clamp(3rem, 11vw, 6rem);
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+  color: var(--accent);
+}
+
+.ledger-figure.muted {
+  font-size: clamp(1.5rem, 5vw, 2.5rem);
+  color: var(--ink-dim);
+}
+
+.ledger-caption {
+  margin: 1rem auto 0;
+  max-width: 46ch;
+  color: var(--ink-dim);
+}
+
+.ledger-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(15rem, 100%), 1fr));
+  gap: 0;
+  margin: 0;
+}
+
+.ledger-grid > div {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--rule);
+  border-right: 1px solid var(--rule);
+  /* min-width:auto on a grid child lets a long value stretch the whole page. */
+  min-width: 0;
+}
+
+.ledger-grid dt {
+  font-size: 0.78rem;
+  color: var(--ink-faint);
+  margin-bottom: 0.35rem;
+}
+
+.ledger-grid dd {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 1.05rem;
+  overflow-wrap: anywhere;
+}
+
+.ledger-proof {
+  padding: 1.25rem;
+}
+
+.ledger-proof p {
+  max-width: 68ch;
+  margin: 0 0 0.6rem;
+}
+
+.ledger-drift {
+  list-style: none;
+  margin: 0.75rem 0 0;
+  padding: 0;
+  overflow-x: auto;
+}
+
+.ledger-drift li {
+  font-size: 0.82rem;
+  padding: 0.25rem 0;
+  white-space: nowrap;
+}

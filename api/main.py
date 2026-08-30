@@ -315,6 +315,31 @@ def _cohort_layout(agents: int) -> str:
 threading.Thread(target=_cohort_layout, args=(20000,), daemon=True).start()
 
 
+@app.get("/api/necessity")
+def necessity() -> dict[str, Any]:
+    """The Necessity Ledger: is the model earning its cost?
+
+    Served from the last recorded run rather than computed on request. The number is the
+    product of a measurement that costs real money — deriving a policy, serving traffic
+    from it, then re-asking the model against its own cache — and recomputing it on every
+    page load would be both slow and a different number each time, which is the opposite
+    of what a ledger is for.
+
+    Absent data returns `available: false` rather than zeros. A necessity of 0% from a run
+    that never happened is the most reassuring number this endpoint could serve and the
+    least true.
+    """
+    path = Path(os.environ.get("CHORUS_NECESSITY", "data/necessity.json"))
+    if not path.exists():
+        return {"available": False,
+                "reason": "no run recorded; scripts/necessity.py writes this"}
+    try:
+        payload = json.loads(path.read_text())
+    except (OSError, json.JSONDecodeError) as exc:
+        return {"available": False, "reason": f"unreadable: {type(exc).__name__}"}
+    return {"available": True, **payload}
+
+
 @app.get("/api/swarm/cohorts")
 def swarm_cohorts(agents: int = 20000) -> Response:
     """The population at rest: pure bucketing, no model calls, no cost.
