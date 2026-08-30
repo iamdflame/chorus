@@ -1,0 +1,1189 @@
+{
+  "version": "3ac62a909b02",
+  "schema_version": "v2",
+  "ceiling": 2304,
+  "populated": 58,
+  "occupancy": 0.0252,
+  "rows": [
+    {
+      "key": "v2|passenger|basic|critical|family|checked_bags|short|hotel|origin",
+      "answer": {
+        "max_wait_hours": 12,
+        "accept_downgrade": true,
+        "accept_split_party": false,
+        "accept_nearby_airport": true,
+        "needs_hotel": true,
+        "urgency_score": 90
+      },
+      "provenance": {
+        "effect_id": "fa44a5b4201970adf80d75003f9c1384",
+        "model": "gemini-3.5-flash",
+        "derived_at": "2026-08-29T06:00:00+00:00",
+        "served": 1
+      },
+      "confirmations": 0,
+      "disagreements": 0,
+      "invalidated": false
+    },
+    {
+      "key": "v2|passenger|basic|critical|group|checked_bags|short|hotel|origin",
+      "answer": {
+        "max_wait_hours": 12,
+        "accept_downgrade": true,
+        "accept_split_party": true,
+        "accept_nearby_airport": true,
+        "needs_hotel": true,
+        "urgency_score": 90
+      },
+      "provenance": {
+        "effect_id": "a43f496c432548472b49b762ca3be39e",
+        "model": "gemini-3.5-flash",
+        "derived_at": "2026-08-29T06:00:00+00:00",
+        "served": 1
+      },
+      "confirmations": 0,
+      "disagreements": 0,
+      "invalidated": false
+    },
+    {
+      "key": "v2|passenger|basic|critical|pair|checked_bags|short|nohotel|origin",
+      "answer": {
+        "max_wait_hours": 12,
+        "accept_downgrade": true,
+        "accept_split_party": true,
+        "accept_nearby_airport": true,
+        "needs_hotel": true,
+        "urgency_score": 95
+      },
+      "provenance": {
+        "effect_id": "866e504dcadcfdcddbce5e5a76b85379",
+        "model": "gemini-3.5-flash",
+        "derived_at": "2026-08-29T06:00:00+00:00",
+        "served": 1
+      },
+      "confirmations": 0,
+      "disagreements": 0,
+      "invalidated": false
+    },
+    {
+      "key": "v2|passenger|basic|critical|solo|unencumbered|short|hotel|origin",
+      "answer": {
+        "max_wait_hours": 6,
+        "accept_downgrade": true,
+        "accept_split_party": true,
+        "accept_nearby_airport": true,
+        "needs_hotel": true,
+        "urgency_score": 95
+      },
+      "provenance": {
+        "effect_id": "f115d9e954c9a2c6bb35edd20ac3df30",
+        "model": "gemini-3.5-flash",
+        "derived_at": "2026-08-29T06:00:00+00:00",
+        "served": 1
+      },
+      "confirmations": 0,
+      "disagreements": 0,
+      "invalidated": false
+    },
+    {
+      "key": "v2|passenger|basic|flexible|family|unencumbered|intercontinental|nohotel|misconnect",
+      "answer": {
+        "max_wait_hours": 36,
+        "accept_downgrade": true,
+        "accept_split_party": false,
+        "accept_nearby_airport": true,
+        "needs_hotel": true,
+        "urgency_score": 40
+      },
+      "provenance": {
+        "effect_id": "2ae948cfd18b381138c71ee4259add26",
+        "model": "gemini-3.5-flash",
+        "derived_at": "2026-08-29T06:00:00+00:00",
+        "served": 1
+      },
+      "confirmations": 0,
+      "disagreements": 0,
+      "invalidated": false
+    },
+    {
+      "key": "v2|passenger|basic|flexible|family|unencumbered|long|hotel|origin",
+      "answer": {
+        "max_wait_hours": 36,
+        "accept_downgrade": true,
+        "accept_split_party": false,
+        "accept_nearby_airport": true,
+        "needs_hotel": true,
+        "urgency_score": 25
+      },
+      "provenance": {
+        "effect_id": "3c23690ea93d3ccbc513a51b58564557",
+        "model": "gemini-3.5-flash",
+        "derived_at": "2026-08-29T06:00:00+00:00",
+        "served": 1
+      },
+      "confirmations": 0,
+      "disagreements": 0,
+      "invalidated": false
+    },
+    {
+      "key": "v2|passenger|basic|flexible|family|unencumbered|short|nohotel|origin",
+      "answer": {
+        "max_wait_hours": 24,
+        "accept_downgrade": false,
+        "accept_split_party": false,
+        "accept_nearby_airport": true,
+        "needs_hotel": true,
+        "urgency_score": 25
+      },
+      "provenance": {
+        "effect_id": "b6e09165d130a5d9bc76cf998ddcd981",
+        "model": "gemini-3.5-flash",
+        "derived_at": "2026-08-29T06:00:00+00:00",
+        "served": 1
+      },
+      "confirmations": 0,
+      "disagreements": 0,
+      "invalidated": false
+    },
+    {
+      "key": "v2|passenger|basic|flexible|group|checked_bags|short|nohotel|misconnect",
+      "answer": {
+        "max_wait_hours": 24,
+        "accept_downgrade": true,
+        "accept_split_party": false,
+        "accept_nearby_airport": false,
+        "needs_hotel": true,
+        "urgency_score": 40
+      },
+      "provenance": {
+        "effect_id": "515e34b366ba70e2c6cc332157b26769",
+        "model": "gemini-3.5-flash",
+        "derived_at": "2026-08-29T06:00:00+00:00",
+        "served": 1
+      },
+      "confirmations": 1,
+      "disagreements": 0,
+      "invalidated": false
+    },
+    {
+      "key": "v2|passenger|basic|flexible|group|unencumbered|long|hotel|misconnect",
+      "answer": {
+        "max_wait_hours": 36,
+        "accept_downgrade": false,
+        "accept_split_party": false,
+        "accept_nearby_airport": true,
+        "needs_hotel": true,
+        "urgency_score": 30
+      },
+      "provenance": {
+        "effect_id": "62125670192e54b390313ee757914fef",
+        "model": "gemini-3.5-flash",
+        "derived_at": "2026-08-29T06:00:00+00:00",
+        "served": 1
+      },
+      "confirmations": 0,
+      "disagreements": 0,
+      "invalidated": false
+    },
+    {
+      "key": "v2|passenger|basic|flexible|group|unencumbered|short|nohotel|misconnect",
+      "answer": {
+        "max_wait_hours": 24,
+        "accept_downgrade": true,
+        "accept_split_party": false,
+        "accept_nearby_airport": true,
+        "needs_hotel": true,
+        "urgency_score": 35
+      },
+      "provenance": {
+        "effect_id": "9bfd7c91047d0fa3036379f8178891f5",
+        "model": "gemini-3.5-flash",
+        "derived_at": "2026-08-29T06:00:00+00:00",
+        "served": 1
+      },
+      "confirmations": 0,
+      "disagreements": 0,
+      "invalidated": false
+    },
+    {
+      "key": "v2|passenger|basic|flexible|pair|checked_bags|short|hotel|origin",
+      "answer": {
+        "max_wait_hours": 24,
+        "accept_downgrade": true,
+        "accept_split_party": false,
+        "accept_nearby_airport": true,
+        "needs_hotel": true,
+        "urgency_score": 25
+      },
+      "provenance": {
+        "effect_id": "a693eacb036b554df972cfe04f052038",
+        "model": "gemini-3.5-flash",
+        "derived_at": "2026-08-29T06:00:00+00:00",
+        "served": 1
+      },
+      "confirmations": 0,
+      "disagreements": 0,
+      "invalidated": false
+    },
+    {
+      "key": "v2|passenger|basic|flexible|pair|unencumbered|intercontinental|nohotel|origin",
+      "answer": {
+        "max_wait_hours": 48,
+        "accept_downgrade": true,
+        "accept_split_party": true,
+        "accept_nearby_airport": true,
+        "needs_hotel": false,
+        "urgency_score": 25
+      },
+      "provenance": {
+        "effect_id": "6134d15131ae5b87095209a7812d7d8d",
+        "model": "gemini-3.5-flash",
+        "derived_at": "2026-08-29T06:00:00+00:00",
+        "served": 1
+      },
+      "confirmations": 0,
+      "disagreements": 0,
+      "invalidated": false
+    },
+    {
+      "key": "v2|passenger|basic|flexible|solo|checked_bags|long|hotel|origin",
+      "answer": {
+        "max_wait_hours": 36,
+        "accept_downgrade": true,
+        "accept_split_party": true,
+        "accept_nearby_airport": true,
+        "needs_hotel": true,
+        "urgency_score": 25
+      },
+      "provenance": {
+        "effect_id": "bd10c92db890c24ffb824af6090e9820",
+        "model": "gemini-3.5-flash",
+        "derived_at": "2026-08-29T06:00:00+00:00",
+        "served": 1
+      },
+      "confirmations": 0,
+      "disagreements": 0,
+      "invalidated": false
+    },
+    {
+      "key": "v2|passenger|basic|flexible|solo|checked_bags|short|nohotel|origin",
+      "answer": {
+        "max_wait_hours": 24,
+        "accept_downgrade": true,
+        "accept_split_party": true,
+        "accept_nearby_airport": true,
+        "needs_hotel": false,
+        "urgency_score": 25
+      },
+      "provenance": {
+        "effect_id": "1c933ffb996d85ad6fec0f14125fbe99",
+        "model": "gemini-3.5-flash",
+        "derived_at": "2026-08-29T06:00:00+00:00",
+        "served": 1
+      },
+      "confirmations": 0,
+      "disagreements": 0,
+      "invalidated": false
+    },
+    {
+      "key": "v2|passenger|basic|same_day|family|checked_bags|short|hotel|origin",
+      "answer": {
+        "max_wait_hours": 12,
+        "accept_downgrade": true,
+        "accept_split_party": false,
+        "accept_nearby_airport": true,
+        "needs_hotel": true,
+        "urgency_score": 80
+      },
+      "provenance": {
+        "effect_id": "301d605253b7714cba19f6640da4f326",
+        "model": "gemini-3.5-flash",
+        "derived_at": "2026-08-29T06:00:00+00:00",
+        "served": 1
+      },
+      "confirmations": 0,
+      "disagreements": 0,
+      "invalidated": false
+    },
+    {
+      "key": "v2|passenger|basic|same_day|group|checked_bags|intercontinental|hotel|misconnect",
+      "answer": {
+        "max_wait_hours": 12,
+        "accept_downgrade": true,
+        "accept_split_party": true,
+        "accept_nearby_airport": true,
+        "needs_hotel": true,
+        "urgency_score": 85
+      },
+      "provenance": {
+        "effect_id": "db77a3540507154de126cbc041e75816",
+        "model": "gemini-3.5-flash",
+        "derived_at": "2026-08-29T06:00:00+00:00",
+        "served": 1
+      },
+      "confirmations": 0,
+      "disagreements": 0,
+      "invalidated": false
+    },
+    {
+      "key": "v2|passenger|basic|same_day|group|checked_bags|intercontinental|hotel|origin",
+      "answer": {
+        "max_wait_hours": 12,
+        "accept_downgrade": true,
+        "accept_split_party": false,
+        "accept_nearby_airport": true,
+        "needs_hotel": true,
+        "urgency_score": 80
+      },
+      "provenance": {
+        "effect_id": "b0a57eaa4b958685836084b2a9a17f0d",
+        "model": "gemini-3.5-flash",
+        "derived_at": "2026-08-29T06:00:00+00:00",
+        "served": 1
+      },
+      "confirmations": 0,
+      "disagreements": 0,
+      "invalidated": false
+    },
+    {
+      "key": "v2|passenger|basic|same_day|group|checked_bags|intercontinental|nohotel|origin",
+      "answer": {
+        "max_wait_hours": 12,
+        "accept_downgrade": true,
+        "accept_split_party": false,
+        "accept_nearby_airport": true,
+        "needs_hotel": true,
+        "urgency_score": 85
+      },
+      "provenance": {
+        "effect_id": "3b8bc176b116c4ec6d8a707cc1debbee",
+        "model": "gemini-3.5-flash",
+        "derived_at": "2026-08-29T06:00:00+00:00",
+        "served": 1
+      },
+      "confirmations": 0,
+      "disagreements": 0,
+      "invalidated": false
+    },
+    {
+      "key": "v2|passenger|basic|same_day|group|checked_bags|long|hotel|origin",
+      "answer": {
+        "max_wait_hours": 12,
+        "accept_downgrade": true,
+        "accept_split_party": false,
+        "accept_nearby_airport": true,
+        "needs_hotel": true,
+        "urgency_score": 80
+      },
+      "provenance": {
+        "effect_id": "f9e73a4d449ba7cb5afd9da045f01601",
+        "model": "gemini-3.5-flash",
+        "derived_at": "2026-08-29T06:00:00+00:00",
+        "served": 1
+      },
+      "confirmations": 0,
+      "disagreements": 0,
+      "invalidated": false
+    },
+    {
+      "key": "v2|passenger|basic|same_day|group|checked_bags|short|hotel|misconnect",
+      "answer": {
+        "max_wait_hours": 12,
+        "accept_downgrade": true,
+        "accept_split_party": false,
+        "accept_nearby_airport": true,
+        "needs_hotel": true,
+        "urgency_score": 85
+      },
+      "provenance": {
+        "effect_id": "a7f569a0f318e9f3cf8f27ee76b67b90",
+        "model": "gemini-3.5-flash",
+        "derived_at": "2026-08-29T06:00:00+00:00",
+        "served": 1
+      },
+      "confirmations": 0,
+      "disagreements": 0,
+      "invalidated": false
+    },
+    {
+      "key": "v2|passenger|basic|same_day|pair|checked_bags|long|hotel|origin",
+      "answer": {
+        "max_wait_hours": 12,
+        "accept_downgrade": true,
+        "accept_split_party": false,
+        "accept_nearby_airport": true,
+        "needs_hotel": true,
+        "urgency_score": 85
+      },
+      "provenance": {
+        "effect_id": "9c22c1213ce5940d4ea1fee621bd1ceb",
+        "model": "gemini-3.5-flash",
+        "derived_at": "2026-08-29T06:00:00+00:00",
+        "served": 1
+      },
+      "confirmations": 0,
+      "disagreements": 0,
+      "invalidated": false
+    },
+    {
+      "key": "v2|passenger|basic|same_day|solo|assisted|intercontinental|nohotel|misconnect",
+      "answer": {
+        "max_wait_hours": 12,
+        "accept_downgrade": true,
+        "accept_split_party": true,
+        "accept_nearby_airport": false,
+        "needs_hotel": true,
+        "urgency_score": 85
+      },
+      "provenance": {
+        "effect_id": "456d453b99b6fd2d0cd43fe223c78e31",
+        "model": "gemini-3.5-flash",
+        "derived_at": "2026-08-29T06:00:00+00:00",
+        "served": 1
+      },
+      "confirmations": 0,
+      "disagreements": 0,
+      "invalidated": false
+    },
+    {
+      "key": "v2|passenger|basic|same_day|solo|checked_bags|intercontinental|hotel|origin",
+      "answer": {
+        "max_wait_hours": 12,
+        "accept_downgrade": true,
+        "accept_split_party": true,
+        "accept_nearby_airport": true,
+        "needs_hotel": true,
+        "urgency_score": 85
+      },
+      "provenance": {
+        "effect_id": "9c075ecdfcac9edc40105f9bba988af6",
+        "model": "gemini-3.5-flash",
+        "derived_at": "2026-08-29T06:00:00+00:00",
+        "served": 1
+      },
+      "confirmations": 0,
+      "disagreements": 0,
+      "invalidated": false
+    },
+    {
+      "key": "v2|passenger|basic|same_day|solo|checked_bags|intercontinental|nohotel|origin",
+      "answer": {
+        "max_wait_hours": 12,
+        "accept_downgrade": true,
+        "accept_split_party": true,
+        "accept_nearby_airport": true,
+        "needs_hotel": false,
+        "urgency_score": 85
+      },
+      "provenance": {
+        "effect_id": "a45feeaac5aace5f9899f39207e0ca43",
+        "model": "gemini-3.5-flash",
+        "derived_at": "2026-08-29T06:00:00+00:00",
+        "served": 1
+      },
+      "confirmations": 0,
+      "disagreements": 0,
+      "invalidated": false
+    },
+    {
+      "key": "v2|passenger|basic|same_day|solo|checked_bags|short|hotel|misconnect",
+      "answer": {
+        "max_wait_hours": 12,
+        "accept_downgrade": true,
+        "accept_split_party": true,
+        "accept_nearby_airport": true,
+        "needs_hotel": true,
+        "urgency_score": 80
+      },
+      "provenance": {
+        "effect_id": "9f5a8f668784292a6799c044487df142",
+        "model": "gemini-3.5-flash",
+        "derived_at": "2026-08-29T06:00:00+00:00",
+        "served": 1
+      },
+      "confirmations": 0,
+      "disagreements": 1,
+      "invalidated": true
+    },
+    {
+      "key": "v2|passenger|basic|same_day|solo|checked_bags|short|hotel|origin",
+      "answer": {
+        "max_wait_hours": 12,
+        "accept_downgrade": true,
+        "accept_split_party": true,
+        "accept_nearby_airport": true,
+        "needs_hotel": true,
+        "urgency_score": 85
+      },
+      "provenance": {
+        "effect_id": "bd8cdbda83615ed34f4c7de814f4df79",
+        "model": "gemini-3.5-flash",
+        "derived_at": "2026-08-29T06:00:00+00:00",
+        "served": 1
+      },
+      "confirmations": 0,
+      "disagreements": 0,
+      "invalidated": false
+    },
+    {
+      "key": "v2|passenger|basic|same_day|solo|unencumbered|intercontinental|nohotel|origin",
+      "answer": {
+        "max_wait_hours": 12,
+        "accept_downgrade": true,
+        "accept_split_party": true,
+        "accept_nearby_airport": true,
+        "needs_hotel": false,
+        "urgency_score": 85
+      },
+      "provenance": {
+        "effect_id": "375b2f6ddb2e5d3d18d2829c847c4021",
+        "model": "gemini-3.5-flash",
+        "derived_at": "2026-08-29T06:00:00+00:00",
+        "served": 1
+      },
+      "confirmations": 0,
+      "disagreements": 0,
+      "invalidated": false
+    },
+    {
+      "key": "v2|passenger|basic|same_day|solo|unencumbered|short|nohotel|origin",
+      "answer": {
+        "max_wait_hours": 8,
+        "accept_downgrade": true,
+        "accept_split_party": true,
+        "accept_nearby_airport": true,
+        "needs_hotel": true,
+        "urgency_score": 85
+      },
+      "provenance": {
+        "effect_id": "8ffdf6ef04d86fe24ec8e012d95cff02",
+        "model": "gemini-3.5-flash",
+        "derived_at": "2026-08-29T06:00:00+00:00",
+        "served": 1
+      },
+      "confirmations": 0,
+      "disagreements": 0,
+      "invalidated": false
+    },
+    {
+      "key": "v2|passenger|basic|urgent|family|assisted|intercontinental|nohotel|origin",
+      "answer": {
+        "max_wait_hours": 24,
+        "accept_downgrade": true,
+        "accept_split_party": false,
+        "accept_nearby_airport": true,
+        "needs_hotel": true,
+        "urgency_score": 85
+      },
+      "provenance": {
+        "effect_id": "ae4849632026b356c2b599c9a3128e27",
+        "model": "gemini-3.5-flash",
+        "derived_at": "2026-08-29T06:00:00+00:00",
+        "served": 1
+      },
+      "confirmations": 0,
+      "disagreements": 0,
+      "invalidated": false
+    },
+    {
+      "key": "v2|passenger|basic|urgent|family|unencumbered|short|nohotel|origin",
+      "answer": {
+        "max_wait_hours": 12,
+        "accept_downgrade": true,
+        "accept_split_party": false,
+        "accept_nearby_airport": true,
+        "needs_hotel": true,
+        "urgency_score": 85
+      },
+      "provenance": {
+        "effect_id": "80dbdb4a4c9fc9f766708b3e1c660c6f",
+        "model": "gemini-3.5-flash",
+        "derived_at": "2026-08-29T06:00:00+00:00",
+        "served": 1
+      },
+      "confirmations": 0,
+      "disagreements": 0,
+      "invalidated": false
+    },
+    {
+      "key": "v2|passenger|basic|urgent|group|checked_bags|long|nohotel|misconnect",
+      "answer": {
+        "max_wait_hours": 12,
+        "accept_downgrade": true,
+        "accept_split_party": true,
+        "accept_nearby_airport": true,
+        "needs_hotel": true,
+        "urgency_score": 85
+      },
+      "provenance": {
+        "effect_id": "1b1bcc1e4de3fdd83a285c9488e13dbe",
+        "model": "gemini-3.5-flash",
+        "derived_at": "2026-08-29T06:00:00+00:00",
+        "served": 1
+      },
+      "confirmations": 0,
+      "disagreements": 0,
+      "invalidated": false
+    },
+    {
+      "key": "v2|passenger|basic|urgent|group|checked_bags|short|nohotel|misconnect",
+      "answer": {
+        "max_wait_hours": 12,
+        "accept_downgrade": true,
+        "accept_split_party": false,
+        "accept_nearby_airport": true,
+        "needs_hotel": true,
+        "urgency_score": 85
+      },
+      "provenance": {
+        "effect_id": "fafdd9b18684810cde2cc8daa59226e6",
+        "model": "gemini-3.5-flash",
+        "derived_at": "2026-08-29T06:00:00+00:00",
+        "served": 1
+      },
+      "confirmations": 0,
+      "disagreements": 0,
+      "invalidated": false
+    },
+    {
+      "key": "v2|passenger|basic|urgent|group|unencumbered|intercontinental|nohotel|origin",
+      "answer": {
+        "max_wait_hours": 18,
+        "accept_downgrade": true,
+        "accept_split_party": true,
+        "accept_nearby_airport": true,
+        "needs_hotel": true,
+        "urgency_score": 85
+      },
+      "provenance": {
+        "effect_id": "72e8a0aa1fbb1b8d2f288bdf67df1709",
+        "model": "gemini-3.5-flash",
+        "derived_at": "2026-08-29T06:00:00+00:00",
+        "served": 1
+      },
+      "confirmations": 1,
+      "disagreements": 0,
+      "invalidated": false
+    },
+    {
+      "key": "v2|passenger|basic|urgent|solo|checked_bags|intercontinental|hotel|misconnect",
+      "answer": {
+        "max_wait_hours": 12,
+        "accept_downgrade": true,
+        "accept_split_party": true,
+        "accept_nearby_airport": true,
+        "needs_hotel": true,
+        "urgency_score": 85
+      },
+      "provenance": {
+        "effect_id": "8c869c0d6dd5e382fbef522e0479e958",
+        "model": "gemini-3.5-flash",
+        "derived_at": "2026-08-29T06:00:00+00:00",
+        "served": 2
+      },
+      "confirmations": 0,
+      "disagreements": 0,
+      "invalidated": false
+    },
+    {
+      "key": "v2|passenger|basic|urgent|solo|checked_bags|intercontinental|nohotel|misconnect",
+      "answer": {
+        "max_wait_hours": 18,
+        "accept_downgrade": true,
+        "accept_split_party": true,
+        "accept_nearby_airport": true,
+        "needs_hotel": true,
+        "urgency_score": 85
+      },
+      "provenance": {
+        "effect_id": "4e627cb6e6dd70f4b43089cc207070ee",
+        "model": "gemini-3.5-flash",
+        "derived_at": "2026-08-29T06:00:00+00:00",
+        "served": 1
+      },
+      "confirmations": 0,
+      "disagreements": 0,
+      "invalidated": false
+    },
+    {
+      "key": "v2|passenger|basic|urgent|solo|checked_bags|long|nohotel|misconnect",
+      "answer": {
+        "max_wait_hours": 12,
+        "accept_downgrade": true,
+        "accept_split_party": true,
+        "accept_nearby_airport": true,
+        "needs_hotel": true,
+        "urgency_score": 85
+      },
+      "provenance": {
+        "effect_id": "166f208df183c58a64f3056a61baacbc",
+        "model": "gemini-3.5-flash",
+        "derived_at": "2026-08-29T06:00:00+00:00",
+        "served": 1
+      },
+      "confirmations": 0,
+      "disagreements": 0,
+      "invalidated": false
+    },
+    {
+      "key": "v2|passenger|basic|urgent|solo|checked_bags|short|nohotel|misconnect",
+      "answer": {
+        "max_wait_hours": 12,
+        "accept_downgrade": true,
+        "accept_split_party": true,
+        "accept_nearby_airport": true,
+        "needs_hotel": true,
+        "urgency_score": 85
+      },
+      "provenance": {
+        "effect_id": "280ae4ec2d77ac96a642284c7f587d00",
+        "model": "gemini-3.5-flash",
+        "derived_at": "2026-08-29T06:00:00+00:00",
+        "served": 1
+      },
+      "confirmations": 0,
+      "disagreements": 0,
+      "invalidated": false
+    },
+    {
+      "key": "v2|passenger|basic|urgent|solo|unencumbered|intercontinental|hotel|misconnect",
+      "answer": {
+        "max_wait_hours": 18,
+        "accept_downgrade": true,
+        "accept_split_party": true,
+        "accept_nearby_airport": true,
+        "needs_hotel": true,
+        "urgency_score": 85
+      },
+      "provenance": {
+        "effect_id": "d17d319c4d6d6f210033da0c0c5ca166",
+        "model": "gemini-3.5-flash",
+        "derived_at": "2026-08-29T06:00:00+00:00",
+        "served": 1
+      },
+      "confirmations": 0,
+      "disagreements": 0,
+      "invalidated": false
+    },
+    {
+      "key": "v2|passenger|gold|critical|solo|unencumbered|short|hotel|misconnect",
+      "answer": {
+        "max_wait_hours": 6,
+        "accept_downgrade": true,
+        "accept_split_party": true,
+        "accept_nearby_airport": true,
+        "needs_hotel": true,
+        "urgency_score": 95
+      },
+      "provenance": {
+        "effect_id": "a9871a3ffb0de87439537af982047f98",
+        "model": "gemini-3.5-flash",
+        "derived_at": "2026-08-29T06:00:00+00:00",
+        "served": 1
+      },
+      "confirmations": 0,
+      "disagreements": 0,
+      "invalidated": false
+    },
+    {
+      "key": "v2|passenger|gold|same_day|solo|unencumbered|short|nohotel|origin",
+      "answer": {
+        "max_wait_hours": 6,
+        "accept_downgrade": true,
+        "accept_split_party": true,
+        "accept_nearby_airport": true,
+        "needs_hotel": true,
+        "urgency_score": 85
+      },
+      "provenance": {
+        "effect_id": "3516c066639eea59b8547665836511eb",
+        "model": "gemini-3.5-flash",
+        "derived_at": "2026-08-29T06:00:00+00:00",
+        "served": 1
+      },
+      "confirmations": 0,
+      "disagreements": 0,
+      "invalidated": false
+    },
+    {
+      "key": "v2|passenger|gold|urgent|group|checked_bags|short|hotel|origin",
+      "answer": {
+        "max_wait_hours": 12,
+        "accept_downgrade": true,
+        "accept_split_party": false,
+        "accept_nearby_airport": true,
+        "needs_hotel": true,
+        "urgency_score": 85
+      },
+      "provenance": {
+        "effect_id": "00d63682a938ed95868592adff16f9bd",
+        "model": "gemini-3.5-flash",
+        "derived_at": "2026-08-29T06:00:00+00:00",
+        "served": 1
+      },
+      "confirmations": 0,
+      "disagreements": 0,
+      "invalidated": false
+    },
+    {
+      "key": "v2|passenger|platinum|critical|family|checked_bags|long|hotel|misconnect",
+      "answer": {
+        "max_wait_hours": 12,
+        "accept_downgrade": true,
+        "accept_split_party": false,
+        "accept_nearby_airport": true,
+        "needs_hotel": true,
+        "urgency_score": 95
+      },
+      "provenance": {
+        "effect_id": "b1a07ed02386cc4e3bbe7cc59e08ca7b",
+        "model": "gemini-3.5-flash",
+        "derived_at": "2026-08-29T06:00:00+00:00",
+        "served": 1
+      },
+      "confirmations": 0,
+      "disagreements": 0,
+      "invalidated": false
+    },
+    {
+      "key": "v2|passenger|platinum|critical|family|unencumbered|short|hotel|misconnect",
+      "answer": {
+        "max_wait_hours": 12,
+        "accept_downgrade": true,
+        "accept_split_party": false,
+        "accept_nearby_airport": true,
+        "needs_hotel": true,
+        "urgency_score": 95
+      },
+      "provenance": {
+        "effect_id": "ce46c0a5e79292868d5a7d727839b674",
+        "model": "gemini-3.5-flash",
+        "derived_at": "2026-08-29T06:00:00+00:00",
+        "served": 1
+      },
+      "confirmations": 0,
+      "disagreements": 0,
+      "invalidated": false
+    },
+    {
+      "key": "v2|passenger|platinum|same_day|family|checked_bags|short|hotel|misconnect",
+      "answer": {
+        "max_wait_hours": 8,
+        "accept_downgrade": true,
+        "accept_split_party": false,
+        "accept_nearby_airport": true,
+        "needs_hotel": true,
+        "urgency_score": 85
+      },
+      "provenance": {
+        "effect_id": "6024f8da602c5afa921ae8cd9f7593af",
+        "model": "gemini-3.5-flash",
+        "derived_at": "2026-08-29T06:00:00+00:00",
+        "served": 1
+      },
+      "confirmations": 0,
+      "disagreements": 0,
+      "invalidated": false
+    },
+    {
+      "key": "v2|passenger|platinum|same_day|family|checked_bags|short|nohotel|misconnect",
+      "answer": {
+        "max_wait_hours": 8,
+        "accept_downgrade": true,
+        "accept_split_party": false,
+        "accept_nearby_airport": true,
+        "needs_hotel": true,
+        "urgency_score": 90
+      },
+      "provenance": {
+        "effect_id": "2def20fc1a64f329e51e32d86cb7060d",
+        "model": "gemini-3.5-flash",
+        "derived_at": "2026-08-29T06:00:00+00:00",
+        "served": 1
+      },
+      "confirmations": 0,
+      "disagreements": 0,
+      "invalidated": false
+    },
+    {
+      "key": "v2|passenger|platinum|same_day|group|unencumbered|intercontinental|nohotel|origin",
+      "answer": {
+        "max_wait_hours": 12,
+        "accept_downgrade": true,
+        "accept_split_party": true,
+        "accept_nearby_airport": true,
+        "needs_hotel": true,
+        "urgency_score": 85
+      },
+      "provenance": {
+        "effect_id": "d83c688505b97c02832be5016122766e",
+        "model": "gemini-3.5-flash",
+        "derived_at": "2026-08-29T06:00:00+00:00",
+        "served": 1
+      },
+      "confirmations": 0,
+      "disagreements": 0,
+      "invalidated": false
+    },
+    {
+      "key": "v2|passenger|platinum|same_day|solo|checked_bags|short|hotel|misconnect",
+      "answer": {
+        "max_wait_hours": 6,
+        "accept_downgrade": true,
+        "accept_split_party": true,
+        "accept_nearby_airport": true,
+        "needs_hotel": true,
+        "urgency_score": 90
+      },
+      "provenance": {
+        "effect_id": "5fc93000703ac822d815664155c15f42",
+        "model": "gemini-3.5-flash",
+        "derived_at": "2026-08-29T06:00:00+00:00",
+        "served": 1
+      },
+      "confirmations": 0,
+      "disagreements": 0,
+      "invalidated": false
+    },
+    {
+      "key": "v2|passenger|platinum|urgent|group|checked_bags|long|hotel|origin",
+      "answer": {
+        "max_wait_hours": 12,
+        "accept_downgrade": true,
+        "accept_split_party": false,
+        "accept_nearby_airport": true,
+        "needs_hotel": true,
+        "urgency_score": 85
+      },
+      "provenance": {
+        "effect_id": "756ee913f6fa3c56627912f9812221dc",
+        "model": "gemini-3.5-flash",
+        "derived_at": "2026-08-29T06:00:00+00:00",
+        "served": 1
+      },
+      "confirmations": 0,
+      "disagreements": 0,
+      "invalidated": false
+    },
+    {
+      "key": "v2|passenger|platinum|urgent|solo|checked_bags|intercontinental|nohotel|misconnect",
+      "answer": {
+        "max_wait_hours": 12,
+        "accept_downgrade": true,
+        "accept_split_party": true,
+        "accept_nearby_airport": true,
+        "needs_hotel": true,
+        "urgency_score": 90
+      },
+      "provenance": {
+        "effect_id": "4ae7f3d2eb8567ebe0860218092efcbe",
+        "model": "gemini-3.5-flash",
+        "derived_at": "2026-08-29T06:00:00+00:00",
+        "served": 1
+      },
+      "confirmations": 0,
+      "disagreements": 0,
+      "invalidated": false
+    },
+    {
+      "key": "v2|passenger|platinum|urgent|solo|checked_bags|short|nohotel|origin",
+      "answer": {
+        "max_wait_hours": 8,
+        "accept_downgrade": true,
+        "accept_split_party": true,
+        "accept_nearby_airport": true,
+        "needs_hotel": true,
+        "urgency_score": 85
+      },
+      "provenance": {
+        "effect_id": "d70734925103d79bdbceb0e6a52b22e7",
+        "model": "gemini-3.5-flash",
+        "derived_at": "2026-08-29T06:00:00+00:00",
+        "served": 1
+      },
+      "confirmations": 0,
+      "disagreements": 0,
+      "invalidated": false
+    },
+    {
+      "key": "v2|passenger|silver|critical|family|assisted|intercontinental|nohotel|misconnect",
+      "answer": {
+        "max_wait_hours": 12,
+        "accept_downgrade": true,
+        "accept_split_party": false,
+        "accept_nearby_airport": true,
+        "needs_hotel": true,
+        "urgency_score": 95
+      },
+      "provenance": {
+        "effect_id": "339d4587804fbdd335e57356214ddcea",
+        "model": "gemini-3.5-flash",
+        "derived_at": "2026-08-29T06:00:00+00:00",
+        "served": 1
+      },
+      "confirmations": 0,
+      "disagreements": 0,
+      "invalidated": false
+    },
+    {
+      "key": "v2|passenger|silver|critical|family|checked_bags|intercontinental|nohotel|misconnect",
+      "answer": {
+        "max_wait_hours": 12,
+        "accept_downgrade": true,
+        "accept_split_party": false,
+        "accept_nearby_airport": true,
+        "needs_hotel": true,
+        "urgency_score": 95
+      },
+      "provenance": {
+        "effect_id": "482b7899e03d5babe9c8b049f43b5c05",
+        "model": "gemini-3.5-flash",
+        "derived_at": "2026-08-29T06:00:00+00:00",
+        "served": 1
+      },
+      "confirmations": 0,
+      "disagreements": 0,
+      "invalidated": false
+    },
+    {
+      "key": "v2|passenger|silver|critical|solo|checked_bags|short|nohotel|origin",
+      "answer": {
+        "max_wait_hours": 6,
+        "accept_downgrade": true,
+        "accept_split_party": true,
+        "accept_nearby_airport": true,
+        "needs_hotel": true,
+        "urgency_score": 95
+      },
+      "provenance": {
+        "effect_id": "9241d77a07adb4172a84ba343e0b65ba",
+        "model": "gemini-3.5-flash",
+        "derived_at": "2026-08-29T06:00:00+00:00",
+        "served": 1
+      },
+      "confirmations": 0,
+      "disagreements": 0,
+      "invalidated": false
+    },
+    {
+      "key": "v2|passenger|silver|critical|solo|unencumbered|intercontinental|hotel|origin",
+      "answer": {
+        "max_wait_hours": 12,
+        "accept_downgrade": true,
+        "accept_split_party": true,
+        "accept_nearby_airport": true,
+        "needs_hotel": true,
+        "urgency_score": 95
+      },
+      "provenance": {
+        "effect_id": "5844437201bf9731f35dc26723ac786c",
+        "model": "gemini-3.5-flash",
+        "derived_at": "2026-08-29T06:00:00+00:00",
+        "served": 1
+      },
+      "confirmations": 1,
+      "disagreements": 0,
+      "invalidated": false
+    },
+    {
+      "key": "v2|passenger|silver|flexible|solo|checked_bags|short|nohotel|misconnect",
+      "answer": {
+        "max_wait_hours": 18,
+        "accept_downgrade": true,
+        "accept_split_party": true,
+        "accept_nearby_airport": true,
+        "needs_hotel": true,
+        "urgency_score": 45
+      },
+      "provenance": {
+        "effect_id": "8ad2bb054160b5d50136c0da55e4fd26",
+        "model": "gemini-3.5-flash",
+        "derived_at": "2026-08-29T06:00:00+00:00",
+        "served": 1
+      },
+      "confirmations": 0,
+      "disagreements": 0,
+      "invalidated": false
+    },
+    {
+      "key": "v2|passenger|silver|same_day|family|assisted|short|hotel|misconnect",
+      "answer": {
+        "max_wait_hours": 8,
+        "accept_downgrade": true,
+        "accept_split_party": false,
+        "accept_nearby_airport": false,
+        "needs_hotel": true,
+        "urgency_score": 85
+      },
+      "provenance": {
+        "effect_id": "60c3137515ab758ecd5356c2af4db081",
+        "model": "gemini-3.5-flash",
+        "derived_at": "2026-08-29T06:00:00+00:00",
+        "served": 1
+      },
+      "confirmations": 0,
+      "disagreements": 0,
+      "invalidated": false
+    },
+    {
+      "key": "v2|passenger|silver|same_day|solo|unencumbered|short|nohotel|origin",
+      "answer": {
+        "max_wait_hours": 8,
+        "accept_downgrade": true,
+        "accept_split_party": true,
+        "accept_nearby_airport": true,
+        "needs_hotel": true,
+        "urgency_score": 85
+      },
+      "provenance": {
+        "effect_id": "b8c013f2b3fa24f5823ab888ea35dae6",
+        "model": "gemini-3.5-flash",
+        "derived_at": "2026-08-29T06:00:00+00:00",
+        "served": 1
+      },
+      "confirmations": 0,
+      "disagreements": 0,
+      "invalidated": false
+    },
+    {
+      "key": "v2|passenger|silver|urgent|group|unencumbered|long|nohotel|misconnect",
+      "answer": {
+        "max_wait_hours": 12,
+        "accept_downgrade": true,
+        "accept_split_party": true,
+        "accept_nearby_airport": true,
+        "needs_hotel": true,
+        "urgency_score": 85
+      },
+      "provenance": {
+        "effect_id": "fccc1df1bf4b8fd3ef6af6c4fa2499d1",
+        "model": "gemini-3.5-flash",
+        "derived_at": "2026-08-29T06:00:00+00:00",
+        "served": 1
+      },
+      "confirmations": 0,
+      "disagreements": 0,
+      "invalidated": false
+    },
+    {
+      "key": "v2|passenger|silver|urgent|solo|checked_bags|intercontinental|nohotel|misconnect",
+      "answer": {
+        "max_wait_hours": 12,
+        "accept_downgrade": true,
+        "accept_split_party": true,
+        "accept_nearby_airport": true,
+        "needs_hotel": true,
+        "urgency_score": 85
+      },
+      "provenance": {
+        "effect_id": "e9f42bea4445e04062cf6fb4541981fb",
+        "model": "gemini-3.5-flash",
+        "derived_at": "2026-08-29T06:00:00+00:00",
+        "served": 1
+      },
+      "confirmations": 0,
+      "disagreements": 0,
+      "invalidated": false
+    }
+  ]
+}

@@ -1,0 +1,53 @@
+{
+  "ledger": {
+    "period": "derive 60 \u2192 serve 2,000",
+    "policy_version": "3ac62a909b02",
+    "decisions": 2000,
+    "served_from_table": 205,
+    "served_from_model": 1795,
+    "table_share": 0.1025,
+    "necessity": 0.25,
+    "cost_usd": 0.0585,
+    "projected_naive_cost_usd": 0.07,
+    "shadow": {
+      "sampled": 4,
+      "confirmed": 3,
+      "drifted": 1,
+      "failed": 0,
+      "cost_usd": 0.0037,
+      "drift_rate": 0.25,
+      "events": [
+        {
+          "key": "v2|passenger|basic|same_day|solo|checked_bags|short|hotel|misconnect",
+          "fields": [
+            "max_wait_hours"
+          ],
+          "was": {
+            "max_wait_hours": 12,
+            "accept_downgrade": true,
+            "accept_split_party": true,
+            "accept_nearby_airport": true,
+            "needs_hotel": true,
+            "urgency_score": 80
+          },
+          "now": {
+            "max_wait_hours": 8,
+            "accept_downgrade": true,
+            "accept_split_party": true,
+            "accept_nearby_airport": true,
+            "needs_hotel": true,
+            "urgency_score": 85
+          }
+        }
+      ]
+    }
+  },
+  "policy": {
+    "version": "3ac62a909b02",
+    "schema_version": "v2",
+    "ceiling": 2304,
+    "populated": 58,
+    "occupancy": 0.0252
+  },
+  "unseen_situations": 883
+}

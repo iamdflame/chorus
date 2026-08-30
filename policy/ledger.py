@@ -42,7 +42,11 @@ class NecessityLedger:
     """Decisions served, what they cost, and how much of it the model was needed for."""
 
     served_from_table: int = 0
+    # Decisions the table could not answer. Not the same as calls made: a decision that
+    # *would* need the model is only a call once someone pays for it, and conflating the
+    # two made the cost projection divide by a number 28 times too large.
     served_from_model: int = 0
+    model_calls_made: int = 0
     model_cost_usd: float = 0.0
     shadow: ShadowReport | None = None
     policy_version: str = ""
@@ -66,17 +70,23 @@ class NecessityLedger:
         """
         return self.shadow.drift_rate if self.shadow else float("nan")
 
-    def projected_naive_cost(self) -> float:
-        """What the same decisions would have cost with one model call apiece.
+    @property
+    def calls_paid_for(self) -> int:
+        """Model calls actually executed, which is what the cost was divided among."""
+        return self.model_calls_made + (self.shadow.sampled if self.shadow else 0)
 
-        A projection from the measured per-call cost, never a measurement. Labelled as
-        such wherever it is printed.
+    @property
+    def cost_per_call(self) -> float:
+        return self.total_cost() / self.calls_paid_for if self.calls_paid_for else 0.0
+
+    def projected_naive_cost(self) -> float:
+        """What the same decisions would have cost at one model call apiece.
+
+        Derived from the cost of calls genuinely made, never from decisions that merely
+        would have needed one. A projection, never a measurement, and labelled as such
+        wherever it is printed.
         """
-        paid = self.served_from_model + (self.shadow.sampled if self.shadow else 0)
-        total = self.model_cost_usd + (self.shadow.cost_usd if self.shadow else 0.0)
-        if not paid:
-            return 0.0
-        return (total / paid) * self.decisions
+        return self.cost_per_call * self.decisions
 
     def total_cost(self) -> float:
         return self.model_cost_usd + (self.shadow.cost_usd if self.shadow else 0.0)
@@ -88,6 +98,8 @@ class NecessityLedger:
             "decisions": self.decisions,
             "served_from_table": self.served_from_table,
             "served_from_model": self.served_from_model,
+            "model_calls_made": self.model_calls_made,
+            "cost_per_call_usd": round(self.cost_per_call, 6),
             "table_share": round(self.table_share, 4),
             "necessity": self.necessity,
             "cost_usd": round(self.total_cost(), 4),
@@ -108,7 +120,7 @@ class NecessityLedger:
             lines += [
                 f"    {'from policy table (free)':<38}"
                 f"{self.served_from_table:>13,}{100 * self.table_share:>6.2f}%",
-                f"    {'model calls':<38}{self.served_from_model:>13,}"
+                f"    {'needing the model':<38}{self.served_from_model:>13,}"
                 f"{100 * (1 - self.table_share):>6.2f}%",
             ]
         if self.shadow and self.shadow.sampled:
@@ -141,6 +153,7 @@ class NecessityLedger:
         naive = self.projected_naive_cost()
         lines += [
             f"  {'─' * w}",
+            f"  {'model calls actually paid for':<40}{self.calls_paid_for:>18,}",
             f"  {'cost this period':<40}{'$' + format(self.total_cost(), ',.4f'):>18}",
             f"  {'cost without the kernel':<40}"
             f"{'$' + format(naive, ',.2f'):>18}  ← projected",

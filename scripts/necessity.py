@@ -145,6 +145,7 @@ async def main(derive: int, serve: int, rate: float, concurrency: int) -> int:
     ledger = NecessityLedger(
         served_from_table=from_table,
         served_from_model=from_model,
+        model_calls_made=metrics.model_calls,
         model_cost_usd=metrics.cost_usd,
         shadow=report,
         policy_version=table.version,

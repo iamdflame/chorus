@@ -210,6 +210,10 @@ class CohortTrace:
     address: str | None = None
     served: int = 0
     paid: bool = False
+    # Which entities consumed this thought. This is the blast radius of a poisoned
+    # answer, and recording it during the run is what makes the radius exact rather
+    # than reconstructed.
+    members: list[str] = field(default_factory=list)
 
 
 class Swarm:
@@ -320,6 +324,7 @@ class Swarm:
                     preferences[entity["id"]] = answer
                 trace = cohorts.setdefault(projection.key(), CohortTrace(projection.key()))
                 trace.served += 1
+                trace.members.append(entity["id"])
                 if trace.answer is None and answer is not None:
                     trace.answer = answer
                 if trace.address is None and plugin.served_model:

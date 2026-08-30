@@ -190,15 +190,15 @@ class TestLedger:
 
     def test_the_projection_is_labelled_as_one(self) -> None:
         led = NecessityLedger(
-            served_from_table=1_000, served_from_model=10, model_cost_usd=0.10,
-            shadow=ShadowReport(sampled=10, confirmed=10),
+            served_from_table=1_000, served_from_model=10, model_calls_made=10,
+            model_cost_usd=0.10, shadow=ShadowReport(sampled=10, confirmed=10),
         )
         assert "← projected" in led.render()
 
     def test_projected_cost_exceeds_actual_when_the_table_serves_most_traffic(self) -> None:
         led = NecessityLedger(
-            served_from_table=10_000, served_from_model=100, model_cost_usd=1.0,
-            shadow=ShadowReport(sampled=0),
+            served_from_table=10_000, served_from_model=100, model_calls_made=100,
+            model_cost_usd=1.0, shadow=ShadowReport(sampled=0),
         )
         assert led.projected_naive_cost() > led.total_cost() * 50
 
@@ -217,3 +217,31 @@ class TestComparisonIsShared:
         assert disagreeing_fields({"needs_hotel": True}, {"needs_hotel": False}) == [
             "needs_hotel"
         ]
+
+
+class TestCostProjection:
+    def test_projection_divides_by_calls_made_not_decisions_wanting_one(self) -> None:
+        """The bug this pins: 1,795 decisions needed the model but only 60 calls were
+        paid for. Dividing the cost among the 1,795 made each call look 28x cheaper than
+        it was, and the projected saving collapsed to less than the actual spend."""
+        led = NecessityLedger(
+            served_from_table=205, served_from_model=1_795, model_calls_made=60,
+            model_cost_usd=0.0555,
+            shadow=ShadowReport(sampled=4, confirmed=3, drifted=1, cost_usd=0.003),
+        )
+        assert led.calls_paid_for == 64
+        assert led.cost_per_call == pytest.approx(0.0585 / 64, rel=1e-3)
+        assert led.projected_naive_cost() == pytest.approx(2_000 * 0.0585 / 64, rel=1e-3)
+
+    def test_the_projection_always_exceeds_what_was_spent(self) -> None:
+        """A kernel that saves nothing should report no saving, never a negative one."""
+        led = NecessityLedger(
+            served_from_table=900, served_from_model=100, model_calls_made=100,
+            model_cost_usd=1.0,
+        )
+        assert led.projected_naive_cost() > led.total_cost()
+
+    def test_a_run_with_no_calls_projects_nothing(self) -> None:
+        led = NecessityLedger(served_from_table=50, served_from_model=0)
+        assert led.cost_per_call == 0.0
+        assert led.projected_naive_cost() == 0.0
