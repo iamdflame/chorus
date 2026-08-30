@@ -12,12 +12,14 @@ from __future__ import annotations
 
 import json
 import os
+import threading
+from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, StreamingResponse
+from fastapi.responses import FileResponse, Response, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
@@ -263,12 +265,13 @@ def adopt(request: AdoptRequest) -> dict[str, Any]:
 
 # -- swarm --------------------------------------------------------------------
 
-@app.get("/api/swarm/cohorts")
-def swarm_cohorts(agents: int = 20000) -> dict[str, Any]:
-    """The cohort layout for a population, without running anything.
+@lru_cache(maxsize=8)
+def _cohort_layout(agents: int) -> str:
+    """The cohort layout for a population, as a JSON string.
 
-    Pure bucketing, no model calls, no cost — so the console can render the field at rest
-    before a single agent has been woken.
+    Deterministic: the scenario is generated from a fixed seed, so this is the same answer
+    every time and has no business being computed twice. Cached as a string rather than a
+    dict so callers cannot mutate the cached value.
     """
     from dataclasses import asdict
 
@@ -278,7 +281,7 @@ def swarm_cohorts(agents: int = 20000) -> dict[str, Any]:
     scenario = build_scenario(passengers=agents)
     passengers = [asdict(p) for p in scenario.passengers]
     grouped = collapse(passengers, project_passenger)
-    return {
+    return json.dumps({
         "agents": len(passengers),
         "scenario": scenario.summary(),
         "cohorts": [
@@ -286,7 +289,24 @@ def swarm_cohorts(agents: int = 20000) -> dict[str, Any]:
              "label": key.split("|", 1)[1] if "|" in key else key}
             for key, members in sorted(grouped.items(), key=lambda kv: len(kv[1]), reverse=True)
         ],
-    }
+    })
+
+
+# Warmed off the critical path so a cold container does not make its first visitor sit
+# through the generation. Started here rather than beside the engine because the function
+# has to exist first — module bodies run top to bottom.
+threading.Thread(target=_cohort_layout, args=(20000,), daemon=True).start()
+
+
+@app.get("/api/swarm/cohorts")
+def swarm_cohorts(agents: int = 20000) -> Response:
+    """The population at rest: pure bucketing, no model calls, no cost.
+
+    The console draws the field from this before anything is woken, so it sits directly in
+    front of first paint — several seconds of blank canvas here is the first thing anyone
+    sees of the product.
+    """
+    return Response(content=_cohort_layout(agents), media_type="application/json")
 
 
 @app.post("/api/swarm")
