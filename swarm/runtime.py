@@ -87,7 +87,15 @@ class SwarmMetrics:
 
     @property
     def collapse(self) -> float:
-        return self.agents_invoked / max(self.distinct_thoughts, 1)
+        """Agents per distinct thought.
+
+        Zero when nothing was computed. A run served entirely from the store has no
+        collapse ratio — dividing by a guarded 1 would report the agent count as though it
+        were a compression factor, which is a flattering number for having done nothing.
+        """
+        if not self.distinct_thoughts:
+            return 0.0
+        return self.agents_invoked / self.distinct_thoughts
 
     @property
     def naive_cost_usd(self) -> float:

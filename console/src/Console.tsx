@@ -169,7 +169,12 @@ export function Console() {
             <Metric label="shared" value={num(stats.cache_hits)} />
             <Metric label="cost" value={usd(stats.cost_usd)} tone="accent" />
             <Metric label="instead of" value={usd(stats.naive_cost_usd)} tone="muted" />
-            <Metric label="collapse" value={`${stats.collapse}×`} tone="accent" />
+            {/* A fully replayed run has no collapse ratio: nothing was computed. */}
+            <Metric
+              label={stats.collapse ? "collapse" : "replayed"}
+              value={stats.collapse ? `${stats.collapse}×` : "free"}
+              tone="accent"
+            />
           </>
         ) : (
           <>
