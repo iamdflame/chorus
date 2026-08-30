@@ -1,0 +1,14 @@
+
+  Two instances against one Firestore, branch converge-e0314cf0
+
+  [1] instance A recorded 40 situations
+  [2] instance B resolved 40/40 from the shared store
+      0 would have been paid for a second time
+  [3] answers identical across instances: 40/40
+
+  PASS  a second instance paid nothing for 40 situations the
+        first had answered, and resolved every one to the same answer.
+        Collapse survives horizontal scale.
+
+        Cleaned up 42 documents under the run's scratch root.
+

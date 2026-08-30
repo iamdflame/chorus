@@ -803,6 +803,7 @@ export GOOGLE_CLOUD_PROJECT=YOUR_PROJECT
 | Injection cannot reach a shared address | `scripts/verify_armor.py` |
 | Gemma agreement predicts correctness | `scripts/verify_gemma.py --sample 200` |
 | Memory persists 90 days and costs 9% of collapse | `scripts/verify_memory.py` |
+| Collapse survives two instances on one store | `scripts/verify_convergence.py` |
 | The allocator cannot call a model, and is denied | `scripts/verify_controls.sh` |
 | Is the model earning its cost? | `scripts/necessity.py` |
 | The whole pipeline, end to end | `scripts/prove_pipeline.py` |
@@ -921,6 +922,9 @@ reader that goes missing on one message in six is not one you can depend on.
 
 **The rate limiter is per instance.** With several Cloud Run instances the effective rate is
 the limit times the instance count. A global limit belongs in Cloud Armor and is not there.
+The *effect store* does converge across instances — `scripts/verify_convergence.py` shows a
+second instance paying nothing for 40 situations the first answered, and resolving every one
+to the same answer — but the limiter does not share that property.
 
 **Seeded history is synthetic.** 120 disputes over 21 days, deterministically generated. The
 *execution* over it is entirely real — real Gemini calls, real tool dispatch, real
