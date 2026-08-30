@@ -91,11 +91,28 @@ class SwarmMetrics:
 
     @property
     def collapse(self) -> float:
-        """Agents per distinct thought.
+        """Agents per model call actually made. The measured number.
 
-        Zero when nothing was computed. A run served entirely from the store has no
-        collapse ratio — dividing by a guarded 1 would report the agent count as though it
-        were a compression factor, which is a flattering number for having done nothing.
+        Two different quantities were previously both called "collapse" — one computed
+        from distinct situations, one from real calls — and they disagreed by 16% inside a
+        single document. This is the one that costs money, so this is the one that keeps
+        the name.
+
+        Zero when nothing was computed: a run served entirely from the store has no
+        collapse ratio, and dividing by a guarded 1 would report the agent count itself as
+        a compression factor, which is a flattering number for having done nothing.
+        """
+        if not self.model_calls:
+            return 0.0
+        return self.agents_invoked / self.model_calls
+
+    @property
+    def structural_ceiling(self) -> float:
+        """Agents per distinct situation — the best this population could possibly do.
+
+        Bounded by the projection lattice, not by anything the system achieved. Reported
+        separately so the gap between it and `collapse` is visible: that gap is duplicate
+        work, and closing it is what single-flight is for.
         """
         if not self.distinct_thoughts:
             return 0.0
@@ -116,6 +133,8 @@ class SwarmMetrics:
             "coalesced": self.coalesced,
             "distinct_thoughts": self.distinct_thoughts,
             "collapse": round(self.collapse, 1),
+            "structural_ceiling": round(self.structural_ceiling, 1),
+            "duplicate_calls": max(self.model_calls - self.distinct_thoughts, 0),
             "tokens_in": self.tokens_in,
             "tokens_out": self.tokens_out,
             "cost_usd": round(self.cost_usd, 6),

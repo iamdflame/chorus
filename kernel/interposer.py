@@ -179,6 +179,8 @@ class LightconePlugin(BasePlugin):
         self.visited: list[str] = []
         # Effects this run actually executed (as opposed to served from the store).
         self.recorded: list[Effect] = []
+        # Addresses already persisted by write-through, so flush does not rewrite them.
+        self._written: set[str] = set()
         self.diverged: list[str] = []
         self.hits = 0
         self.misses = 0
@@ -307,7 +309,19 @@ class LightconePlugin(BasePlugin):
         return effect, self._resolve(effect.id)
 
     def _close(self, effect: Effect, response: dict[str, Any] | None, **kw: Any) -> None:
-        self.recorded.append(effect.with_response(response, **kw))
+        closed = effect.with_response(response, **kw)
+        self.recorded.append(closed)
+        # Written through immediately rather than only at flush.
+        #
+        # There is otherwise a window between a leader resolving its single-flight promise
+        # and its invocation ending: the in-flight entry is gone, the store does not yet
+        # hold the answer, and an agent arriving in that gap misses both and pays for a
+        # question already answered. It is small, it is real, and it is exactly the kind of
+        # duplicate that quietly erodes a collapse ratio under load — measured here as one
+        # extra call in 120 agents before this line existed.
+        if not closed.replayed:
+            self.store.put(closed.with_seq(self.store.next_seq(self.branch_id)))
+            self._written.add(closed.id)
 
     def _record_pure(
         self,
@@ -560,7 +574,7 @@ class LightconePlugin(BasePlugin):
         stamped = [
             effect.with_seq(self.store.next_seq(self.branch_id))
             for effect in self.recorded
-            if not effect.replayed
+            if not effect.replayed and effect.id not in self._written
         ]
         self.store.put_many(stamped)
         self.store.append_manifest(self.branch_id, self.visited)

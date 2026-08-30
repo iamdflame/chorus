@@ -40,6 +40,11 @@ jobs:
         # fails if content addressing is not cheaper than regrouping across runs.
         run: python scripts/ablation.py
 
+      - name: Concurrency invariance
+        # A saving that only holds when nobody is in a hurry is not a saving. Asserts the
+        # same population costs the same at concurrency 1 and 48.
+        run: python scripts/verify_concurrency.py
+
       - name: Baselines
         # Every arm that can run, runs, and all of them are printed. There is no flag to
         # hide a losing one — B2 (hand-written rules, no model) beat an earlier version of
