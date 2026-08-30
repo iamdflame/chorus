@@ -1,94 +1,99 @@
 {
   "population": 20000,
   "schema_version": "v2",
-  "sample": 20,
-  "cohorts": 4,
-  "per_cohort": 5,
-  "compared": 20,
-  "exact_agreement": 0.0,
+  "sample": 600,
+  "cohorts": 40,
+  "per_cohort": 15,
+  "compared": 599,
+  "exact_agreement": 0.04006677796327212,
   "per_field": {
-    "accept_downgrade": 0.7,
-    "accept_split_party": 1.0,
-    "accept_nearby_airport": 1.0,
-    "needs_hotel": 0.75,
-    "max_wait_hours": 0.25,
-    "urgency_score": 0.0
+    "accept_downgrade": 0.8297161936560935,
+    "accept_split_party": 0.7278797996661102,
+    "accept_nearby_airport": 0.9115191986644408,
+    "needs_hotel": 0.8864774624373957,
+    "max_wait_hours": 0.15358931552587646,
+    "urgency_score": 0.4006677796327212
   },
   "numeric": {
     "max_wait_hours": {
-      "bias": -3.0,
-      "spearman": NaN
+      "bias": -7.045075125208681,
+      "spearman": 0.24158225639307568
     },
     "urgency_score": {
-      "bias": -6.0,
-      "spearman": -0.6666666666666666
+      "bias": 8.080133555926544,
+      "spearman": -0.052735159606047605
     }
   },
-  "same_flight": 1.0,
-  "same_flight_contested": 1.0,
-  "contested": 3,
-  "b4_calls": 5,
-  "b5_calls": 20,
+  "same_flight": 0.8597662771285476,
+  "same_flight_contested": 0.125,
+  "contested": 96,
+  "b4_calls": 46,
+  "b5_calls": 599,
   "panels": [
     {
       "strategy": "B4 collapsed",
-      "bookings_seated": 3,
-      "souls_seated": 3,
-      "bookings_stranded": 17,
-      "souls_stranded": 40,
-      "satisfaction_tier_weighted": 5.6,
-      "satisfaction_tier_blind": 5.6,
-      "mean_wait": 2.23,
-      "p95_wait": 2.4,
-      "worst_wait": 2.4,
-      "gini_wait": 0.0498,
+      "bookings_seated": 60,
+      "souls_seated": 73,
+      "bookings_stranded": 540,
+      "souls_stranded": 1241,
+      "satisfaction_tier_weighted": 132.0,
+      "satisfaction_tier_blind": 84.8,
+      "mean_wait": 15.18,
+      "p95_wait": 31.0,
+      "worst_wait": 33.2,
+      "gini_wait": 0.3258,
       "parties_split": 0,
       "constraint_violations": 0,
-      "model_calls": 5,
+      "model_calls": 46,
       "coalesced": 0,
-      "cost_usd": 0.0046,
+      "cost_usd": 0.0421,
       "notes": []
     },
     {
       "strategy": "B5 uncollapsed",
-      "bookings_seated": 3,
-      "souls_seated": 3,
-      "bookings_stranded": 17,
-      "souls_stranded": 40,
-      "satisfaction_tier_weighted": 5.6,
-      "satisfaction_tier_blind": 5.6,
-      "mean_wait": 2.23,
-      "p95_wait": 2.4,
-      "worst_wait": 2.4,
-      "gini_wait": 0.0498,
+      "bookings_seated": 51,
+      "souls_seated": 59,
+      "bookings_stranded": 549,
+      "souls_stranded": 1255,
+      "satisfaction_tier_weighted": 158.8,
+      "satisfaction_tier_blind": 92.7,
+      "mean_wait": 12.76,
+      "p95_wait": 23.5,
+      "worst_wait": 24.7,
+      "gini_wait": 0.2702,
       "parties_split": 0,
       "constraint_violations": 0,
-      "model_calls": 20,
+      "model_calls": 599,
       "coalesced": 0,
-      "cost_usd": 0.02,
+      "cost_usd": 0.6007,
       "notes": []
     }
   ],
   "worst_cohorts": [
     {
-      "key": "v2|passenger|basic|critical|family|checked_bags|long|hotel|origin",
+      "key": "v2|passenger|basic|critical|family|checked_bags|intercontinental|hotel|origin",
       "agreement": 0.0,
-      "n": 5
+      "n": 15
     },
     {
-      "key": "v2|passenger|silver|flexible|pair|unencumbered|intercontinental|hotel|origin",
+      "key": "v2|passenger|basic|urgent|group|checked_bags|short|hotel|misconnect",
       "agreement": 0.0,
-      "n": 5
+      "n": 15
     },
     {
-      "key": "v2|passenger|silver|flexible|pair|unencumbered|intercontinental|nohotel|origin",
+      "key": "v2|passenger|basic|urgent|family|unencumbered|short|hotel|misconnect",
       "agreement": 0.0,
-      "n": 5
+      "n": 15
     },
     {
-      "key": "v2|passenger|basic|same_day|solo|checked_bags|intercontinental|nohotel|origin",
+      "key": "v2|passenger|silver|critical|pair|checked_bags|short|hotel|origin",
       "agreement": 0.0,
-      "n": 5
+      "n": 15
+    },
+    {
+      "key": "v2|passenger|silver|urgent|pair|unencumbered|short|nohotel|origin",
+      "agreement": 0.0,
+      "n": 15
     }
   ]
 }

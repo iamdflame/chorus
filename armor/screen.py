@@ -98,6 +98,20 @@ def normalise(text: str) -> str:
     return _INVISIBLE.sub("", unicodedata.normalize("NFKC", text))
 
 
+def _variants(text: str) -> tuple[str, ...]:
+    """Every reading of the message an attacker might have intended.
+
+    Deleting invisible characters is not enough on its own. An attacker who writes
+    "Ignore\u200ball\u200bprevious\u200binstructions" is using them as word separators, so
+    deletion yields one long token and a word-boundary pattern sails past it. Substituting
+    a space defeats that, while deletion still defeats the opposite trick of hiding a
+    zero-width character *inside* a word. Both readings are screened, because the model
+    will see whichever one the tokeniser produces and the screen does not get to choose.
+    """
+    folded = unicodedata.normalize("NFKC", text)
+    return tuple({folded, _INVISIBLE.sub("", folded), _INVISIBLE.sub(" ", folded)})
+
+
 def screen(text: str) -> Verdict:
     """Screen one inbound message. Conservative by construction.
 
@@ -106,16 +120,16 @@ def screen(text: str) -> Verdict:
     blocking them would replace one failure mode with a worse one.
     """
     verdict = Verdict()
-    cleaned = normalise(text)
-    if cleaned != text:
+    if normalise(text) != text:
         verdict.categories.append("hidden_characters")
         verdict.evidence.append("message contained invisible or bidirectional characters")
-    for name, pattern in _INJECTION:
-        found = pattern.search(cleaned)
-        if found:
-            if name not in verdict.categories:
-                verdict.categories.append(name)
-            verdict.evidence.append(found.group(0)[:120])
+    for reading in _variants(text):
+        for name, pattern in _INJECTION:
+            found = pattern.search(reading)
+            if found:
+                if name not in verdict.categories:
+                    verdict.categories.append(name)
+                    verdict.evidence.append(found.group(0)[:120])
     verdict.blocked = bool(
         [c for c in verdict.categories if c != "hidden_characters"]
     )

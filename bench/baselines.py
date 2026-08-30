@@ -149,22 +149,39 @@ def allocate_by_preference(
     preferences: dict[str, dict[str, Any]],
     *,
     order: str = "urgency",
+    tie_break: bool = True,
 ) -> Assignments:
     """One allocator, used by every preference-driven arm.
 
     Sharing it is deliberate: if each arm brought its own allocator, a difference in the
     results would not tell you whether the preferences or the packing was responsible.
+
+    `tie_break` exists because the fidelity measurement found that it mattered: a
+    collapsed arm hands every member of a cohort an identical urgency score, so who flies
+    was being decided by position in a list. Set it False to reproduce that.
     """
     seats = _seats(flights)
     by_wait = sorted(flights, key=_wait)
 
-    def rank(p: dict[str, Any]) -> float:
+    def rank(p: dict[str, Any]) -> tuple[float, str, str]:
         prefs = preferences.get(p["id"], {})
         score = float(prefs.get("urgency_score", 50))
-        if order == "value":
+        primary = (
             # Value per seat consumed: what a packing algorithm would prioritise.
-            return -score / max(int(p.get("party_size", 1)), 1)
-        return -score
+            -score / max(int(p.get("party_size", 1)), 1)
+            if order == "value"
+            else -score
+        )
+        if not tie_break:
+            return (primary, "", "")
+        # Collapse gives every member of a cohort the same score, so the primary key ties
+        # for all of them and the sort falls back to input order — an arbitrary decision
+        # about who flies, made by list position. The tie is broken on how long the
+        # traveller has already been waiting, which is a queue discipline any airline
+        # would defend, is derived only from the booking record, and is deliberately
+        # unrelated to the scoring function so that improving the score cannot be the
+        # reason it was chosen. The id is a last resort, for total determinism.
+        return (primary, str(p.get("scheduled_departure", "")), str(p.get("id", "")))
 
     out: Assignments = {}
     for passenger in sorted(passengers, key=rank):

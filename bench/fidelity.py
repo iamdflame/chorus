@@ -293,8 +293,14 @@ async def main(
           "allocator\n  actually consumes.")
 
     # -- decisions -------------------------------------------------------------
-    b4_assign = allocate_by_preference(passengers, flights, b4_prefs)
-    b5_assign = allocate_by_preference(passengers, flights, b5_prefs)
+    # Three allocations from two elicitations. B4t costs nothing extra — it is the same
+    # collapsed answers under a tie-break the allocator can apply from the record alone,
+    # which is the cheapest possible response to the loss the agreement numbers show.
+    b4_assign = allocate_by_preference(
+        passengers, flights, b4_prefs, tie_break=False
+    )
+    b4t_assign = allocate_by_preference(passengers, flights, b4_prefs, tie_break=True)
+    b5_assign = allocate_by_preference(passengers, flights, b5_prefs, tie_break=True)
     same = sum(1 for pid in both if b4_assign.get(pid) == b5_assign.get(pid))
     # Seats are scarce by design, so most travellers go unseated on both arms and count
     # as agreeing for a reason that says nothing about the projection. The number that
@@ -316,6 +322,9 @@ async def main(
         score(strategy="B4 collapsed", passengers=passengers, flights=flights,
               assignments=b4_assign, model_calls=b4_metrics.model_calls,
               cost_usd=b4_metrics.cost_usd),
+        score(strategy="B4t +tie-break", passengers=passengers, flights=flights,
+              assignments=b4t_assign, model_calls=b4_metrics.model_calls,
+              cost_usd=b4_metrics.cost_usd),
         score(strategy="B5 uncollapsed", passengers=passengers, flights=flights,
               assignments=b5_assign, model_calls=b5_metrics.model_calls,
               cost_usd=b5_metrics.cost_usd),
@@ -329,9 +338,12 @@ async def main(
               f"{pan.satisfaction_tier_blind:>12.3f}{pan.p95_wait:>10.1f}"
               f"{pan.gini_wait:>8.3f}{pan.model_calls:>8,}{pan.cost_usd:>10.4f}")
 
-    delta = (panels[0].satisfaction_tier_weighted
-             - panels[1].satisfaction_tier_weighted)
-    print(f"\n  Outcome delta (B4 − B5), tier-weighted satisfaction: {delta:+.4f}")
+    ref = panels[-1].satisfaction_tier_weighted
+    for pan in panels[:-1]:
+        gap = pan.satisfaction_tier_weighted - ref
+        share = 100 * gap / ref if ref else float("nan")
+        print(f"\n  Outcome delta ({pan.strategy.split()[0]} − B5), tier-weighted: "
+              f"{gap:+.1f} ({share:+.1f}%)")
     print(f"  Cost ratio within this sample: "
           f"{b5_metrics.model_calls / max(b4_metrics.model_calls, 1):.1f}× "
           f"— and it grows with population, while agreement does not.")
@@ -346,6 +358,14 @@ async def main(
         for key, rate, n in worst:
             print(f"    {100 * rate:>5.1f}%  n={n:<4} {key}")
 
+    Path("data").mkdir(exist_ok=True)
+    Path("data/fidelity_raw.json").write_text(json.dumps({
+        "population": population, "per_cohort": per_cohort,
+        "cohort_of": cohort_of,
+        "b4": {pid: b4_prefs.get(pid) for pid in both},
+        "b5": {pid: b5_prefs.get(pid) for pid in both},
+    }, indent=2))
+
     out = Path("data/fidelity.json")
     out.parent.mkdir(exist_ok=True)
     out.write_text(json.dumps({
@@ -359,6 +379,9 @@ async def main(
         "per_field": {f: sum(v) / len(v) for f, v in per_field.items()},
         "numeric": {f: {"bias": b, "spearman": r} for f, (b, r) in numerics.items()},
         "same_flight": same / len(both),
+        "same_flight_b4t": sum(
+            1 for pid in both if b4t_assign.get(pid) == b5_assign.get(pid)
+        ) / len(both),
         "same_flight_contested": (
             same_contested / len(contested) if contested else None
         ),
