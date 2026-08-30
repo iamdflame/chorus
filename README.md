@@ -290,6 +290,57 @@ exploit of your own scoring function is worth showing.
 
 ---
 
+## Three ways in, one lattice
+
+Adding a modality is decorative unless it lands in the same place. The claim worth testing
+is not "we support voice" — it is whether **collapse is modality-independent**: does a
+traveller who speaks join the cohort the typed one would have joined, and share the thought
+it already had?
+
+Each modality is asked for what only it can supply, which is the same division of labour
+everything else here uses:
+
+| modality | supplies | why that one |
+| --- | --- | --- |
+| **text** | urgency, party, constraints | unbounded input; no table follows it |
+| **speech** | the same, spoken | disfluency and self-correction, with no keyboard to tidy them away |
+| **a photographed boarding pass** | PNR, flight, tier, bags | facts the airline already holds — inferring these from prose is the mistake that escalated 23 travellers in 24 |
+
+```
+[1] text     24/24 produced a valid situation
+[2] speech   24/24 heard, 412s of audio synthesised and understood
+[3] vision   24/24 passes read, 96/96 fields correct from a degraded photo
+
+Same cohort from text and from speech     81.8%   (18/22)
+```
+
+<sub>Regenerate: `python scripts/verify_multimodal.py --sample 24`</sub>
+
+**Vision is exact: 96 of 96 fields**, and not from a clean render. The passes are skewed,
+unevenly lit, noise-flecked and JPEG-compressed before the model sees them, because reading
+a pristine PNG would measure the renderer rather than the model.
+
+**Speech is not exact, and the interesting part is how it fails.** A spoken message reaches
+the same cohort as the typed one 82% of the time, so four travellers in twenty-two would be
+reasoned about in a different bucket depending on how they got in touch. All four
+disagreements are on the ordinal fields, and three of the four are between **neighbouring
+bands** — `same_day` against `flexible`, `urgent` against `critical`, `pair` against
+`family`. The modalities are not reading different situations; they are placing the same
+situation on either side of a boundary. Two further voice reads produced a value outside the
+closed vocabulary and were rejected rather than admitted, which is the airlock working.
+
+Audio is sent as audio. Transcribing first and extracting second would throw away everything
+the waveform carries beyond the words, and would hide a transcription error as an extraction
+error.
+
+**The honest summary: the unbounded input widens to speech and images, and the bounded
+lattice does not move — but a spoken traveller lands in the right cell about four times in
+five, not five times in five.** The speech is also synthesised, so it is cleaner than a call
+from a departure hall; this measures the pipeline, not robustness to a crying child six feet
+away.
+
+---
+
 ## Memory that survives contact with collapse
 
 A returning traveller should not have to re-explain that their mother cannot manage stairs.
@@ -705,6 +756,7 @@ Firestore    durable timeline, keyed by content address
 | Requirement | Used | Where |
 | --- | --- | --- |
 | Gemini 3.5 or newer | `gemini-3.5-flash` for all six fleet agents and the policy proposer; `gemini-embedding-001` for similarity | [`fleet/agents.py`](fleet/agents.py) |
+| Multimodal input | **Gemini TTS** (`gemini-3.1-flash-tts-preview`) synthesises traveller speech, **Gemini audio understanding** hears it, and **Gemini vision** reads a degraded photograph of a boarding pass — 96/96 fields correct. All three reduce to the same 2,304-cell lattice | [`intake/voice.py`](intake/voice.py), [`intake/vision.py`](intake/vision.py) |
 | Additional Google model | **Gemma 4** (`gemma-4-26b-a4b-it`) as an independent second reader whose agreement lifts extraction accuracy by ~10 points on the two fields Gemini gets wrong. Measured, not claimed — including the two corrections to our own method that the measurement required | [`models/gemma.py`](models/gemma.py), [`scripts/verify_gemma.py`](scripts/verify_gemma.py) |
 | Google agent framework | **ADK** (`google-adk` 2.8) — `BasePlugin` interposition, `SequentialAgent`, runtime `transfer_to_agent` | [`kernel/interposer.py`](kernel/interposer.py) |
 | Google Cloud infrastructure | **Cloud Run** (serving), **Firestore** native mode (durable effect store), **Vertex AI** (model access), **Cloud Trace** (39,996 spans from one run), **Secret Manager** (the write token) | [`infra/terraform/`](infra/terraform/), [`infra/deploy.sh`](infra/deploy.sh) |
@@ -806,6 +858,7 @@ export GOOGLE_CLOUD_PROJECT=YOUR_PROJECT
 | Injection cannot reach a shared address | `scripts/verify_armor.py` |
 | Gemma agreement predicts correctness | `scripts/verify_gemma.py --sample 200` |
 | Memory persists 90 days and costs 9% of collapse | `scripts/verify_memory.py` |
+| Voice and a photographed pass reach the same lattice | `scripts/verify_multimodal.py` |
 | Collapse survives two instances on one store | `scripts/verify_convergence.py` |
 | The allocator cannot call a model, and is denied | `scripts/verify_controls.sh` |
 | Is the model earning its cost? | `scripts/necessity.py` |
@@ -915,6 +968,12 @@ impact. Weighting agreement by seat contention would plainly be better and is no
 known situations so ground truth exists by construction. That makes the extraction result
 measurable and it also means the distribution is ours. Real traveller messages would be
 messier in ways we cannot anticipate here.
+
+**A spoken traveller lands in the right cohort 82% of the time, not 100%.** Four in
+twenty-two would be reasoned about in a neighbouring bucket depending on whether they
+typed or spoke. The disagreements are all at band boundaries rather than across the
+scale, which is a mild failure rather than a wrong reading — but it is not nothing, and
+the synthesised speech used to measure it is cleaner than a real airport call.
 
 **Gemma fails to answer 17.5% of the time.** On what it does answer it is marginally better
 than Gemini, so this is an unreliability problem rather than a quality one — but a second

@@ -1,0 +1,21 @@
+
+  Three modalities, 24 travellers
+
+  [1] text     24/24 produced a valid situation
+
+  [2] speech   24/24 heard, 412s of audio synthesised and understood      
+
+  [3] vision   24/24 passes read, 96/96 fields correct from a degraded photo   
+
+  Same cohort from text and from speech     81.8%   (18/22)
+  Agreement on the spoken fields alone      81.8%   (18/22)
+
+  Collapse is only partly modality-independent on this sample. A spoken
+  message reaches the same cohort as the typed one 82% of the time,
+  so 4 of 22 travellers would be reasoned about in a different bucket
+  depending on how they got in touch. Where they diverge is recorded in
+  data/multimodal.json; the disagreements are on the spoken fields, which
+  is where speech and prose genuinely carry different amounts of signal.
+
+  Written to data/multimodal.json
+
