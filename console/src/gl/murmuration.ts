@@ -78,6 +78,12 @@ export class Murmuration {
   // a second row on a narrow screen is enough to do it.
   private lastCohorts: Cohort[] = [];
   private observer: ResizeObserver | null = null;
+  // Rendering is on demand. The field is ~30,000 static circles across 192 Graphics, and
+  // a continuously running ticker re-rasterises all of them every frame for a picture
+  // that is not changing — enough to pin the main thread and make the page unclickable on
+  // modest hardware. Frames are drawn only while something is actually animating.
+  private renderQueued = false;
+  private renderUntil = 0;
 
   onHover: (cohort: CohortSummary | null) => void = () => {};
   onSelect: (cohort: CohortSummary | null) => void = () => {};
@@ -98,6 +104,7 @@ export class Murmuration {
     this.ready = true;
     host.appendChild(this.app.canvas);
     this.app.stage.addChild(this.stage, this.overlay);
+    this.app.ticker.stop();
 
     let frame = 0;
     this.observer = new ResizeObserver(() => {
@@ -124,6 +131,24 @@ export class Murmuration {
       if (x >= c.x && x <= c.x + c.w && y >= c.y && y <= c.y + c.h) return view;
     }
     return null;
+  }
+
+  /** Draw now, and keep drawing for `durationMs` so an in-flight tween is shown. */
+  private requestRender(durationMs = 0): void {
+    if (!this.ready || this.destroyed) return;
+    this.renderUntil = Math.max(this.renderUntil, performance.now() + durationMs);
+    if (this.renderQueued) return;
+    this.renderQueued = true;
+    const loop = () => {
+      if (this.destroyed) { this.renderQueued = false; return; }
+      this.app.renderer.render(this.app.stage);
+      if (performance.now() < this.renderUntil) {
+        requestAnimationFrame(loop);
+      } else {
+        this.renderQueued = false;
+      }
+    };
+    requestAnimationFrame(loop);
   }
 
   private summary(view: CohortView): CohortSummary {
@@ -164,6 +189,7 @@ export class Murmuration {
    *  rebuilds its geometry — the field stays perfectly still under the cursor. */
   private drawOverlay(): void {
     this.overlay.clear();
+    this.requestRender();
     for (const key of [this.hovered, this.selected]) {
       if (!key) continue;
       const view = this.views.get(key);
@@ -322,6 +348,7 @@ export class Murmuration {
     this.hovered = null;
     this.selected = null;
     this.overlay.clear();
+    this.requestRender();
   }
 
   /** A cohort reached the model: one agent thought, and the whole cohort is about to
@@ -341,6 +368,7 @@ export class Murmuration {
     );
     gsap.fromTo(view.container.scale, { x: 1, y: 1 },
       { x: 1.14, y: 1.14, duration: 0.22, yoyo: true, repeat: 1, ease: "power2.out" });
+    this.requestRender(900);
   }
 
   /** A cohort was served from the store — no model call. Settles to the dim shared
@@ -351,6 +379,7 @@ export class Murmuration {
     view.status = "shared";
     view.dots.tint = C.shared;
     gsap.fromTo(view.dots, { alpha: 0.35 }, { alpha: 0.75, duration: 0.6, ease: "power2.out" });
+    this.requestRender(750);
   }
 
   reset(): void {
@@ -360,5 +389,6 @@ export class Murmuration {
       view.dots.alpha = 0.9;
       view.status = "idle";
     }
+    this.requestRender();
   }
 }
