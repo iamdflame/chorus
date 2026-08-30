@@ -870,13 +870,69 @@ The mechanism is not airline-specific. Anywhere you have many entities, few dist
 
 ---
 
-## What is honest about this
+## What we did not solve
 
-- The seeded history is **synthetic** (120 disputes over 21 days, deterministically generated). The *execution* over it is entirely real: real Gemini calls, real tool dispatch, real embeddings, real recorded effects. Every number in the console traces to a recorded effect.
-- **Search scale is bounded by API rate limits, not by the design.** The architecture parallelises across candidates; the concurrency ceiling is the key's, not the kernel's.
-- **Cloud Run deployment requires billing on the GCP project.** Firestore, Pub/Sub and Vertex AI do not, and Firestore is live and tested here.
-- **Replay fidelity depends on interposing on *every* non-deterministic boundary.** Tool ordering under concurrent fan-out is not automatically deterministic; effects are sequenced by causal position rather than wall clock, and the DAG comparison is order-insensitive.
-- **The one projected number on this page is labelled as projected.** Everything else was measured on a real run and is regenerable by the command listed beside it.
+Every project that got caught in the audit that produced this rebuild was missing this
+section. Here is what is wrong with Chorus, in the order we would attack it.
+
+**Collapse is lossy on this workload, by about 13%.** Collapsed reasoning costs 12.9% of
+tier-weighted satisfaction against reasoning per traveller, replicated across three runs,
+and loses on equity and worst-case wait too. Escalating the worst-agreeing 30% of cohorts
+recovers 85% of that at a third of the cost of not collapsing — but the remaining 15% is
+unrecovered and we do not have a way to close it without paying full price.
+
+**We cannot rank inside a cohort.** Everyone in a cohort receives the same `urgency_score`,
+so when seats are scarce the allocator picks between them by list position. A tie-break on
+how long they have already waited did not help, nor did record urgency or party size. This
+is the mechanism behind the 13%, and it is unsolved.
+
+**These five cohorts are where the bucket stops speaking for its members**, identically
+across three independent runs — high-urgency situations with an unresolved trade-off, where
+two reasonable travellers genuinely differ:
+
+```
+basic  | critical | family | checked_bags | intercontinental | hotel   | origin
+basic  | urgent   | group  | checked_bags | short            | hotel   | misconnect
+basic  | urgent   | family | unencumbered | short            | hotel   | misconnect
+silver | critical | pair   | checked_bags | short            | hotel   | origin
+silver | urgent   | pair   | unencumbered | short            | nohotel | origin
+```
+
+**The necessity number is a direction, not a decimal.** 10.5% drift on 19 answered samples
+carries a 95% interval of [2.9%, 31.4%]. The noise floor is solid — the model disagreed with
+itself 0 times in 27 — but the drift rate itself needs a far larger sample before anyone
+should plan against it.
+
+**Escalation is ordered by the wrong signal.** We escalate the worst-agreeing cohorts first,
+and the first two recover almost nothing, because agreement is not the same as decision
+impact. Weighting agreement by seat contention would plainly be better and is not built.
+
+**The corpus is generated, not collected.** 2,000 messages across 8 languages, written from
+known situations so ground truth exists by construction. That makes the extraction result
+measurable and it also means the distribution is ours. Real traveller messages would be
+messier in ways we cannot anticipate here.
+
+**Gemma fails to answer 17.5% of the time.** On what it does answer it is marginally better
+than Gemini, so this is an unreliability problem rather than a quality one — but a second
+reader that goes missing on one message in six is not one you can depend on.
+
+**Memory costs 9% of collapse.** Remembering moves travellers between cells: 10.2× becomes
+9.2×. Worth it, but not free, and the number grows with how much is remembered.
+
+**The rate limiter is per instance.** With several Cloud Run instances the effective rate is
+the limit times the instance count. A global limit belongs in Cloud Armor and is not there.
+
+**Seeded history is synthetic.** 120 disputes over 21 days, deterministically generated. The
+*execution* over it is entirely real — real Gemini calls, real tool dispatch, real
+embeddings, real recorded effects — but the disputes themselves were not.
+
+**Tool ordering under concurrent fan-out is not automatically deterministic.** Effects are
+sequenced by causal position rather than wall clock and the DAG comparison is
+order-insensitive, which makes replay sound; it does not make the live ordering repeatable.
+
+**One number on this page is projected and says so.** Cost-without-the-kernel is derived
+from the measured per-call cost. Everything else was measured on a real run and regenerates
+with the command listed beside it.
 
 ---
 
