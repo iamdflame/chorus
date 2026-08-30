@@ -10,3 +10,10 @@ dist/
 # Accidentally extracted here once by a malformed shell command.
 gcloud auth login/
 google-cloud-sdk/
+
+# Terraform working directories and state. State can contain resource metadata and
+# secret *references*; it does not belong in a public repository.
+infra/terraform/.terraform/
+infra/terraform/.terraform.lock.hcl
+*.tfstate
+*.tfstate.*
