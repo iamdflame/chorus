@@ -182,6 +182,11 @@ class LightconePlugin(BasePlugin):
         # Addresses already persisted by write-through, so flush does not rewrite them.
         self._written: set[str] = set()
         self.diverged: list[str] = []
+        # Every model-call address this plugin resolved, whether it paid for the answer
+        # or was handed one. Distillation needs the address regardless of who paid: a row
+        # served from the store is exactly the row whose provenance must name the call
+        # that originally produced it.
+        self.served_model: list[str] = []
         self.hits = 0
         self.misses = 0
         # Calls suppressed because an identical question was already in flight.
@@ -366,6 +371,7 @@ class LightconePlugin(BasePlugin):
             extra_parents=tuple(self._data_parents(request["contents"])),
         )
         self._advance(agent, effect.id)
+        self.served_model.append(effect.id)
 
         if cached is not None and cached.response:
             # Replay hit: the model is never called.

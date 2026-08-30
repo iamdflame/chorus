@@ -55,6 +55,11 @@ if _env.exists():
 
 from bench.baselines import allocate_by_preference
 from bench.metrics import Panel, score
+from policy.compare import (
+    BOOLEAN_FIELDS,
+    NUMERIC_FIELDS,
+    agreement,
+)
 from kernel.branch import PRIMARY
 from kernel.clock import FIXED, Clock
 from kernel.interposer import Mode
@@ -62,18 +67,6 @@ from kernel.store import InMemoryEffectStore
 from swarm.canonical import SCHEMA_VERSION, bind, project_passenger
 from swarm.runtime import Swarm
 from swarm.scenario import build_scenario
-
-# The six keys the elicitation returns. Booleans are compared for equality; the two
-# numerics get a tolerance, because "max_wait_hours 6 vs 7" is not a disagreement anyone
-# would act on and scoring it as one would understate agreement dishonestly.
-BOOLEAN_FIELDS = (
-    "accept_downgrade",
-    "accept_split_party",
-    "accept_nearby_airport",
-    "needs_hotel",
-)
-NUMERIC_FIELDS = {"max_wait_hours": 2.0, "urgency_score": 10.0}
-
 
 @dataclass(frozen=True, slots=True)
 class FullRecord:
@@ -137,19 +130,6 @@ def spearman(a: list[float], b: list[float]) -> float:
     da = sum((x - ma) ** 2 for x in ra) ** 0.5
     db = sum((y - mb) ** 2 for y in rb) ** 0.5
     return num / (da * db) if da and db else float("nan")
-
-
-def agreement(a: dict[str, Any], b: dict[str, Any]) -> dict[str, bool]:
-    """Field-by-field agreement between one traveller's two answers."""
-    out: dict[str, bool] = {}
-    for field in BOOLEAN_FIELDS:
-        out[field] = bool(a.get(field)) == bool(b.get(field))
-    for field, tolerance in NUMERIC_FIELDS.items():
-        try:
-            out[field] = abs(float(a.get(field, 0)) - float(b.get(field, 0))) <= tolerance
-        except (TypeError, ValueError):
-            out[field] = False
-    return out
 
 
 async def elicit(

@@ -196,6 +196,22 @@ def _check_projector(projector: Callable[[dict[str, Any]], Projection]) -> None:
             f"{required[1:]}; bind them first — e.g. bind(project_passenger, clock)"
         )
 
+@dataclass
+class CohortTrace:
+    """What one situation was answered with, and which call paid for it.
+
+    Built while the swarm runs rather than reconstructed afterwards. Reconstruction would
+    mean matching prompt text back to a projection, which is exactly the fragile inference
+    the effect addresses exist to make unnecessary.
+    """
+
+    key: str
+    answer: dict[str, Any] | None = None
+    address: str | None = None
+    served: int = 0
+    paid: bool = False
+
+
 class Swarm:
     """Invokes one agent per entity against a shared content-addressed store."""
 
@@ -217,6 +233,8 @@ class Swarm:
         self.single_flight = SingleFlight()
         self.agents = {role: build_agent(role) for role in ("passenger", "crew")}
         self._sessions = InMemorySessionService()
+        # Cohort traces from the most recent run, for distillation to compile.
+        self.last_cohorts: dict[str, CohortTrace] = {}
 
     def round_anchor(self, round_id: str, context: dict[str, Any]) -> str:
         """A causal anchor shared by every agent reasoning in this round.
@@ -279,6 +297,7 @@ class Swarm:
         anchor = self.round_anchor(round_id, {"role": role, "context": hash_payload(context)})
         preferences: dict[str, dict[str, Any]] = {}
         seen_addresses: set[str] = set()
+        cohorts: dict[str, CohortTrace] = {}
 
         async def one(entity: dict[str, Any]) -> None:
             async with self.gate:
@@ -299,6 +318,14 @@ class Swarm:
                     return
                 if answer is not None:
                     preferences[entity["id"]] = answer
+                trace = cohorts.setdefault(projection.key(), CohortTrace(projection.key()))
+                trace.served += 1
+                if trace.answer is None and answer is not None:
+                    trace.answer = answer
+                if trace.address is None and plugin.served_model:
+                    trace.address = plugin.served_model[0]
+                if plugin.misses:
+                    trace.paid = True
                 metrics.agents_invoked += 1
                 metrics.model_calls += plugin.misses
                 metrics.cache_hits += plugin.hits
@@ -326,4 +353,5 @@ class Swarm:
             await asyncio.gather(*(one(e) for e in entities[start:start + batch]))
 
         metrics.wall_s = time.perf_counter() - started
+        self.last_cohorts = cohorts
         return preferences, metrics
