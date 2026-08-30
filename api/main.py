@@ -12,12 +12,16 @@ from __future__ import annotations
 
 import json
 import os
+import time
+from collections import defaultdict
+from hmac import compare_digest
 import threading
 from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
 from fastapi import FastAPI, HTTPException, Query
+from fastapi import Depends, Header, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, Response, StreamingResponse
 from fastapi.staticfiles import StaticFiles
@@ -36,31 +40,121 @@ app = FastAPI(
     description="Version control for agent reality.",
     version="0.1.0",
 )
+# The console is served from the same origin as the API, so cross-origin access is a
+# convenience for local development rather than a requirement. `*` with credentials is the
+# combination that turns a browsing judge into an authenticated caller of someone else's
+# mutation endpoints, so the allowlist is explicit and extra origins are opt-in.
+_ORIGINS = [o for o in os.environ.get("CHORUS_ORIGINS", "").split(",") if o] or [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=_ORIGINS,
+    allow_credentials=False,
+    allow_methods=["GET", "POST"],
+    allow_headers=["content-type", "authorization"],
 )
 
 engine = Engine(SNAPSHOT)
 
 
+
+# -- authorisation ------------------------------------------------------------
+#
+# Reads stay public and mutations do not. That split is deliberate: a judge, a reader or a
+# recruiter should be able to open the console and watch twenty thousand agents collapse
+# without being handed a credential, while forking a timeline, merging one into production,
+# adopting a policy or spending money on a swarm should not be available to anyone who
+# finds the URL.
+#
+# The token comes from Secret Manager via the deploy, never from a literal. When none is
+# configured the mutation endpoints are refused outright rather than left open — an
+# unset secret is the single most common way a control like this ends up doing nothing.
+
+_MUTATION_TOKEN = os.environ.get("CHORUS_WRITE_TOKEN", "")
+
+
+def require_write(authorization: str = Header(default="")) -> None:
+    """Gate for anything that mutates state or spends money."""
+    if not _MUTATION_TOKEN:
+        raise HTTPException(
+            status_code=503,
+            detail=(
+                "No write token is configured, so mutation endpoints are closed. "
+                "Set CHORUS_WRITE_TOKEN to enable them."
+            ),
+        )
+    supplied = authorization.removeprefix("Bearer ").strip()
+    # Constant time: a short-circuiting comparison leaks the token one byte at a time.
+    if not supplied or not compare_digest(supplied, _MUTATION_TOKEN):
+        raise HTTPException(status_code=401, detail="write access requires a bearer token")
+
+
+
+# The demo endpoint is the exception, and the reasoning is worth stating. Closing
+# /api/swarm would protect the budget by removing the product: the one thing a visitor
+# should be able to do is watch the collapse happen. So it stays open with a ceiling low
+# enough that abuse is bounded, and the full range needs a token.
+#
+# The limiter is per instance, not global. With several Cloud Run instances the effective
+# rate is the limit times the instance count, which is a real weakness and is written down
+# rather than left for someone to discover. A global limit belongs in Cloud Armor.
+
+PUBLIC_AGENT_CEILING = 300
+_RATE_WINDOW_S = 60.0
+_RATE_MAX = 6
+_recent: dict[str, list[float]] = defaultdict(list)
+
+
+def _rate_limited(caller: str) -> bool:
+    now = time.time()
+    hits = [t for t in _recent[caller] if now - t < _RATE_WINDOW_S]
+    _recent[caller] = hits
+    if len(hits) >= _RATE_MAX:
+        return True
+    hits.append(now)
+    return False
+
+
+def demo_or_write(
+    request: Request, authorization: str = Header(default="")
+) -> bool:
+    """Allow a small public run; require a token for anything larger.
+
+    Returns whether the caller is authorised for the full range, so the endpoint can cap
+    the population rather than refuse the request outright.
+    """
+    supplied = authorization.removeprefix("Bearer ").strip()
+    if _MUTATION_TOKEN and supplied and compare_digest(supplied, _MUTATION_TOKEN):
+        return True
+    caller = request.client.host if request.client else "unknown"
+    if _rate_limited(caller):
+        raise HTTPException(
+            status_code=429,
+            detail=f"more than {_RATE_MAX} runs a minute; use a token for sustained use",
+        )
+    return False
+
+
 # -- request models -----------------------------------------------------------
 
+# Every bound below is a real limit rather than a formality. `agents` multiplies directly
+# into model spend, `concurrency` into rate-limit rejections, and an unbounded `population`
+# in a search request is an unbounded bill someone else pays.
 class ForkRequest(BaseModel):
-    name: str = Field(..., description="Human name for the new timeline")
-    at_seq: int = Field(..., description="Sequence position to fork from")
+    name: str = Field(..., min_length=1, max_length=120)
+    at_seq: int = Field(..., ge=0, le=10_000_000)
     perturbation: dict[str, Any] | None = None
 
 
 class PolicyEdit(BaseModel):
-    text: str
+    text: str = Field(..., min_length=1, max_length=20_000)
 
 
 class ReplayRequest(BaseModel):
-    dispute_ids: list[str] | None = None
-    limit: int = 10
+    dispute_ids: list[str] | None = Field(default=None, max_length=500)
+    limit: int = Field(10, ge=1, le=500)
 
 
 class MergeRequest(BaseModel):
@@ -69,21 +163,21 @@ class MergeRequest(BaseModel):
 
 
 class SearchRequest(BaseModel):
-    dispute_ids: list[str] = Field(default_factory=list)
-    clause_id: str = "POL-REFUND-CEILING"
-    generations: int = 2
-    population: int = 3
-    concurrency: int = 3
+    dispute_ids: list[str] = Field(default_factory=list, max_length=500)
+    clause_id: str = Field("POL-REFUND-CEILING", max_length=120)
+    generations: int = Field(2, ge=1, le=10)
+    population: int = Field(3, ge=1, le=12)
+    concurrency: int = Field(3, ge=1, le=16)
 
 
 class SwarmRequest(BaseModel):
-    agents: int = 2000
-    concurrency: int = 6
+    agents: int = Field(2_000, ge=1, le=50_000)
+    concurrency: int = Field(6, ge=1, le=64)
 
 
 class AdoptRequest(BaseModel):
-    clause_id: str
-    text: str
+    clause_id: str = Field(..., min_length=1, max_length=120)
+    text: str = Field(..., min_length=1, max_length=20_000)
 
 
 # -- meta ---------------------------------------------------------------------
@@ -108,7 +202,7 @@ def list_branches() -> list[dict[str, Any]]:
     return engine.branches()
 
 
-@app.post("/api/branches/{branch_id}/fork")
+@app.post("/api/branches/{branch_id}/fork", dependencies=[Depends(require_write)])
 def fork(branch_id: str, request: ForkRequest) -> dict[str, Any]:
     try:
         return engine.fork(
@@ -175,7 +269,7 @@ def edit_policy(branch_id: str, clause_id: str, edit: PolicyEdit) -> dict[str, A
         raise HTTPException(status_code=404, detail=str(exc)) from exc
 
 
-@app.post("/api/branches/{branch_id}/merge")
+@app.post("/api/branches/{branch_id}/merge", dependencies=[Depends(require_write)])
 def merge(branch_id: str, request: MergeRequest) -> dict[str, Any]:
     if engine.store.get_branch(branch_id) is None:
         raise HTTPException(status_code=404, detail=f"unknown branch {branch_id}")
@@ -189,7 +283,7 @@ def merge(branch_id: str, request: MergeRequest) -> dict[str, Any]:
 
 # -- replay -------------------------------------------------------------------
 
-@app.post("/api/branches/{branch_id}/replay")
+@app.post("/api/branches/{branch_id}/replay", dependencies=[Depends(require_write)])
 async def replay(branch_id: str, request: ReplayRequest) -> StreamingResponse:
     if engine.store.get_branch(branch_id) is None:
         raise HTTPException(status_code=404, detail=f"unknown branch {branch_id}")
@@ -218,7 +312,7 @@ async def replay(branch_id: str, request: ReplayRequest) -> StreamingResponse:
 
 # -- policy search ------------------------------------------------------------
 
-@app.post("/api/search")
+@app.post("/api/search", dependencies=[Depends(require_write)])
 async def search(request: SearchRequest) -> StreamingResponse:
     """Search policy space against recorded history.
 
@@ -254,7 +348,7 @@ async def search(request: SearchRequest) -> StreamingResponse:
     )
 
 
-@app.post("/api/policies/adopt")
+@app.post("/api/policies/adopt", dependencies=[Depends(require_write)])
 def adopt(request: AdoptRequest) -> dict[str, Any]:
     """Install a policy the search proved better into production."""
     try:
@@ -352,16 +446,39 @@ def swarm_cohorts(agents: int = 20000) -> Response:
 
 
 @app.post("/api/swarm")
-async def swarm(request: SwarmRequest) -> StreamingResponse:
+async def swarm(
+    request: SwarmRequest,
+    privileged: bool = Depends(demo_or_write),
+) -> StreamingResponse:
     """Run the swarm, streaming progress.
 
     A recorded swarm replays from the store with no model calls at all, so re-running
     one is instant and free — which is what makes twenty thousand agents watchable in a
     demo rather than a twenty-minute wait.
+
+    An unauthenticated caller is capped rather than refused. The cap is silent in the
+    response body but reported in the stream's opening frame, so a visitor sees what they
+    actually ran instead of wondering why the number changed.
     """
+    agents = request.agents
+    capped = not privileged and agents > PUBLIC_AGENT_CEILING
+    if capped:
+        agents = PUBLIC_AGENT_CEILING
+
     async def stream():
+        if capped:
+            yield (
+                "data: "
+                + json.dumps({
+                    "event": "capped",
+                    "requested": request.agents,
+                    "running": agents,
+                    "reason": "public demo ceiling; a write token lifts it",
+                })
+                + "\n\n"
+            )
         async for event in engine.run_swarm(
-            agents=request.agents, concurrency=request.concurrency
+            agents=agents, concurrency=request.concurrency
         ):
             yield f"data: {json.dumps(event)}\n\n"
 

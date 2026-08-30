@@ -4,7 +4,6 @@ google-cloud-firestore==2.29.0
 google-cloud-pubsub==2.39.2
 google-genai==2.20.0
 orjson==3.12.0
-playwright==1.62.0
 pytest==9.1.1
 pytest-asyncio==1.4.0
 uvicorn==0.52.4

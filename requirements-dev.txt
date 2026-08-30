@@ -1,0 +1,5 @@
+# Development and screenshot tooling. Deliberately not in requirements.txt: production has
+# no use for a headless browser, and shipping one puts a browser engine and its entire
+# dependency tree inside the image that serves the API.
+-r requirements.txt
+playwright==1.62.0
