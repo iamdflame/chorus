@@ -1,0 +1,12 @@
+{
+  "sample": 8,
+  "text_valid": 8,
+  "speech_heard": 8,
+  "audio_seconds": 134.6,
+  "vision_read": 8,
+  "vision_fields_correct": 32,
+  "vision_fields_total": 32,
+  "same_cohort": 5,
+  "compared": 7,
+  "spoken_fields_agree": 5
+}

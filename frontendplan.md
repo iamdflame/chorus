@@ -439,7 +439,8 @@ Sentence case everywhere. Active voice. A control names exactly what happens: *F
 
 **Innovation & Operational Utility (40%).** The Necessity Ledger and the blast-radius view answer questions no other tool in this field can even ask.
 
-**And for Google specifically:** Google Sans Flex and Google Sans Code used with their variable axes as real design tokens, Material 3 Expressive spring physics and size hierarchy applied to a non-Material product, effects exported as OpenTelemetry spans so the same causality is inspectable in Cloud Trace. It respects Google's design research without cosplaying as an Android app.
+**And for Google specifically:** Google Sans Flex and Google Sans Code used with their variable axes as real design tokens, Material 3 Expressive spring physics and size hierarchy applied to a non-Material product, effects exported as OpenTelemetry spans so the same causality is inspectable in Cloud Trace. It respects Google's design research without cosplaying as an Androi
+d app.
 
 ## The one-line design brief
 
