@@ -1,0 +1,19 @@
+
+  Bucket product: 4 x 4 x 4 x 3 = 192
+  No population can require more distinct thoughts than this.
+
+     agents   distinct    collapse
+  --------------------------------
+        500        128        3.9x
+      1,000        149        6.7x
+      2,000        170       11.8x
+      4,000        183       21.9x
+      8,000        187       42.8x
+     20,000        192      104.2x
+
+  final growth over last 12,000 agents: +5 distinct situations
+  identity-invariant projection: True
+
+  PASS  distinct thoughts saturate at 192 against a derived ceiling of 192;
+        20,000 agents collapse 104x, and identity never reaches the model.
+

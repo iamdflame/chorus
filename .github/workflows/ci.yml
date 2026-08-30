@@ -35,6 +35,11 @@ jobs:
         # once or reproduces a different causal root hash.
         run: python scripts/verify_determinism.py
 
+      - name: Ablation
+        # Answers "is this just a GROUP BY" with numbers rather than a paragraph, and
+        # fails if content addressing is not cheaper than regrouping across runs.
+        run: python scripts/ablation.py
+
       - name: Collapse proof
         # Asserts distinct situations stay bounded while population grows — the
         # saturation property, checked without spending a token.

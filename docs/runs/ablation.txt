@@ -1,0 +1,23 @@
+
+  Two populations of 4,000 agents each, generated from different seeds.
+
+                                       run 1           run 2           total            cost
+  ------------------------------------------------------------------------------------------
+  A  no store                           4000            4000            8000           $6.96
+  B  hand-grouped                        183             185             368           $0.32
+  C  Chorus                              183               7             190           $0.17
+  ------------------------------------------------------------------------------------------
+
+  On the first population alone, B and C are identical (183 calls each).
+  Grouping by a key you already know is exactly as cheap as deriving it.
+
+  On the second population B pays 185 again, because its sharing lives inside
+  one pass. C pays 7 — only the situations it had never seen.
+
+  second population reuse                96%
+  calls avoided vs B                     178
+  calls avoided vs A                    7810
+
+  PASS  identical to hand-grouping on one population, and 96% cheaper on
+        the next one — because the sharing is derived, not declared.
+

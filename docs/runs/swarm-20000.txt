@@ -1,0 +1,15 @@
+che 19648  $0.2137
+  ======================================================================
+  agents invoked                      20,000
+  model calls actually made              222
+  served from the store               19,778
+  distinct thoughts                      192
+  collapse                            104.2x
+  ----------------------------------------------------------------------
+  cost incurred                      $0.2137
+  cost if one call per agent        $19.2539
+  saved                             $19.0402
+  wall clock                          361.5s
+  preferences produced                20,000
+  ======================================================================
+  PASS  20,000 agents reasoned for $0.2137 instead of $19.2539 — 104x fewer thoughts than agents.

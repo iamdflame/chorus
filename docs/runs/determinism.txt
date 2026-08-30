@@ -1,0 +1,29 @@
+/home/dflame/Pictures/all_things/scripts/verify_determinism.py:84: DeprecationWarning: SequentialAgent is deprecated in favor of Workflow and will be removed in a future version. Workflow cannot yet be used as an LlmAgent sub-agent.
+  return SequentialAgent(name="revops_fleet", sub_agents=[triage, policy_agent, ledger])
+/home/dflame/Pictures/all_things/scripts/verify_determinism.py:84: DeprecationWarning: SequentialAgent is deprecated in favor of Workflow and will be removed in a future version. Workflow cannot yet be used as an LlmAgent sub-agent.
+  return SequentialAgent(name="revops_fleet", sub_agents=[triage, policy_agent, ledger])
+
+  MODEL   counting instrument (offline; use --live for gemini-3.5-flash)
+
+  ======================================================================================
+                                          RECORD              REPLAY      PERTURBED FORK
+  --------------------------------------------------------------------------------------
+  model+tool crossings                         3                   3                   3
+  served from store                            0                   3                   1
+  actually executed                            3                   0                   2
+  real model invocations                       3                   0                   2
+  effects written                              7                   0                   3
+  cost incurred (USD)                  $0.000891           $0.000000           $0.000594
+  cost avoided (USD)                   $0.000000           $0.000891           $0.000297
+  ======================================================================================
+
+  baseline root hash        f3eeff7bd19a993dbcd2a0f1
+  replay root hash          f3eeff7bd19a993dbcd2a0f1
+  fork root hash            f55488ef7dd582afce3d9bd9
+  causal diff               {'identical': 4, 'changed': 0, 'added': 3, 'removed': 3, 'diverged': 6}
+  primary effects intact                       7
+  fork effects stored                          3
+
+  PASS  replay is free and exact; the fork reused 33% of the recorded run
+        and paid only for the 2 crossing(s) the change actually touched.
+
