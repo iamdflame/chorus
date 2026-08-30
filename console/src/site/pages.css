@@ -44,7 +44,7 @@
   position: absolute;
   inset: auto 0 0;
   height: 190px;
-  background: linear-gradient(to bottom, transparent, var(--ground));
+  background: linear-gradient(to bottom, transparent, var(--housing));
   pointer-events: none;
 }
 
@@ -74,7 +74,7 @@
   font-size: 10px;
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: var(--ink-faint);
+  color: var(--text-faint);
 }
 
 /* -- generic sections ----------------------------------------------------- */
@@ -91,12 +91,12 @@
   grid-template-columns: repeat(auto-fit, minmax(272px, 1fr));
   gap: clamp(30px, 4vw, 62px);
 }
-.pillars article { border-top: 1px solid var(--rule-lit); padding-top: 26px; }
+.pillars article { border-top: 1px solid var(--rule-hi); padding-top: 26px; }
 .pillar-n {
   display: block;
   font-size: 10px;
   letter-spacing: 0.24em;
-  color: var(--accent);
+  color: var(--filament);
   margin-bottom: 20px;
 }
 .pillars h3 { margin: 0 0 16px; }
@@ -107,39 +107,39 @@
 
 .chart { margin: 54px 0 0; }
 .chart svg { width: 100%; height: auto; display: block; overflow: visible; }
-.chart figcaption b { color: var(--ink-bright); font-weight: 400; }
+.chart figcaption b { color: var(--text-hi); font-weight: 400; }
 .chart figcaption {
   margin-top: 22px;
   font-size: 12px;
-  color: var(--ink-faint);
+  color: var(--text-faint);
   max-width: 62ch;
 }
 
 .chart-grid { stroke: var(--rule); stroke-width: 1; }
 .chart-tick {
-  fill: var(--ink-faint);
-  font-family: var(--mono);
+  fill: var(--text-faint);
+  font-family: var(--data);
   font-size: 11px;
   letter-spacing: 0.06em;
 }
 .chart-value {
-  fill: var(--ink-bright);
-  font-family: var(--mono);
+  fill: var(--text-hi);
+  font-family: var(--data);
   font-size: 13px;
   font-variant-numeric: tabular-nums;
 }
 .chart-label {
-  fill: var(--ink-dim);
-  font-family: var(--mono);
+  fill: var(--text-lo);
+  font-family: var(--data);
   font-size: 11px;
   letter-spacing: 0.06em;
 }
-.chart-label.accent { fill: var(--accent); font-size: 13px; }
-.chart-label.naive { fill: var(--danger); opacity: 0.75; }
+.chart-label.accent { fill: var(--filament); font-size: 13px; }
+.chart-label.naive { fill: var(--breach); opacity: 0.75; }
 
-.chart-callout { stroke: var(--accent); stroke-width: 1; stroke-dasharray: 2 4; opacity: 0.6; }
-.chart-line { fill: none; stroke: var(--accent); stroke-width: 2.5; stroke-linecap: round; }
-.chart-dot { fill: var(--ground); stroke: var(--accent); stroke-width: 2.5; }
+.chart-callout { stroke: var(--filament); stroke-width: 1; stroke-dasharray: 2 4; opacity: 0.6; }
+.chart-line { fill: none; stroke: var(--filament); stroke-width: 2.5; stroke-linecap: round; }
+.chart-dot { fill: var(--housing); stroke: var(--filament); stroke-width: 2.5; }
 
 /* The line draws itself as the figure scrolls through, so the flattening is something
    you watch happen rather than a shape already sitting there. */
@@ -177,16 +177,16 @@
   font-weight: 400;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: var(--ink-faint);
-  border-bottom: 1px solid var(--rule-lit);
+  color: var(--text-faint);
+  border-bottom: 1px solid var(--rule-hi);
 }
 .compare th:first-child { text-align: left; }
 .compare td { padding: 18px 0; border-bottom: 1px solid var(--rule); text-align: right; }
-.compare td:first-child { text-align: left; color: var(--ink-dim); }
-.compare tr.hot td { color: var(--ink-bright); }
-.compare tr.hot td:nth-child(3) { color: var(--accent); font-size: 17px; }
-.compare .up { color: var(--accent); font-size: 12px; }
-.compare .flat { color: var(--ink-faint); font-size: 12px; }
+.compare td:first-child { text-align: left; color: var(--text-lo); }
+.compare tr.hot td { color: var(--text-hi); }
+.compare tr.hot td:nth-child(3) { color: var(--filament); font-size: 17px; }
+.compare .up { color: var(--filament); font-size: 12px; }
+.compare .flat { color: var(--text-faint); font-size: 12px; }
 .compare-note { margin-top: 26px; }
 
 /* -- prose pages ---------------------------------------------------------- */
@@ -196,7 +196,7 @@
 
 .steps { display: grid; gap: 1px; background: var(--rule); margin-top: 52px; }
 .step {
-  background: var(--ground);
+  background: var(--housing);
   padding: clamp(26px, 3.4vw, 44px);
   display: grid;
   grid-template-columns: 88px minmax(0, 1fr);
@@ -208,25 +208,25 @@
    potentially-wide content needs this. */
 .step > * { min-width: 0; }
 .step code { max-width: 100%; }
-.step-n { font-size: 11px; letter-spacing: 0.22em; color: var(--accent); padding-top: 6px; }
+.step-n { font-size: 11px; letter-spacing: 0.22em; color: var(--filament); padding-top: 6px; }
 .step h3 { margin: 0 0 14px; }
 .step code {
   display: block;
   margin-top: 20px;
   padding: 16px 18px;
-  background: var(--ground-1);
-  border-left: 2px solid var(--accent-deep);
+  background: var(--housing-deep);
+  border-left: 2px solid var(--filament-dim);
   font-size: 12.5px;
-  color: var(--ink-bright);
+  color: var(--text-hi);
   overflow-x: auto;
   white-space: pre;
 }
 
 .facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 1px; background: var(--rule); margin-top: 48px; }
-.fact { background: var(--ground); padding: 30px 26px; }
+.fact { background: var(--housing); padding: 30px 26px; }
 .fact dd { margin: 0; font-size: clamp(26px, 3vw, 40px); line-height: 1; }
-.fact dt { margin-top: 12px; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-faint); }
-.fact[data-tone="accent"] dd { color: var(--accent); }
+.fact dt { margin-top: 12px; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-faint); }
+.fact[data-tone="accent"] dd { color: var(--filament); }
 
 @media (max-width: 760px) {
   .step { grid-template-columns: minmax(0, 1fr); gap: 14px; }
@@ -242,7 +242,7 @@
 .ledger {
   border: 1px solid var(--rule);
   border-radius: 2px;
-  background: color-mix(in oklab, var(--ground) 92%, var(--ink) 8%);
+  background: color-mix(in oklab, var(--housing) 92%, var(--text) 8%);
 }
 
 .ledger-head {
@@ -264,22 +264,22 @@
 }
 
 .ledger-figure {
-  font-family: var(--mono);
+  font-family: var(--data);
   font-size: clamp(3rem, 11vw, 6rem);
   line-height: 0.95;
   letter-spacing: -0.03em;
-  color: var(--accent);
+  color: var(--filament);
 }
 
 .ledger-figure.muted {
   font-size: clamp(1.5rem, 5vw, 2.5rem);
-  color: var(--ink-dim);
+  color: var(--text-lo);
 }
 
 .ledger-caption {
   margin: 1rem auto 0;
   max-width: 46ch;
-  color: var(--ink-dim);
+  color: var(--text-lo);
 }
 
 .ledger-grid {
@@ -310,13 +310,13 @@
 
 .ledger-grid dt {
   font-size: 0.78rem;
-  color: var(--ink-faint);
+  color: var(--text-faint);
   margin-bottom: 0.35rem;
 }
 
 .ledger-grid dd {
   margin: 0;
-  font-family: var(--mono);
+  font-family: var(--data);
   font-size: 1.05rem;
   overflow-wrap: anywhere;
 }
@@ -353,4 +353,102 @@
   font-size: 0.82rem;
   padding: 0.25rem 0;
   white-space: nowrap;
+}
+
+/* ── The hero ────────────────────────────────────────────────────────────────
+ * The thesis, running, before it is described. */
+
+.hero {
+  position: relative;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  /* Clears the fixed bar at every viewport height. A percentage here is what put the
+     old build's headline underneath the nav on short screens. */
+  padding-block: calc(var(--nav-h) + 2rem) 1.5rem;
+}
+
+.hero-inner { position: relative; z-index: 2; }
+
+.hero-claim {
+  font-size: clamp(2rem, 5.2vw, 3.4rem);
+  max-width: 20ch;
+}
+
+/* The second line shifts on the width and roundedness axes rather than sloping. This
+   family ships no italic, so `<em>` would synthesise one — a mechanical skew that a
+   type designer spots instantly and that undoes the point of using the family at all. */
+.hero-claim-alt {
+  font-variation-settings: "wght" 380, "wdth" 108, "ROND" 60;
+  color: var(--text-lo);
+}
+
+.hero-figure {
+  font-family: var(--data);
+  font-variation-settings: "wght" 300;
+  font-size: var(--t-hero);
+  line-height: 0.86;
+  letter-spacing: -0.05em;
+  color: var(--filament);
+  margin: clamp(0.5rem, 1.6vh, 1.2rem) 0 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.hero-figure-label {
+  font-size: var(--t-xs);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin: 0.4rem 0 0;
+}
+
+.hero-lede { margin-top: clamp(1rem, 2.4vh, 1.6rem); max-width: 54ch; }
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.hero-strip {
+  position: relative;
+  z-index: 2;
+  margin-top: auto;
+  padding-top: 2rem;
+}
+
+.strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(8.5rem, 45%), 1fr));
+  gap: 1.25rem 2rem;
+  margin: 0;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--rule);
+}
+
+.strip div { min-width: 0; }
+
+.strip dd {
+  margin: 0;
+  font-family: var(--data);
+  font-size: var(--t-lg);
+  font-variation-settings: "wght" 400;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-hi);
+}
+
+/* Incandescent for what was computed, reflected for what was reused. The colour is never
+   alone: the label says which, and the figures sit in a fixed order. */
+.strip div[data-tone="filament"] dd { color: var(--filament); }
+.strip div[data-tone="reflect"] dd { color: var(--reflect); }
+
+.strip dt {
+  font-family: var(--data);
+  font-size: var(--t-xs);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin-top: 0.3rem;
 }

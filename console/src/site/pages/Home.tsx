@@ -28,37 +28,52 @@ export function Home() {
         <HeroField />
         <div className="shell hero-inner">
           <p className="eyebrow">All Things Agentic · Fortified Enterprise Fleet</p>
-          <h1 className="display h1">
+
+          {/* The thesis, stated as a measurement rather than a headline about a thesis. */}
+          <h1 className="display hero-claim">
             Twenty thousand agents.<br />
-            <em>Two thousand thoughts.</em>
+            <span className="hero-claim-alt">Two thousand thoughts.</span>
           </h1>
-          <p className="lede hero-lede">
-            Reasoning now costs less than a database query, so every entity in a system
-            could have its own permanent agent. Nobody builds that — twenty thousand
-            agents means twenty thousand model calls. <strong>Unless identical reasoning
-            is computed once.</strong>
+
+          {/* The one scale break in the entire design system. One number is allowed to be
+              enormous; nothing else is. */}
+          <div className="hero-figure" aria-hidden="true">
+            <Counter to={10.2} dp={1} />×
+          </div>
+          <p className="hero-figure-label data">
+            collapse, measured on a live 20,000-agent run
           </p>
+
+          <p className="lede hero-lede">
+            Every entity gets its own agent. Identical reasoning is computed once, and we
+            measure how much of it was needed at all — on this workload,{" "}
+            <strong>10.5%</strong>. The rest is a lookup table, and it is served as one.
+          </p>
+
           <div className="hero-actions">
-            <Link to="/console" className="btn">
-              Wake the swarm <span className="arrow">→</span>
+            <Link to="/console" className="btn" data-variant="primary">
+              Watch it collapse <span className="arrow">→</span>
             </Link>
-            <Link to="/mechanism" className="btn" data-variant="ghost">
-              How it works
+            <Link to="/evidence" className="btn" data-variant="ghost">
+              Read the evidence
             </Link>
           </div>
+        </div>
 
-          <dl className="hero-stats stagger">
+        {/* The live strip: what the run actually cost, including what it did not. */}
+        <div className="shell hero-strip">
+          <dl className="strip">
             {[
-              { k: "agents", v: 20000, suffix: "" },
-              { k: "model calls", v: 1964, suffix: "" },
-              { k: "cost", v: 1.9394, prefix: "$", dp: 4 },
-              { k: "collapse", v: 10.2, suffix: "×", dp: 1 },
-            ].map((stat, i) => (
-              <div key={stat.k} style={{ "--i": i } as React.CSSProperties}>
+              { k: "spent", v: 1.9394, prefix: "$", dp: 4, tone: "filament" },
+              { k: "avoided", v: 17.8101, prefix: "$", dp: 4, tone: "reflect" },
+              { k: "model calls", v: 1964, dp: 0, tone: "filament" },
+              { k: "served free", v: 17964, dp: 0, tone: "reflect" },
+              { k: "paid twice", v: 0, dp: 0, tone: undefined },
+            ].map((stat) => (
+              <div key={stat.k} data-tone={stat.tone}>
                 <dd className="fig">
                   {stat.prefix ?? ""}
-                  <Counter to={stat.v} dp={stat.dp ?? 0} />
-                  {stat.suffix ?? ""}
+                  <Counter to={stat.v} dp={stat.dp} />
                 </dd>
                 <dt>{stat.k}</dt>
               </div>

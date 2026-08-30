@@ -3,10 +3,21 @@ import { LINKS } from "./links";
 import { Mark } from "./Mark";
 import { Link, useRoute } from "./router";
 
+// Four in the bar, everything in the sheet. Seven destinations across one row on a
+// laptop crowds the mark and pushes the actions into it, which is exactly how the
+// previous build ended up with "Source" sitting underneath the console button.
 const ROUTES = [
-  { to: "/", label: "Overview" },
   { to: "/mechanism", label: "Mechanism" },
+  { to: "/ledger", label: "Ledger" },
   { to: "/evidence", label: "Evidence" },
+  { to: "/incident", label: "Incident" },
+];
+
+const SHEET = [
+  { to: "/", label: "Overview" },
+  ...ROUTES,
+  { to: "/intake", label: "Intake" },
+  { to: "/console", label: "Console" },
 ];
 
 export function Nav() {
@@ -66,7 +77,7 @@ export function Nav() {
       </div>
 
       <div className="nav-sheet" hidden={!open}>
-        {[...ROUTES, { to: "/console", label: "Console" }].map((route) => (
+        {SHEET.map((route) => (
           <Link key={route.to} to={route.to} className="nav-sheet-link">
             {route.label}
           </Link>

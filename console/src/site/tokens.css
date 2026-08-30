@@ -100,7 +100,7 @@
   --t-xl: 1.953rem;
   --t-2xl: 2.441rem;
   --t-3xl: 3.052rem;
-  --t-hero: clamp(4rem, 14vw, 11rem);
+  --t-hero: clamp(3.4rem, 11vw, 8.5rem);
 
   /* ── Motion ─────────────────────────────────────────────────────────────────
    * Material 3 Expressive found that expressive motion let people locate key

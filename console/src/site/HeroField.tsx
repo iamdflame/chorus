@@ -121,24 +121,34 @@ export function HeroField() {
         const h = heat[a.cohort];
         const s = inherited[a.cohort];
 
-        // Base is barely there; the field should read as latent until something happens.
-        let r = 0x4a, g = 0x55, b = 0x66, alpha = 0.72;
+        // Three states, and the colour is never the only thing that separates them:
+        // an unlit agent is a dim neutral speck, a reflected one takes the cool cast of
+        // light it did not pay for, and an ignited one goes incandescent AND grows. Size
+        // and hue move together so the field still reads without colour discrimination.
+        //
+        //   latent    #4A5566   waiting
+        //   reflect   #A8D5E5   served from the store, free
+        //   filament  #FF9D4D   a model call, and money leaving
+        let r = 0x5c, g = 0x67, b = 0x7a, alpha = 0.8;
         if (s > 0.01) {
-          alpha = 0.72 + s * 0.28;
-          r = Math.round(0x4a + (0x5e - 0x4a) * s);
-          g = Math.round(0x55 + (0xf0 - 0x55) * s);
-          b = Math.round(0x66 + (0xc8 - 0x66) * s);
+          alpha = 0.8 + s * 0.2;
+          r = Math.round(0x5c + (0xa8 - 0x5c) * s);
+          g = Math.round(0x67 + (0xd5 - 0x67) * s);
+          b = Math.round(0x7a + (0xe5 - 0x7a) * s);
         }
         if (h > 0.02) {
+          // Ignition ramps through the hot filament rather than through white: this is
+          // the only moment anything in the interface flashes, and it flashes exactly
+          // when money is spent, so the visual budget maps to the financial one.
           const k = Math.min(h * 1.15, 1);
-          r = Math.round(r + (255 - r) * k);
-          g = Math.round(g + (255 - g) * k);
-          b = Math.round(b + (255 - b) * k);
-          alpha = Math.min(alpha + h * 0.5, 1);
+          r = Math.round(r + (0xff - r) * k);
+          g = Math.round(g + (0xc4 - g) * k);
+          b = Math.round(b + (0x8a - b) * k);
+          alpha = Math.min(alpha + h * 0.55, 1);
         }
 
         ctx.fillStyle = `rgba(${r},${g},${b},${alpha})`;
-        const size = 1.6 + h * 1.8;
+        const size = 1.5 + s * 0.5 + h * 2.4;
         ctx.fillRect(a.x - size / 2, a.y + wobble - size / 2, size, size);
       }
 

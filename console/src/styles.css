@@ -31,14 +31,14 @@
 .cx-scenario {
   margin: 0;
   font-size: 12px;
-  color: var(--ink-dim);
+  color: var(--text-lo);
   letter-spacing: 0.02em;
 }
-.cx-scenario b { color: var(--ink-bright); font-weight: 400; }
+.cx-scenario b { color: var(--text-hi); font-weight: 400; }
 .cx-scenario i {
   display: inline-block;
   width: 3px; height: 3px; border-radius: 50%;
-  background: var(--rule-lit);
+  background: var(--rule-hi);
   margin: 0 12px;
   vertical-align: middle;
 }
@@ -62,14 +62,14 @@
   top: var(--pad);
   width: min(340px, calc(100% - var(--pad) * 2));
   padding: 18px 20px 20px;
-  background: color-mix(in srgb, var(--ground) 88%, transparent);
+  background: color-mix(in srgb, var(--housing) 88%, transparent);
   border: 1px solid var(--rule);
   backdrop-filter: blur(10px);
-  animation: card-in 260ms var(--ease) both;
+  animation: card-in 260ms var(--ease-place) both;
 }
 .cx-card[data-pinned="true"] {
-  border-color: var(--accent-deep);
-  background: color-mix(in srgb, var(--ground) 96%, transparent);
+  border-color: var(--filament-dim);
+  background: color-mix(in srgb, var(--housing) 96%, transparent);
 }
 @keyframes card-in {
   from { opacity: 0; transform: translateY(-6px); }
@@ -82,17 +82,17 @@
   font-weight: 400;
   letter-spacing: 0.24em;
   text-transform: uppercase;
-  color: var(--ink-faint);
+  color: var(--text-faint);
 }
 .cx-card h2 + * { margin-top: 0; }
 
 .cx-facets { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 18px; }
 .cx-facets span {
   padding: 4px 9px;
-  border: 1px solid var(--rule-lit);
+  border: 1px solid var(--rule-hi);
   font-size: 10.5px;
   letter-spacing: 0.04em;
-  color: var(--ink-bright);
+  color: var(--text-hi);
 }
 
 .cx-kv {
@@ -102,25 +102,25 @@
   margin: 0 0 18px;
   font-size: 12px;
 }
-.cx-kv dt { color: var(--ink-faint); }
-.cx-kv dd { margin: 0; color: var(--ink-bright); }
-.cx-kv dd[data-status="thinking"] { color: var(--hot); }
-.cx-kv dd[data-status="thought"]  { color: var(--accent); }
-.cx-kv dd[data-status="shared"]   { color: var(--accent-deep); }
+.cx-kv dt { color: var(--text-faint); }
+.cx-kv dd { margin: 0; color: var(--text-hi); }
+.cx-kv dd[data-status="thinking"] { color: var(--filament-hot); }
+.cx-kv dd[data-status="thought"]  { color: var(--filament); }
+.cx-kv dd[data-status="shared"]   { color: var(--filament-dim); }
 
 .cx-thought {
   margin: 0 0 14px;
   padding: 13px 15px;
   max-height: 210px;
   overflow: auto;
-  background: var(--ground-1);
-  border-left: 2px solid var(--accent-deep);
+  background: var(--housing-deep);
+  border-left: 2px solid var(--filament-dim);
   font-size: 11.5px;
   line-height: 1.6;
-  color: var(--ink-bright);
+  color: var(--text-hi);
 }
 
-.cx-foot { margin: 0; font-size: 11px; color: var(--ink-faint); }
+.cx-foot { margin: 0; font-size: 11px; color: var(--text-faint); }
 
 /* -- readout -------------------------------------------------------------- */
 /* The one loud element on the screen. Everything else is a thin line of type at the edge
@@ -148,21 +148,21 @@
   font-size: clamp(22px, 2.6vw, 36px);
   line-height: 0.94;
   letter-spacing: -0.035em;
-  color: var(--ink-bright);
+  color: var(--text-hi);
 }
-.cx-metric-value[data-tone="accent"] { color: var(--accent); }
-.cx-metric-value[data-tone="muted"]  { color: var(--ink-faint); }
+.cx-metric-value[data-tone="accent"] { color: var(--filament); }
+.cx-metric-value[data-tone="muted"]  { color: var(--text-faint); }
 .cx-metric-label {
   font-size: 9px;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: var(--ink-faint);
+  color: var(--text-faint);
 }
 
 .cx-note {
   margin: 0 0 4px auto;
   font-size: 11px;
-  color: var(--ink-dim);
+  color: var(--text-lo);
   text-align: right;
   max-width: 52ch;
   /* One line, always. The status text changes length on every event during a run; left
@@ -182,7 +182,7 @@
 
 /* The card sits opposite the cohort it describes; anchored top-left it covered the very
    cell you had just pointed at. */
-.cx-card { transition: left 220ms var(--ease), right 220ms var(--ease); }
+.cx-card { transition: left 220ms var(--ease-place), right 220ms var(--ease-place); }
 .cx-card[data-side="left"]  { left: var(--pad);  right: auto; }
 .cx-card[data-side="right"] { right: var(--pad); left: auto; }
 

@@ -1,3 +1,4 @@
+import { applyPlace, placeFor } from "./place";
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
 
 /** A router in forty lines, because the alternative is a dependency that does the same
@@ -14,6 +15,13 @@ const RouteContext = createContext<{ path: string; go: (to: string) => void }>({
 
 export function RouterProvider({ children }: { children: ReactNode }) {
   const [path, setPath] = useState(() => window.location.pathname);
+
+  // The place is applied from the route rather than toggled by the user. Moving from the
+  // record into the apparatus is a lighting change, and it should happen because of where
+  // you went, not because of a switch you found.
+  useEffect(() => {
+    applyPlace(placeFor(path));
+  }, [path]);
 
   useEffect(() => {
     const onPop = () => setPath(window.location.pathname);
