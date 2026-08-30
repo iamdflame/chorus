@@ -165,3 +165,13 @@
 .cx-card { transition: left 220ms var(--ease), right 220ms var(--ease); }
 .cx-card[data-side="left"]  { left: var(--pad);  right: auto; }
 .cx-card[data-side="right"] { right: var(--pad); left: auto; }
+
+/* The label must never wrap: "WAKE THE SWARM" broken across three lines turns a primary
+   action into a paragraph. */
+.cx-bar .btn { white-space: nowrap; }
+
+@media (max-width: 620px) {
+  .cx-bar { gap: 14px; }
+  .cx-bar .btn { padding: 9px 13px; font-size: 11px; letter-spacing: 0.06em; }
+  .cx-scenario { font-size: 11px; }
+}

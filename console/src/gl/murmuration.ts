@@ -73,6 +73,11 @@ export class Murmuration {
   private host!: HTMLElement;
   private ready = false;
   private destroyed = false;
+  // Kept so the treemap can be recomputed when the stage changes size. Laying out once at
+  // mount leaves the field clipped the moment anything reflows — the readout wrapping to
+  // a second row on a narrow screen is enough to do it.
+  private lastCohorts: Cohort[] = [];
+  private observer: ResizeObserver | null = null;
 
   onHover: (cohort: CohortSummary | null) => void = () => {};
   onSelect: (cohort: CohortSummary | null) => void = () => {};
@@ -93,6 +98,17 @@ export class Murmuration {
     this.ready = true;
     host.appendChild(this.app.canvas);
     this.app.stage.addChild(this.stage, this.overlay);
+
+    let frame = 0;
+    this.observer = new ResizeObserver(() => {
+      // Coalesced: a resize fires many times per drag, and re-tiling 192 cohorts on each
+      // one would drop frames for no benefit.
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        if (this.lastCohorts.length) this.setCohorts(this.lastCohorts);
+      });
+    });
+    this.observer.observe(host);
 
     this.app.canvas.addEventListener("pointermove", this.handleMove);
     this.app.canvas.addEventListener("pointerleave", this.handleLeave);
@@ -166,6 +182,8 @@ export class Murmuration {
   destroy(): void {
     if (this.destroyed) return;
     this.destroyed = true;
+    this.observer?.disconnect();
+    this.observer = null;
     if (this.ready) this.app.destroy(true, { children: true });
   }
 
@@ -221,9 +239,11 @@ export class Murmuration {
   /** Lay the population out as clustered clouds, one per cohort, area proportional to
    *  cohort size so the eye reads population weight directly. */
   setCohorts(cohorts: Cohort[]): void {
+    const previous = new Map([...this.views].map(([key, view]) => [key, view.status]));
     this.stage.removeChildren();
     this.views.clear();
     this.order = [];
+    this.lastCohorts = cohorts;
     if (!cohorts.length) return;
 
     const w = this.host.clientWidth || 1200;
@@ -275,7 +295,13 @@ export class Murmuration {
           dotSize,
         );
       }
+      const carried = previous.get(cohort.key);
       dots.fill({ color: C.idle, alpha: 1 });
+      if (carried === "thought" || carried === "thinking") {
+        dots.tint = C.thought;
+      } else if (carried === "shared") {
+        dots.tint = C.shared;
+      }
 
       container.addChild(backing, dots);
       this.stage.addChild(container);
@@ -287,7 +313,7 @@ export class Murmuration {
         backing,
         size: cohort.size,
         cell: inner,
-        status: "idle",
+        status: previous.get(cohort.key) ?? "idle",
       };
       this.views.set(cohort.key, view);
       this.order.push(view);

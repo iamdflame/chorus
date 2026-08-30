@@ -29,6 +29,17 @@
   opacity: 1;
 }
 
+/* On narrow screens the text fills the frame, so there is nowhere for the field to be
+   dense without sitting under a paragraph. It drops back to a faint texture rather than
+   competing with the only content on screen. */
+@media (max-width: 760px) {
+  .hero-field {
+    mask-image: linear-gradient(to bottom, #000 0%, transparent 62%);
+    opacity: 0.4;
+  }
+  .hero-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 26px 20px; }
+}
+
 .hero-fade {
   position: absolute;
   inset: auto 0 0;
@@ -145,7 +156,7 @@
 
 /* -- comparison table ----------------------------------------------------- */
 
-.compare { margin-top: 46px; }
+.compare { margin-top: 46px; overflow-x: auto; }
 .compare table {
   width: 100%;
   border-collapse: collapse;
@@ -184,6 +195,11 @@
   gap: clamp(18px, 3vw, 44px);
   align-items: start;
 }
+/* A grid track defaults to min-width: auto, so a wide <pre> stretches the track and takes
+   the whole page with it instead of scrolling inside itself. Every track holding
+   potentially-wide content needs this. */
+.step > * { min-width: 0; }
+.step code { max-width: 100%; }
 .step-n { font-size: 11px; letter-spacing: 0.22em; color: var(--accent); padding-top: 6px; }
 .step h3 { margin: 0 0 14px; }
 .step code {
@@ -205,6 +221,6 @@
 .fact[data-tone="accent"] dd { color: var(--accent); }
 
 @media (max-width: 760px) {
-  .step { grid-template-columns: 1fr; gap: 14px; }
+  .step { grid-template-columns: minmax(0, 1fr); gap: 14px; }
   .compare table { font-size: 12.5px; }
 }
