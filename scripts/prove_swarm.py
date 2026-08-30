@@ -76,7 +76,7 @@ async def main(count: int, concurrency: int) -> int:
                   f"${m.cost_usd:.4f}", end="", flush=True)
 
     preferences, metrics = await swarm.run(
-        entities=passengers, projector=project_passenger, role="passenger",
+        entities=passengers, projector=bind(project_passenger, FIXED), role="passenger",
         context=context, round_id="irrops-round-1", on_progress=progress,
     )
     print()

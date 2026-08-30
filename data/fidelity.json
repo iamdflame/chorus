@@ -1,0 +1,94 @@
+{
+  "population": 20000,
+  "schema_version": "v2",
+  "sample": 20,
+  "cohorts": 4,
+  "per_cohort": 5,
+  "compared": 20,
+  "exact_agreement": 0.0,
+  "per_field": {
+    "accept_downgrade": 0.7,
+    "accept_split_party": 1.0,
+    "accept_nearby_airport": 1.0,
+    "needs_hotel": 0.75,
+    "max_wait_hours": 0.25,
+    "urgency_score": 0.0
+  },
+  "numeric": {
+    "max_wait_hours": {
+      "bias": -3.0,
+      "spearman": NaN
+    },
+    "urgency_score": {
+      "bias": -6.0,
+      "spearman": -0.6666666666666666
+    }
+  },
+  "same_flight": 1.0,
+  "same_flight_contested": 1.0,
+  "contested": 3,
+  "b4_calls": 5,
+  "b5_calls": 20,
+  "panels": [
+    {
+      "strategy": "B4 collapsed",
+      "bookings_seated": 3,
+      "souls_seated": 3,
+      "bookings_stranded": 17,
+      "souls_stranded": 40,
+      "satisfaction_tier_weighted": 5.6,
+      "satisfaction_tier_blind": 5.6,
+      "mean_wait": 2.23,
+      "p95_wait": 2.4,
+      "worst_wait": 2.4,
+      "gini_wait": 0.0498,
+      "parties_split": 0,
+      "constraint_violations": 0,
+      "model_calls": 5,
+      "coalesced": 0,
+      "cost_usd": 0.0046,
+      "notes": []
+    },
+    {
+      "strategy": "B5 uncollapsed",
+      "bookings_seated": 3,
+      "souls_seated": 3,
+      "bookings_stranded": 17,
+      "souls_stranded": 40,
+      "satisfaction_tier_weighted": 5.6,
+      "satisfaction_tier_blind": 5.6,
+      "mean_wait": 2.23,
+      "p95_wait": 2.4,
+      "worst_wait": 2.4,
+      "gini_wait": 0.0498,
+      "parties_split": 0,
+      "constraint_violations": 0,
+      "model_calls": 20,
+      "coalesced": 0,
+      "cost_usd": 0.02,
+      "notes": []
+    }
+  ],
+  "worst_cohorts": [
+    {
+      "key": "v2|passenger|basic|critical|family|checked_bags|long|hotel|origin",
+      "agreement": 0.0,
+      "n": 5
+    },
+    {
+      "key": "v2|passenger|silver|flexible|pair|unencumbered|intercontinental|hotel|origin",
+      "agreement": 0.0,
+      "n": 5
+    },
+    {
+      "key": "v2|passenger|silver|flexible|pair|unencumbered|intercontinental|nohotel|origin",
+      "agreement": 0.0,
+      "n": 5
+    },
+    {
+      "key": "v2|passenger|basic|same_day|solo|checked_bags|intercontinental|nohotel|origin",
+      "agreement": 0.0,
+      "n": 5
+    }
+  ]
+}

@@ -22,6 +22,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import inspect
 import time
 from dataclasses import dataclass, field
 from typing import Any, Callable
@@ -170,6 +171,31 @@ def build_agent(role: str) -> LlmAgent:
     )
 
 
+def _check_projector(projector: Callable[[dict[str, Any]], Projection]) -> None:
+    """Reject a projector that cannot be called with an entity alone.
+
+    Projection takes an injected clock, so call sites must bind one. Passing the bare
+    function is accepted by the type checker and then fails deep inside a gather, after
+    the run has already begun and money has already been spent. Checking the signature
+    here turns that into an immediate, legible error naming the fix.
+    """
+    try:
+        signature = inspect.signature(projector)
+    except (TypeError, ValueError):  # builtins, C callables — nothing to check
+        return
+    required = [
+        name
+        for name, param in signature.parameters.items()
+        if param.default is inspect.Parameter.empty
+        and param.kind
+        in (inspect.Parameter.POSITIONAL_OR_KEYWORD, inspect.Parameter.KEYWORD_ONLY)
+    ]
+    if len(required) > 1:
+        raise TypeError(
+            f"projector {getattr(projector, '__name__', projector)!r} still requires "
+            f"{required[1:]}; bind them first — e.g. bind(project_passenger, clock)"
+        )
+
 class Swarm:
     """Invokes one agent per entity against a shared content-addressed store."""
 
@@ -247,6 +273,7 @@ class Swarm:
         on_progress: Callable[[int, int, SwarmMetrics, str, bool, dict[str, Any] | None], None] | None = None,
     ) -> tuple[dict[str, dict[str, Any]], SwarmMetrics]:
         """Invoke every entity's agent. Sharing is discovered, never assumed."""
+        _check_projector(projector)
         started = time.perf_counter()
         metrics = SwarmMetrics()
         anchor = self.round_anchor(round_id, {"role": role, "context": hash_payload(context)})

@@ -420,7 +420,7 @@ class Engine:
                     })
 
             task = asyncio.create_task(
-                swarm.run(entities=passengers, projector=project_passenger,
+                swarm.run(entities=passengers, projector=bind(project_passenger, FIXED),
                           role="passenger", context=context,
                           round_id=f"irrops-{agents}", on_progress=progress)
             )
