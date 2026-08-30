@@ -290,6 +290,56 @@ exploit of your own scoring function is worth showing.
 
 ---
 
+## Memory that survives contact with collapse
+
+A returning traveller should not have to re-explain that their mother cannot manage stairs.
+The obvious way to arrange that destroys this product:
+
+> Per-traveller history in a prompt is identity-bearing and anti-collapse. Every returning
+> passenger's prompt becomes unique, every address becomes unique, and collapse goes to 1×.
+> The system would remember everyone and reason about no one twice.
+
+That is the same wall the injection analysis hits from the other side. Anything
+traveller-specific that reaches shared reasoning either makes it unshareable or makes it
+poisonable.
+
+**So memory feeds the projection, not the prompt.** A remembered constraint is a *fact about
+a traveller*, and facts about travellers already have a home — beside tier and hotel
+entitlement, in the record-sourced half. A profile changes **which cohort someone joins**,
+never what that cohort thinks.
+
+| remembered | what it changes | what it does not change |
+| --- | --- | --- |
+| needs assistance | `constraints` → `assisted` | the prompt for `assisted` |
+| hotel entitlement | the cohort they join | that cohort's shared answer |
+
+```
+[1] first disruption      1,965 distinct situations, 10.2x collapse
+    learned a durable constraint for 6,667 of them
+
+[2] 90 days later         2,164 distinct situations, 9.2x collapse
+    6,667 travellers were recognised without re-stating anything
+
+[3] 200 days later        memory still influences 0 travellers
+
+[4] identity in prompts   0 of 500 remembered travellers
+```
+
+<sub>Runs in CI. Regenerate: `python scripts/verify_memory.py`</sub>
+
+**It is not free, and the cost is printed rather than omitted.** Remembering moves travellers
+between cells, so the lattice goes from 1,965 occupied cells to 2,164 and collapse from
+10.2× to **9.2× — a 9% cost**, paid to stop asking people to re-explain themselves. Worth
+making, but a trade.
+
+Two decisions that go against the grain, both deliberate. **Memory only ever raises a
+constraint, never lowers one** — forgetting on silence is the dangerous direction, the one
+case where being wrong strands someone at a gate they cannot reach. And **constraints
+expire**: a wheelchair needed after surgery in March is not needed in December, and a
+system that remembers permanently mislabels people for years.
+
+---
+
 ## A second model family, and what it is actually for
 
 The plan for this integration was Gemma as a cheap triage classifier ahead of Gemini. That
@@ -639,6 +689,7 @@ Firestore    durable timeline, keyed by content address
 | **Discovery & lifecycle — Agent Registry** | Every agent publishes a versioned agent card (name, role, tools, thinking level, schema); the registry is the discovery surface and the address namespace | [`fleet/registry.py`](fleet/registry.py) |
 | **Core execution & state — long-running async** | Cloud Run + SSE; the causal DAG *is* the durable execution log, so a run resumes from any effect | [`api/main.py`](api/main.py), [`kernel/`](kernel/) |
 | **Memory across weeks** | 21-day recorded history in Firestore, keyed by content address; branches fork it in O(1) and time-travel to any sequence number | [`world/`](world/), [`kernel/firestore_store.py`](kernel/firestore_store.py) |
+| **Cross-session traveller memory** | A returning traveller is recognised 90 days later without re-stating anything. Memory feeds the **projection, not the prompt** — it changes which cohort you join, never what that cohort thinks — so the shared thought stays shareable and no identity reaches a model. Constraints expire on a schedule rather than mislabelling someone for years | [`memory/`](memory/), [`scripts/verify_memory.py`](scripts/verify_memory.py) |
 | **Security — data handling & PII** | Identity never crosses the model boundary; enforced structurally, not by policy | [`swarm/canonical.py`](swarm/canonical.py) |
 | **Zero-trust — agent identity** | One service account per agent *role*, not per app. The allocator has no model access at all, so a model there is unreachable rather than merely unused. Proved by attempting the forbidden action from each identity — including two probes that must be ALLOWED, since an identity that can do nothing proves only that it is broken | [`infra/identity.sh`](infra/identity.sh), [`scripts/verify_controls.sh`](scripts/verify_controls.sh) |
 | **Governance — policy enforcement** | Quarantine gate: irreversible actions are staged, not dispatched, until a policy adopts the timeline | [`kernel/quarantine.py`](kernel/quarantine.py) |
@@ -751,6 +802,7 @@ export GOOGLE_CLOUD_PROJECT=YOUR_PROJECT
 | 39,996 spans, 1,965 executed | `scripts/trace_run.py` |
 | Injection cannot reach a shared address | `scripts/verify_armor.py` |
 | Gemma agreement predicts correctness | `scripts/verify_gemma.py --sample 200` |
+| Memory persists 90 days and costs 9% of collapse | `scripts/verify_memory.py` |
 | The allocator cannot call a model, and is denied | `scripts/verify_controls.sh` |
 | Is the model earning its cost? | `scripts/necessity.py` |
 | The whole pipeline, end to end | `scripts/prove_pipeline.py` |
