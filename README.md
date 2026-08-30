@@ -290,6 +290,67 @@ exploit of your own scoring function is worth showing.
 
 ---
 
+## A second model family, and what it is actually for
+
+The plan for this integration was Gemma as a cheap triage classifier ahead of Gemini. That
+premise does not survive the model. `gemma-4-26b-a4b-it` rejects both `thinking_budget` and
+`thinking_level` outright, and spends **19 tokens reasoning for every token it answers**. It
+is not the cheap end of anything, and it is not claimed as one.
+
+Getting an honest measurement out of it took two corrections to our own method, both worth
+stating because the first one nearly became a published finding about the model.
+
+**It cannot be given Gemini's prompt.** Handed the same rubric, Gemma does not merely score
+worse — it never terminates: 4,000 output tokens of deliberation, `finishReason: MAX_TOKENS`,
+no answer at all, on every message tried.
+
+**The obvious fix produced a false result.** A bare field list took Gemma to 26.7% on
+urgency, *below the regex*, and we were one commit from reporting that. A bare list names
+the four urgency bands without saying what they mean, so Gemma was guessing boundaries
+Gemini had been handed. One line of definition per field took urgency to 80.8%. The first
+measurement was a fact about our prompt, not about the model.
+
+| extractor | tier | urgency | party | constraints | exact | mean |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| keyword (free) | 62.5% | 45.0% | 55.5% | 77.5% | 12.0% | 60.1% |
+| gemini-3.5-flash | 72.5% | 79.5% | 97.5% | 98.5% | 54.5% | 87.0% |
+| gemma-4-26b-a4b-it | 66.0% | 76.5% | 93.5% | 86.0% | 47.5% | 80.5% |
+| └ *on the 165 it answered* | 73.9% | **86.1%** | 97.0% | 97.0% | **57.6%** | **88.5%** |
+
+<sub>200 messages, ground truth known by construction. Regenerate: `python scripts/verify_gemma.py --sample 200`</sub>
+
+**Gemma is not less accurate than Gemini — it is less reliable.** On the messages it
+finishes it is marginally *better* (88.5% against 87.0%). It fails to finish 35 of 200, and
+those failures are what put it behind overall. That is a different problem from being worse
+at the task, and it has a different remedy.
+
+### So it is used where a second opinion is worth paying for
+
+The Necessity Ledger has a blind spot: shadow sampling re-asks **the same model**, which
+finds a stale table but never a consistently mistaken one. Ask Gemini twice about a cohort
+it misreads and it agrees with itself, confidently, forever. A different family disagreeing
+is a much stronger signal — so the question is whether Gemma's agreement actually predicts
+Gemini being right.
+
+| field | agreed | Gemini right | when Gemma agrees | lift |
+| --- | ---: | ---: | ---: | ---: |
+| tier | 138/200 | 72.5% | 81.9% | **+9.4** |
+| urgency | 113/200 | 79.5% | 90.3% | **+10.8** |
+| party | 81/200 | 97.5% | 97.5% | +0.0 |
+| constraints | 76/200 | 98.5% | 100.0% | +1.5 |
+
+It does, and it does so coherently: **agreement is informative exactly where the first model
+is fallible, and adds nothing where it is already right.** Tier and urgency are the two
+fields Gemini actually gets wrong, and a second family's agreement lifts accuracy on both by
+about ten points. Party and constraints are at 97.5% and 98.5% — there is no headroom, and
+the measurement correctly reports none.
+
+Measured per field rather than on all four at once, because requiring four simultaneous
+agreements leaves 22 samples to reason from and that cannot support a claim in either
+direction.
+
+---
+
 ## What collapse costs
 
 Every number above measures what collapse saves. This measures what it loses, which is the
@@ -591,6 +652,7 @@ Firestore    durable timeline, keyed by content address
 | Requirement | Used | Where |
 | --- | --- | --- |
 | Gemini 3.5 or newer | `gemini-3.5-flash` for all six fleet agents and the policy proposer; `gemini-embedding-001` for similarity | [`fleet/agents.py`](fleet/agents.py) |
+| Additional Google model | **Gemma 4** (`gemma-4-26b-a4b-it`) as an independent second reader whose agreement lifts extraction accuracy by ~10 points on the two fields Gemini gets wrong. Measured, not claimed — including the two corrections to our own method that the measurement required | [`models/gemma.py`](models/gemma.py), [`scripts/verify_gemma.py`](scripts/verify_gemma.py) |
 | Google agent framework | **ADK** (`google-adk` 2.8) — `BasePlugin` interposition, `SequentialAgent`, runtime `transfer_to_agent` | [`kernel/interposer.py`](kernel/interposer.py) |
 | Google Cloud infrastructure | **Cloud Run** (serving), **Firestore** native mode (durable effect store), **Vertex AI** (model access), **Cloud Trace** (spans) | [`infra/deploy.sh`](infra/deploy.sh) |
 
@@ -688,6 +750,7 @@ export GOOGLE_CLOUD_PROJECT=YOUR_PROJECT
 | Escalation recovers 85% at a third the cost | `scripts/escalation_sweep.py` |
 | 39,996 spans, 1,965 executed | `scripts/trace_run.py` |
 | Injection cannot reach a shared address | `scripts/verify_armor.py` |
+| Gemma agreement predicts correctness | `scripts/verify_gemma.py --sample 200` |
 | The allocator cannot call a model, and is denied | `scripts/verify_controls.sh` |
 | Is the model earning its cost? | `scripts/necessity.py` |
 | The whole pipeline, end to end | `scripts/prove_pipeline.py` |
