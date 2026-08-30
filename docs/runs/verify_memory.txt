@@ -1,0 +1,22 @@
+
+  Memory across weeks — 20,000 travellers
+
+  [1] first disruption      1,965 distinct situations, 10.2x collapse
+      learned a durable constraint for 6,667 of them
+
+  [2] 90 days later         2,164 distinct situations, 9.2x collapse
+      6,667 travellers were recognised without re-stating anything
+
+  [3] 200 days later        memory still influences 0 travellers
+      a wheelchair needed after surgery in March is not needed forever;
+      the constraint expires rather than mislabelling someone for years
+
+  [4] identity in prompts   0 of 500 remembered travellers
+
+  PASS  memory persisted 90 days and expired on schedule.
+
+        It is not free. Remembering moved travellers between cells, so the
+        lattice went from 1,965 occupied cells to 2,164 and collapse from
+        10.2x to 9.2x — a 9% cost, paid to stop asking people to
+        re-explain themselves. Both numbers are printed so the trade is visible.
+

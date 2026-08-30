@@ -63,6 +63,13 @@ jobs:
         # or if the screen starts blocking real travellers.
         run: python scripts/verify_armor.py
 
+      - name: Memory
+        # Memory is the feature most likely to quietly destroy this product: per-traveller
+        # history in a prompt makes every address unique and collapse 1x. Fails if
+        # remembering costs more than a tenth of the saving, if a constraint outlives its
+        # TTL, or if a single identifying string reaches a prompt.
+        run: python scripts/verify_memory.py
+
       - name: Extraction, keyword arm
         # The zero-model control. Its score is the bar the model has to clear for the
         # extraction stage to be worth paying for at all.
