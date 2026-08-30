@@ -138,10 +138,17 @@ def build_prompt(briefs: list[tuple[str, str, str, str]]) -> str:
 # actually describe who they are with, and a traveller writing "our family of four" is
 # giving information, not reciting a schema. The words below have no natural use in a
 # stranded traveller's message and their presence means the corpus is describing itself.
+# Only terms with no natural use in a stranded traveller's message. Bare category words
+# are deliberately absent: "critical" is an ordinary adjective ("her critical medical
+# appointment"), "family" and "group" are how people describe who they are with, and
+# flagging those produced false positives that said more about the checker than the
+# corpus. What survives here is language a person would never reach for — schema names,
+# snake_case, and the category words only in an explicitly categorical context.
 JARGON = (
-    "urgency", "critical", "same_day", "flexible tier", "unencumbered",
-    "party size", "loyalty tier", "platinum tier", "gold tier", "silver tier",
-    "basic tier", "constraint band", "urgency band", "projection",
+    "urgency band", "urgency:", "critical urgency", "same_day", "same-day band",
+    "unencumbered", "party size", "party band", "loyalty tier", "tier:",
+    "platinum tier", "gold tier", "silver tier", "basic tier",
+    "constraint band", "constraints:", "projection", "bucket",
 )
 
 
