@@ -40,6 +40,12 @@ jobs:
         # fails if content addressing is not cheaper than regrouping across runs.
         run: python scripts/ablation.py
 
+      - name: Baselines
+        # Every arm that can run, runs, and all of them are printed. There is no flag to
+        # hide a losing one — B2 (hand-written rules, no model) beat an earlier version of
+        # this project and is in the default output.
+        run: python -m bench.run --agents 4000
+
       - name: Collapse proof
         # Asserts distinct situations stay bounded while population grows — the
         # saturation property, checked without spending a token.

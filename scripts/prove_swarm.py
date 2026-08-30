@@ -139,8 +139,15 @@ async def main(count: int, concurrency: int) -> int:
     from kernel.snapshot import save
     save(os.path.join(ROOT, "data/swarm.json"), store=store, world=world)
     import json as _json
+    # Stamped with the scenario it was produced for. Without this a preference set
+    # outlives the world it describes and gets scored against a different one, which
+    # yields a plausible table full of wrong numbers — the worst kind of artefact.
+    from bench.run import scenario_fingerprint
+
     with open(os.path.join(ROOT, "data/preferences.json"), "w") as fh:
-        _json.dump({"preferences": preferences, "metrics": m,
+        _json.dump({"scenario_fingerprint": scenario_fingerprint(passengers),
+                    "agents": len(passengers),
+                    "preferences": preferences, "metrics": m,
                     "swarm_plan": a, "fcfs_plan": b}, fh)
     print(f"\n  {'snapshot':<30}{'data/swarm.json':>16}")
     print(f"  {'preferences + plans':<30}{'data/preferences.json':>16}")
