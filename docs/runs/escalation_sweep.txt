@@ -1,13 +1,13 @@
 
   Escalating the worst-agreeing cohorts, cheapest first
-  40 cohorts, 584 travellers. Collapse costs 35.1 weighted satisfaction.
+  40 cohorts, 600 travellers. Collapse costs 39.1 weighted satisfaction.
 
    escalated  travellers   calls   sat(w)  gap closed     cost
   --------------------------------------------------------------
-           0           0      40    113.2          0%     1.0x
-           2          30      68    113.2          0%     1.7x
-           4          60      96    130.4         49%     2.4x
-           8         120     152    131.5         52%     3.8x
-          12         180     208    142.0         82%     5.2x
-          20         290     310    157.3        126%     7.8x
-          40         584     584    148.3        100%    14.6x
+           0           0      40    108.3          0%     1.0x
+           2          30      68    108.9          2%     1.7x
+           4          60      96    126.0         45%     2.4x
+           8         120     152    126.3         46%     3.8x
+          12         180     208    141.6         85%     5.2x
+          20         300     320    155.6        121%     8.0x
+          40         600     600    147.4        100%    15.0x

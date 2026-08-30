@@ -727,7 +727,7 @@
     "PAX-100314": {
       "max_wait_hours": 12,
       "accept_downgrade": true,
-      "accept_split_party": false,
+      "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
       "urgency_score": 85
@@ -735,7 +735,7 @@
     "PAX-101366": {
       "max_wait_hours": 12,
       "accept_downgrade": true,
-      "accept_split_party": false,
+      "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
       "urgency_score": 85
@@ -743,7 +743,7 @@
     "PAX-102035": {
       "max_wait_hours": 12,
       "accept_downgrade": true,
-      "accept_split_party": false,
+      "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
       "urgency_score": 85
@@ -751,7 +751,7 @@
     "PAX-104231": {
       "max_wait_hours": 12,
       "accept_downgrade": true,
-      "accept_split_party": false,
+      "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
       "urgency_score": 85
@@ -759,7 +759,7 @@
     "PAX-104777": {
       "max_wait_hours": 12,
       "accept_downgrade": true,
-      "accept_split_party": false,
+      "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
       "urgency_score": 85
@@ -767,7 +767,7 @@
     "PAX-106902": {
       "max_wait_hours": 12,
       "accept_downgrade": true,
-      "accept_split_party": false,
+      "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
       "urgency_score": 85
@@ -775,7 +775,7 @@
     "PAX-108477": {
       "max_wait_hours": 12,
       "accept_downgrade": true,
-      "accept_split_party": false,
+      "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
       "urgency_score": 85
@@ -783,7 +783,7 @@
     "PAX-108981": {
       "max_wait_hours": 12,
       "accept_downgrade": true,
-      "accept_split_party": false,
+      "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
       "urgency_score": 85
@@ -791,7 +791,7 @@
     "PAX-113644": {
       "max_wait_hours": 12,
       "accept_downgrade": true,
-      "accept_split_party": false,
+      "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
       "urgency_score": 85
@@ -799,7 +799,7 @@
     "PAX-117050": {
       "max_wait_hours": 12,
       "accept_downgrade": true,
-      "accept_split_party": false,
+      "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
       "urgency_score": 85
@@ -807,7 +807,7 @@
     "PAX-118171": {
       "max_wait_hours": 12,
       "accept_downgrade": true,
-      "accept_split_party": false,
+      "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
       "urgency_score": 85
@@ -815,7 +815,7 @@
     "PAX-118611": {
       "max_wait_hours": 12,
       "accept_downgrade": true,
-      "accept_split_party": false,
+      "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
       "urgency_score": 85
@@ -823,7 +823,7 @@
     "PAX-119072": {
       "max_wait_hours": 12,
       "accept_downgrade": true,
-      "accept_split_party": false,
+      "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
       "urgency_score": 85
@@ -831,7 +831,7 @@
     "PAX-119106": {
       "max_wait_hours": 12,
       "accept_downgrade": true,
-      "accept_split_party": false,
+      "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
       "urgency_score": 85
@@ -839,7 +839,7 @@
     "PAX-119728": {
       "max_wait_hours": 12,
       "accept_downgrade": true,
-      "accept_split_party": false,
+      "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
       "urgency_score": 85
@@ -1810,7 +1810,7 @@
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 95
+      "urgency_score": 90
     },
     "PAX-100076": {
       "max_wait_hours": 12,
@@ -1818,7 +1818,7 @@
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 95
+      "urgency_score": 90
     },
     "PAX-102213": {
       "max_wait_hours": 12,
@@ -1826,7 +1826,7 @@
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 95
+      "urgency_score": 90
     },
     "PAX-102763": {
       "max_wait_hours": 12,
@@ -1834,7 +1834,7 @@
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 95
+      "urgency_score": 90
     },
     "PAX-103154": {
       "max_wait_hours": 12,
@@ -1842,7 +1842,7 @@
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 95
+      "urgency_score": 90
     },
     "PAX-104012": {
       "max_wait_hours": 12,
@@ -1850,7 +1850,7 @@
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 95
+      "urgency_score": 90
     },
     "PAX-104027": {
       "max_wait_hours": 12,
@@ -1858,7 +1858,7 @@
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 95
+      "urgency_score": 90
     },
     "PAX-104143": {
       "max_wait_hours": 12,
@@ -1866,7 +1866,7 @@
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 95
+      "urgency_score": 90
     },
     "PAX-104396": {
       "max_wait_hours": 12,
@@ -1874,7 +1874,7 @@
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 95
+      "urgency_score": 90
     },
     "PAX-106424": {
       "max_wait_hours": 12,
@@ -1882,7 +1882,7 @@
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 95
+      "urgency_score": 90
     },
     "PAX-110504": {
       "max_wait_hours": 12,
@@ -1890,7 +1890,7 @@
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 95
+      "urgency_score": 90
     },
     "PAX-113950": {
       "max_wait_hours": 12,
@@ -1898,7 +1898,7 @@
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 95
+      "urgency_score": 90
     },
     "PAX-114325": {
       "max_wait_hours": 12,
@@ -1906,7 +1906,7 @@
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 95
+      "urgency_score": 90
     },
     "PAX-114906": {
       "max_wait_hours": 12,
@@ -1914,7 +1914,7 @@
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 95
+      "urgency_score": 90
     },
     "PAX-116398": {
       "max_wait_hours": 12,
@@ -1922,7 +1922,7 @@
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 95
+      "urgency_score": 90
     },
     "PAX-100273": {
       "max_wait_hours": 24,
@@ -2528,121 +2528,121 @@
       "max_wait_hours": 24,
       "accept_downgrade": false,
       "accept_split_party": false,
-      "accept_nearby_airport": false,
+      "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 30
+      "urgency_score": 35
     },
     "PAX-101399": {
       "max_wait_hours": 24,
       "accept_downgrade": false,
       "accept_split_party": false,
-      "accept_nearby_airport": false,
+      "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 30
+      "urgency_score": 35
     },
     "PAX-101668": {
       "max_wait_hours": 24,
       "accept_downgrade": false,
       "accept_split_party": false,
-      "accept_nearby_airport": false,
+      "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 30
+      "urgency_score": 35
     },
     "PAX-102113": {
       "max_wait_hours": 24,
       "accept_downgrade": false,
       "accept_split_party": false,
-      "accept_nearby_airport": false,
+      "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 30
+      "urgency_score": 35
     },
     "PAX-104297": {
       "max_wait_hours": 24,
       "accept_downgrade": false,
       "accept_split_party": false,
-      "accept_nearby_airport": false,
+      "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 30
+      "urgency_score": 35
     },
     "PAX-105823": {
       "max_wait_hours": 24,
       "accept_downgrade": false,
       "accept_split_party": false,
-      "accept_nearby_airport": false,
+      "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 30
+      "urgency_score": 35
     },
     "PAX-108251": {
       "max_wait_hours": 24,
       "accept_downgrade": false,
       "accept_split_party": false,
-      "accept_nearby_airport": false,
+      "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 30
+      "urgency_score": 35
     },
     "PAX-109050": {
       "max_wait_hours": 24,
       "accept_downgrade": false,
       "accept_split_party": false,
-      "accept_nearby_airport": false,
+      "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 30
+      "urgency_score": 35
     },
     "PAX-109308": {
       "max_wait_hours": 24,
       "accept_downgrade": false,
       "accept_split_party": false,
-      "accept_nearby_airport": false,
+      "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 30
+      "urgency_score": 35
     },
     "PAX-109349": {
       "max_wait_hours": 24,
       "accept_downgrade": false,
       "accept_split_party": false,
-      "accept_nearby_airport": false,
+      "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 30
+      "urgency_score": 35
     },
     "PAX-109505": {
       "max_wait_hours": 24,
       "accept_downgrade": false,
       "accept_split_party": false,
-      "accept_nearby_airport": false,
+      "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 30
+      "urgency_score": 35
     },
     "PAX-109944": {
       "max_wait_hours": 24,
       "accept_downgrade": false,
       "accept_split_party": false,
-      "accept_nearby_airport": false,
+      "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 30
+      "urgency_score": 35
     },
     "PAX-110356": {
       "max_wait_hours": 24,
       "accept_downgrade": false,
       "accept_split_party": false,
-      "accept_nearby_airport": false,
+      "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 30
+      "urgency_score": 35
     },
     "PAX-110447": {
       "max_wait_hours": 24,
       "accept_downgrade": false,
       "accept_split_party": false,
-      "accept_nearby_airport": false,
+      "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 30
+      "urgency_score": 35
     },
     "PAX-114031": {
       "max_wait_hours": 24,
       "accept_downgrade": false,
       "accept_split_party": false,
-      "accept_nearby_airport": false,
+      "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 30
+      "urgency_score": 35
     },
     "PAX-101510": {
       "max_wait_hours": 48,
@@ -2756,6 +2756,14 @@
       "needs_hotel": true,
       "urgency_score": 20
     },
+    "PAX-114232": {
+      "max_wait_hours": 48,
+      "accept_downgrade": true,
+      "accept_split_party": true,
+      "accept_nearby_airport": true,
+      "needs_hotel": true,
+      "urgency_score": 20
+    },
     "PAX-100710": {
       "max_wait_hours": 12,
       "accept_downgrade": true,
@@ -2820,6 +2828,14 @@
       "needs_hotel": true,
       "urgency_score": 85
     },
+    "PAX-107667": {
+      "max_wait_hours": 12,
+      "accept_downgrade": true,
+      "accept_split_party": true,
+      "accept_nearby_airport": true,
+      "needs_hotel": true,
+      "urgency_score": 85
+    },
     "PAX-107702": {
       "max_wait_hours": 12,
       "accept_downgrade": true,
@@ -2829,6 +2845,14 @@
       "urgency_score": 85
     },
     "PAX-108186": {
+      "max_wait_hours": 12,
+      "accept_downgrade": true,
+      "accept_split_party": true,
+      "accept_nearby_airport": true,
+      "needs_hotel": true,
+      "urgency_score": 85
+    },
+    "PAX-108970": {
       "max_wait_hours": 12,
       "accept_downgrade": true,
       "accept_split_party": true,
@@ -2863,7 +2887,15 @@
     "PAX-100318": {
       "max_wait_hours": 12,
       "accept_downgrade": true,
-      "accept_split_party": true,
+      "accept_split_party": false,
+      "accept_nearby_airport": true,
+      "needs_hotel": true,
+      "urgency_score": 95
+    },
+    "PAX-100795": {
+      "max_wait_hours": 12,
+      "accept_downgrade": true,
+      "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
       "urgency_score": 95
@@ -2871,7 +2903,7 @@
     "PAX-100808": {
       "max_wait_hours": 12,
       "accept_downgrade": true,
-      "accept_split_party": true,
+      "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
       "urgency_score": 95
@@ -2879,7 +2911,7 @@
     "PAX-102825": {
       "max_wait_hours": 12,
       "accept_downgrade": true,
-      "accept_split_party": true,
+      "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
       "urgency_score": 95
@@ -2887,7 +2919,7 @@
     "PAX-103669": {
       "max_wait_hours": 12,
       "accept_downgrade": true,
-      "accept_split_party": true,
+      "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
       "urgency_score": 95
@@ -2895,7 +2927,7 @@
     "PAX-105668": {
       "max_wait_hours": 12,
       "accept_downgrade": true,
-      "accept_split_party": true,
+      "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
       "urgency_score": 95
@@ -2903,7 +2935,7 @@
     "PAX-107267": {
       "max_wait_hours": 12,
       "accept_downgrade": true,
-      "accept_split_party": true,
+      "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
       "urgency_score": 95
@@ -2911,7 +2943,7 @@
     "PAX-107502": {
       "max_wait_hours": 12,
       "accept_downgrade": true,
-      "accept_split_party": true,
+      "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
       "urgency_score": 95
@@ -2919,7 +2951,7 @@
     "PAX-107817": {
       "max_wait_hours": 12,
       "accept_downgrade": true,
-      "accept_split_party": true,
+      "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
       "urgency_score": 95
@@ -2927,7 +2959,7 @@
     "PAX-108334": {
       "max_wait_hours": 12,
       "accept_downgrade": true,
-      "accept_split_party": true,
+      "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
       "urgency_score": 95
@@ -2935,7 +2967,7 @@
     "PAX-110000": {
       "max_wait_hours": 12,
       "accept_downgrade": true,
-      "accept_split_party": true,
+      "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
       "urgency_score": 95
@@ -2943,7 +2975,7 @@
     "PAX-113268": {
       "max_wait_hours": 12,
       "accept_downgrade": true,
-      "accept_split_party": true,
+      "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
       "urgency_score": 95
@@ -2951,7 +2983,7 @@
     "PAX-113578": {
       "max_wait_hours": 12,
       "accept_downgrade": true,
-      "accept_split_party": true,
+      "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
       "urgency_score": 95
@@ -2959,7 +2991,7 @@
     "PAX-114793": {
       "max_wait_hours": 12,
       "accept_downgrade": true,
-      "accept_split_party": true,
+      "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
       "urgency_score": 95
@@ -2967,7 +2999,7 @@
     "PAX-114974": {
       "max_wait_hours": 12,
       "accept_downgrade": true,
-      "accept_split_party": true,
+      "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
       "urgency_score": 95
@@ -2981,6 +3013,14 @@
       "urgency_score": 85
     },
     "PAX-101612": {
+      "max_wait_hours": 8,
+      "accept_downgrade": true,
+      "accept_split_party": false,
+      "accept_nearby_airport": true,
+      "needs_hotel": true,
+      "urgency_score": 85
+    },
+    "PAX-102707": {
       "max_wait_hours": 8,
       "accept_downgrade": true,
       "accept_split_party": false,
@@ -3021,6 +3061,14 @@
       "urgency_score": 85
     },
     "PAX-108440": {
+      "max_wait_hours": 8,
+      "accept_downgrade": true,
+      "accept_split_party": false,
+      "accept_nearby_airport": true,
+      "needs_hotel": true,
+      "urgency_score": 85
+    },
+    "PAX-108591": {
       "max_wait_hours": 8,
       "accept_downgrade": true,
       "accept_split_party": false,
@@ -3196,6 +3244,14 @@
       "needs_hotel": true,
       "urgency_score": 85
     },
+    "PAX-100188": {
+      "max_wait_hours": 18,
+      "accept_downgrade": true,
+      "accept_split_party": true,
+      "accept_nearby_airport": true,
+      "needs_hotel": true,
+      "urgency_score": 85
+    },
     "PAX-100415": {
       "max_wait_hours": 18,
       "accept_downgrade": true,
@@ -3252,7 +3308,31 @@
       "needs_hotel": true,
       "urgency_score": 85
     },
+    "PAX-104652": {
+      "max_wait_hours": 18,
+      "accept_downgrade": true,
+      "accept_split_party": true,
+      "accept_nearby_airport": true,
+      "needs_hotel": true,
+      "urgency_score": 85
+    },
+    "PAX-105049": {
+      "max_wait_hours": 18,
+      "accept_downgrade": true,
+      "accept_split_party": true,
+      "accept_nearby_airport": true,
+      "needs_hotel": true,
+      "urgency_score": 85
+    },
     "PAX-106693": {
+      "max_wait_hours": 18,
+      "accept_downgrade": true,
+      "accept_split_party": true,
+      "accept_nearby_airport": true,
+      "needs_hotel": true,
+      "urgency_score": 85
+    },
+    "PAX-106804": {
       "max_wait_hours": 18,
       "accept_downgrade": true,
       "accept_split_party": true,
@@ -3268,8 +3348,24 @@
       "needs_hotel": true,
       "urgency_score": 85
     },
-    "PAX-100029": {
+    "PAX-107271": {
       "max_wait_hours": 18,
+      "accept_downgrade": true,
+      "accept_split_party": true,
+      "accept_nearby_airport": true,
+      "needs_hotel": true,
+      "urgency_score": 85
+    },
+    "PAX-107377": {
+      "max_wait_hours": 18,
+      "accept_downgrade": true,
+      "accept_split_party": true,
+      "accept_nearby_airport": true,
+      "needs_hotel": true,
+      "urgency_score": 85
+    },
+    "PAX-100029": {
+      "max_wait_hours": 12,
       "accept_downgrade": true,
       "accept_split_party": true,
       "accept_nearby_airport": true,
@@ -3277,7 +3373,23 @@
       "urgency_score": 85
     },
     "PAX-100526": {
-      "max_wait_hours": 18,
+      "max_wait_hours": 12,
+      "accept_downgrade": true,
+      "accept_split_party": true,
+      "accept_nearby_airport": true,
+      "needs_hotel": true,
+      "urgency_score": 85
+    },
+    "PAX-102710": {
+      "max_wait_hours": 12,
+      "accept_downgrade": true,
+      "accept_split_party": true,
+      "accept_nearby_airport": true,
+      "needs_hotel": true,
+      "urgency_score": 85
+    },
+    "PAX-102879": {
+      "max_wait_hours": 12,
       "accept_downgrade": true,
       "accept_split_party": true,
       "accept_nearby_airport": true,
@@ -3285,7 +3397,7 @@
       "urgency_score": 85
     },
     "PAX-104014": {
-      "max_wait_hours": 18,
+      "max_wait_hours": 12,
       "accept_downgrade": true,
       "accept_split_party": true,
       "accept_nearby_airport": true,
@@ -3293,7 +3405,7 @@
       "urgency_score": 85
     },
     "PAX-104697": {
-      "max_wait_hours": 18,
+      "max_wait_hours": 12,
       "accept_downgrade": true,
       "accept_split_party": true,
       "accept_nearby_airport": true,
@@ -3301,7 +3413,7 @@
       "urgency_score": 85
     },
     "PAX-105611": {
-      "max_wait_hours": 18,
+      "max_wait_hours": 12,
       "accept_downgrade": true,
       "accept_split_party": true,
       "accept_nearby_airport": true,
@@ -3309,7 +3421,7 @@
       "urgency_score": 85
     },
     "PAX-106537": {
-      "max_wait_hours": 18,
+      "max_wait_hours": 12,
       "accept_downgrade": true,
       "accept_split_party": true,
       "accept_nearby_airport": true,
@@ -3317,7 +3429,7 @@
       "urgency_score": 85
     },
     "PAX-108531": {
-      "max_wait_hours": 18,
+      "max_wait_hours": 12,
       "accept_downgrade": true,
       "accept_split_party": true,
       "accept_nearby_airport": true,
@@ -3325,7 +3437,7 @@
       "urgency_score": 85
     },
     "PAX-108787": {
-      "max_wait_hours": 18,
+      "max_wait_hours": 12,
       "accept_downgrade": true,
       "accept_split_party": true,
       "accept_nearby_airport": true,
@@ -3333,7 +3445,7 @@
       "urgency_score": 85
     },
     "PAX-109890": {
-      "max_wait_hours": 18,
+      "max_wait_hours": 12,
       "accept_downgrade": true,
       "accept_split_party": true,
       "accept_nearby_airport": true,
@@ -3341,7 +3453,7 @@
       "urgency_score": 85
     },
     "PAX-110112": {
-      "max_wait_hours": 18,
+      "max_wait_hours": 12,
       "accept_downgrade": true,
       "accept_split_party": true,
       "accept_nearby_airport": true,
@@ -3349,7 +3461,7 @@
       "urgency_score": 85
     },
     "PAX-110185": {
-      "max_wait_hours": 18,
+      "max_wait_hours": 12,
       "accept_downgrade": true,
       "accept_split_party": true,
       "accept_nearby_airport": true,
@@ -3357,7 +3469,7 @@
       "urgency_score": 85
     },
     "PAX-112518": {
-      "max_wait_hours": 18,
+      "max_wait_hours": 12,
       "accept_downgrade": true,
       "accept_split_party": true,
       "accept_nearby_airport": true,
@@ -3365,7 +3477,7 @@
       "urgency_score": 85
     },
     "PAX-112559": {
-      "max_wait_hours": 18,
+      "max_wait_hours": 12,
       "accept_downgrade": true,
       "accept_split_party": true,
       "accept_nearby_airport": true,
@@ -3375,121 +3487,121 @@
     "PAX-100811": {
       "max_wait_hours": 12,
       "accept_downgrade": true,
-      "accept_split_party": true,
+      "accept_split_party": false,
       "accept_nearby_airport": true,
-      "needs_hotel": false,
+      "needs_hotel": true,
       "urgency_score": 85
     },
     "PAX-100812": {
       "max_wait_hours": 12,
       "accept_downgrade": true,
-      "accept_split_party": true,
+      "accept_split_party": false,
       "accept_nearby_airport": true,
-      "needs_hotel": false,
+      "needs_hotel": true,
       "urgency_score": 85
     },
     "PAX-100961": {
       "max_wait_hours": 12,
       "accept_downgrade": true,
-      "accept_split_party": true,
+      "accept_split_party": false,
       "accept_nearby_airport": true,
-      "needs_hotel": false,
+      "needs_hotel": true,
       "urgency_score": 85
     },
     "PAX-101012": {
       "max_wait_hours": 12,
       "accept_downgrade": true,
-      "accept_split_party": true,
+      "accept_split_party": false,
       "accept_nearby_airport": true,
-      "needs_hotel": false,
+      "needs_hotel": true,
       "urgency_score": 85
     },
     "PAX-101675": {
       "max_wait_hours": 12,
       "accept_downgrade": true,
-      "accept_split_party": true,
+      "accept_split_party": false,
       "accept_nearby_airport": true,
-      "needs_hotel": false,
+      "needs_hotel": true,
       "urgency_score": 85
     },
     "PAX-101794": {
       "max_wait_hours": 12,
       "accept_downgrade": true,
-      "accept_split_party": true,
+      "accept_split_party": false,
       "accept_nearby_airport": true,
-      "needs_hotel": false,
+      "needs_hotel": true,
       "urgency_score": 85
     },
     "PAX-102012": {
       "max_wait_hours": 12,
       "accept_downgrade": true,
-      "accept_split_party": true,
+      "accept_split_party": false,
       "accept_nearby_airport": true,
-      "needs_hotel": false,
+      "needs_hotel": true,
       "urgency_score": 85
     },
     "PAX-102291": {
       "max_wait_hours": 12,
       "accept_downgrade": true,
-      "accept_split_party": true,
+      "accept_split_party": false,
       "accept_nearby_airport": true,
-      "needs_hotel": false,
+      "needs_hotel": true,
       "urgency_score": 85
     },
     "PAX-102416": {
       "max_wait_hours": 12,
       "accept_downgrade": true,
-      "accept_split_party": true,
+      "accept_split_party": false,
       "accept_nearby_airport": true,
-      "needs_hotel": false,
+      "needs_hotel": true,
       "urgency_score": 85
     },
     "PAX-104701": {
       "max_wait_hours": 12,
       "accept_downgrade": true,
-      "accept_split_party": true,
+      "accept_split_party": false,
       "accept_nearby_airport": true,
-      "needs_hotel": false,
+      "needs_hotel": true,
       "urgency_score": 85
     },
     "PAX-105326": {
       "max_wait_hours": 12,
       "accept_downgrade": true,
-      "accept_split_party": true,
+      "accept_split_party": false,
       "accept_nearby_airport": true,
-      "needs_hotel": false,
+      "needs_hotel": true,
       "urgency_score": 85
     },
     "PAX-105558": {
       "max_wait_hours": 12,
       "accept_downgrade": true,
-      "accept_split_party": true,
+      "accept_split_party": false,
       "accept_nearby_airport": true,
-      "needs_hotel": false,
+      "needs_hotel": true,
       "urgency_score": 85
     },
     "PAX-106751": {
       "max_wait_hours": 12,
       "accept_downgrade": true,
-      "accept_split_party": true,
+      "accept_split_party": false,
       "accept_nearby_airport": true,
-      "needs_hotel": false,
+      "needs_hotel": true,
       "urgency_score": 85
     },
     "PAX-107090": {
       "max_wait_hours": 12,
       "accept_downgrade": true,
-      "accept_split_party": true,
+      "accept_split_party": false,
       "accept_nearby_airport": true,
-      "needs_hotel": false,
+      "needs_hotel": true,
       "urgency_score": 85
     },
     "PAX-107235": {
       "max_wait_hours": 12,
       "accept_downgrade": true,
-      "accept_split_party": true,
+      "accept_split_party": false,
       "accept_nearby_airport": true,
-      "needs_hotel": false,
+      "needs_hotel": true,
       "urgency_score": 85
     },
     "PAX-100030": {
@@ -3572,6 +3684,14 @@
       "needs_hotel": true,
       "urgency_score": 85
     },
+    "PAX-105592": {
+      "max_wait_hours": 12,
+      "accept_downgrade": true,
+      "accept_split_party": true,
+      "accept_nearby_airport": true,
+      "needs_hotel": true,
+      "urgency_score": 85
+    },
     "PAX-105902": {
       "max_wait_hours": 12,
       "accept_downgrade": true,
@@ -3597,6 +3717,14 @@
       "urgency_score": 85
     },
     "PAX-109407": {
+      "max_wait_hours": 12,
+      "accept_downgrade": true,
+      "accept_split_party": true,
+      "accept_nearby_airport": true,
+      "needs_hotel": true,
+      "urgency_score": 85
+    },
+    "PAX-100440": {
       "max_wait_hours": 12,
       "accept_downgrade": true,
       "accept_split_party": true,
@@ -3838,123 +3966,123 @@
     },
     "PAX-100187": {
       "max_wait_hours": 36,
-      "accept_downgrade": true,
+      "accept_downgrade": false,
       "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 25
+      "urgency_score": 30
     },
     "PAX-100653": {
       "max_wait_hours": 36,
-      "accept_downgrade": true,
+      "accept_downgrade": false,
       "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 25
+      "urgency_score": 30
     },
     "PAX-101558": {
       "max_wait_hours": 36,
-      "accept_downgrade": true,
+      "accept_downgrade": false,
       "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 25
+      "urgency_score": 30
     },
     "PAX-101647": {
       "max_wait_hours": 36,
-      "accept_downgrade": true,
+      "accept_downgrade": false,
       "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 25
+      "urgency_score": 30
     },
     "PAX-101851": {
       "max_wait_hours": 36,
-      "accept_downgrade": true,
+      "accept_downgrade": false,
       "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 25
+      "urgency_score": 30
     },
     "PAX-102498": {
       "max_wait_hours": 36,
-      "accept_downgrade": true,
+      "accept_downgrade": false,
       "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 25
+      "urgency_score": 30
     },
     "PAX-103014": {
       "max_wait_hours": 36,
-      "accept_downgrade": true,
+      "accept_downgrade": false,
       "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 25
+      "urgency_score": 30
     },
     "PAX-105061": {
       "max_wait_hours": 36,
-      "accept_downgrade": true,
+      "accept_downgrade": false,
       "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 25
+      "urgency_score": 30
     },
     "PAX-106183": {
       "max_wait_hours": 36,
-      "accept_downgrade": true,
+      "accept_downgrade": false,
       "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 25
+      "urgency_score": 30
     },
     "PAX-106696": {
       "max_wait_hours": 36,
-      "accept_downgrade": true,
+      "accept_downgrade": false,
       "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 25
+      "urgency_score": 30
     },
     "PAX-107688": {
       "max_wait_hours": 36,
-      "accept_downgrade": true,
+      "accept_downgrade": false,
       "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 25
+      "urgency_score": 30
     },
     "PAX-108102": {
       "max_wait_hours": 36,
-      "accept_downgrade": true,
+      "accept_downgrade": false,
       "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 25
+      "urgency_score": 30
     },
     "PAX-108622": {
       "max_wait_hours": 36,
-      "accept_downgrade": true,
+      "accept_downgrade": false,
       "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 25
+      "urgency_score": 30
     },
     "PAX-109734": {
       "max_wait_hours": 36,
-      "accept_downgrade": true,
+      "accept_downgrade": false,
       "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 25
+      "urgency_score": 30
     },
     "PAX-110319": {
       "max_wait_hours": 36,
-      "accept_downgrade": true,
+      "accept_downgrade": false,
       "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 25
+      "urgency_score": 30
     },
     "PAX-100373": {
       "max_wait_hours": 12,
@@ -4317,123 +4445,123 @@
       "urgency_score": 85
     },
     "PAX-100251": {
-      "max_wait_hours": 24,
+      "max_wait_hours": 18,
       "accept_downgrade": true,
       "accept_split_party": true,
       "accept_nearby_airport": true,
-      "needs_hotel": false,
+      "needs_hotel": true,
       "urgency_score": 85
     },
     "PAX-101212": {
-      "max_wait_hours": 24,
+      "max_wait_hours": 18,
       "accept_downgrade": true,
       "accept_split_party": true,
       "accept_nearby_airport": true,
-      "needs_hotel": false,
+      "needs_hotel": true,
       "urgency_score": 85
     },
     "PAX-101359": {
-      "max_wait_hours": 24,
+      "max_wait_hours": 18,
       "accept_downgrade": true,
       "accept_split_party": true,
       "accept_nearby_airport": true,
-      "needs_hotel": false,
+      "needs_hotel": true,
       "urgency_score": 85
     },
     "PAX-101446": {
-      "max_wait_hours": 24,
+      "max_wait_hours": 18,
       "accept_downgrade": true,
       "accept_split_party": true,
       "accept_nearby_airport": true,
-      "needs_hotel": false,
+      "needs_hotel": true,
       "urgency_score": 85
     },
     "PAX-103079": {
-      "max_wait_hours": 24,
+      "max_wait_hours": 18,
       "accept_downgrade": true,
       "accept_split_party": true,
       "accept_nearby_airport": true,
-      "needs_hotel": false,
+      "needs_hotel": true,
       "urgency_score": 85
     },
     "PAX-104356": {
-      "max_wait_hours": 24,
+      "max_wait_hours": 18,
       "accept_downgrade": true,
       "accept_split_party": true,
       "accept_nearby_airport": true,
-      "needs_hotel": false,
+      "needs_hotel": true,
       "urgency_score": 85
     },
     "PAX-104358": {
-      "max_wait_hours": 24,
+      "max_wait_hours": 18,
       "accept_downgrade": true,
       "accept_split_party": true,
       "accept_nearby_airport": true,
-      "needs_hotel": false,
+      "needs_hotel": true,
       "urgency_score": 85
     },
     "PAX-104689": {
-      "max_wait_hours": 24,
+      "max_wait_hours": 18,
       "accept_downgrade": true,
       "accept_split_party": true,
       "accept_nearby_airport": true,
-      "needs_hotel": false,
+      "needs_hotel": true,
       "urgency_score": 85
     },
     "PAX-104738": {
-      "max_wait_hours": 24,
+      "max_wait_hours": 18,
       "accept_downgrade": true,
       "accept_split_party": true,
       "accept_nearby_airport": true,
-      "needs_hotel": false,
+      "needs_hotel": true,
       "urgency_score": 85
     },
     "PAX-105913": {
-      "max_wait_hours": 24,
+      "max_wait_hours": 18,
       "accept_downgrade": true,
       "accept_split_party": true,
       "accept_nearby_airport": true,
-      "needs_hotel": false,
+      "needs_hotel": true,
       "urgency_score": 85
     },
     "PAX-107042": {
-      "max_wait_hours": 24,
+      "max_wait_hours": 18,
       "accept_downgrade": true,
       "accept_split_party": true,
       "accept_nearby_airport": true,
-      "needs_hotel": false,
+      "needs_hotel": true,
       "urgency_score": 85
     },
     "PAX-107582": {
-      "max_wait_hours": 24,
+      "max_wait_hours": 18,
       "accept_downgrade": true,
       "accept_split_party": true,
       "accept_nearby_airport": true,
-      "needs_hotel": false,
+      "needs_hotel": true,
       "urgency_score": 85
     },
     "PAX-107706": {
-      "max_wait_hours": 24,
+      "max_wait_hours": 18,
       "accept_downgrade": true,
       "accept_split_party": true,
       "accept_nearby_airport": true,
-      "needs_hotel": false,
+      "needs_hotel": true,
       "urgency_score": 85
     },
     "PAX-107732": {
-      "max_wait_hours": 24,
+      "max_wait_hours": 18,
       "accept_downgrade": true,
       "accept_split_party": true,
       "accept_nearby_airport": true,
-      "needs_hotel": false,
+      "needs_hotel": true,
       "urgency_score": 85
     },
     "PAX-109092": {
-      "max_wait_hours": 24,
+      "max_wait_hours": 18,
       "accept_downgrade": true,
       "accept_split_party": true,
       "accept_nearby_airport": true,
-      "needs_hotel": false,
+      "needs_hotel": true,
       "urgency_score": 85
     },
     "PAX-100411": {
@@ -5159,121 +5287,121 @@
     "PAX-100015": {
       "max_wait_hours": 12,
       "accept_downgrade": true,
-      "accept_split_party": true,
+      "accept_split_party": false,
       "accept_nearby_airport": true,
-      "needs_hotel": false,
+      "needs_hotel": true,
       "urgency_score": 85
     },
     "PAX-100080": {
       "max_wait_hours": 12,
       "accept_downgrade": true,
-      "accept_split_party": true,
+      "accept_split_party": false,
       "accept_nearby_airport": true,
-      "needs_hotel": false,
+      "needs_hotel": true,
       "urgency_score": 85
     },
     "PAX-100763": {
       "max_wait_hours": 12,
       "accept_downgrade": true,
-      "accept_split_party": true,
+      "accept_split_party": false,
       "accept_nearby_airport": true,
-      "needs_hotel": false,
+      "needs_hotel": true,
       "urgency_score": 85
     },
     "PAX-100897": {
       "max_wait_hours": 12,
       "accept_downgrade": true,
-      "accept_split_party": true,
+      "accept_split_party": false,
       "accept_nearby_airport": true,
-      "needs_hotel": false,
+      "needs_hotel": true,
       "urgency_score": 85
     },
     "PAX-100966": {
       "max_wait_hours": 12,
       "accept_downgrade": true,
-      "accept_split_party": true,
+      "accept_split_party": false,
       "accept_nearby_airport": true,
-      "needs_hotel": false,
+      "needs_hotel": true,
       "urgency_score": 85
     },
     "PAX-100986": {
       "max_wait_hours": 12,
       "accept_downgrade": true,
-      "accept_split_party": true,
+      "accept_split_party": false,
       "accept_nearby_airport": true,
-      "needs_hotel": false,
+      "needs_hotel": true,
       "urgency_score": 85
     },
     "PAX-101162": {
       "max_wait_hours": 12,
       "accept_downgrade": true,
-      "accept_split_party": true,
+      "accept_split_party": false,
       "accept_nearby_airport": true,
-      "needs_hotel": false,
+      "needs_hotel": true,
       "urgency_score": 85
     },
     "PAX-101573": {
       "max_wait_hours": 12,
       "accept_downgrade": true,
-      "accept_split_party": true,
+      "accept_split_party": false,
       "accept_nearby_airport": true,
-      "needs_hotel": false,
+      "needs_hotel": true,
       "urgency_score": 85
     },
     "PAX-101603": {
       "max_wait_hours": 12,
       "accept_downgrade": true,
-      "accept_split_party": true,
+      "accept_split_party": false,
       "accept_nearby_airport": true,
-      "needs_hotel": false,
+      "needs_hotel": true,
       "urgency_score": 85
     },
     "PAX-101604": {
       "max_wait_hours": 12,
       "accept_downgrade": true,
-      "accept_split_party": true,
+      "accept_split_party": false,
       "accept_nearby_airport": true,
-      "needs_hotel": false,
+      "needs_hotel": true,
       "urgency_score": 85
     },
     "PAX-101768": {
       "max_wait_hours": 12,
       "accept_downgrade": true,
-      "accept_split_party": true,
+      "accept_split_party": false,
       "accept_nearby_airport": true,
-      "needs_hotel": false,
+      "needs_hotel": true,
       "urgency_score": 85
     },
     "PAX-102008": {
       "max_wait_hours": 12,
       "accept_downgrade": true,
-      "accept_split_party": true,
+      "accept_split_party": false,
       "accept_nearby_airport": true,
-      "needs_hotel": false,
+      "needs_hotel": true,
       "urgency_score": 85
     },
     "PAX-102243": {
       "max_wait_hours": 12,
       "accept_downgrade": true,
-      "accept_split_party": true,
+      "accept_split_party": false,
       "accept_nearby_airport": true,
-      "needs_hotel": false,
+      "needs_hotel": true,
       "urgency_score": 85
     },
     "PAX-102515": {
       "max_wait_hours": 12,
       "accept_downgrade": true,
-      "accept_split_party": true,
+      "accept_split_party": false,
       "accept_nearby_airport": true,
-      "needs_hotel": false,
+      "needs_hotel": true,
       "urgency_score": 85
     },
     "PAX-102536": {
       "max_wait_hours": 12,
       "accept_downgrade": true,
-      "accept_split_party": true,
+      "accept_split_party": false,
       "accept_nearby_airport": true,
-      "needs_hotel": false,
+      "needs_hotel": true,
       "urgency_score": 85
     }
   },
@@ -5284,23 +5412,23 @@
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 60
+      "urgency_score": 65
     },
     "PAX-105249": {
       "max_wait_hours": 24,
-      "accept_downgrade": true,
+      "accept_downgrade": false,
       "accept_split_party": false,
-      "accept_nearby_airport": false,
+      "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 45
+      "urgency_score": 50
     },
     "PAX-106390": {
-      "max_wait_hours": 36,
+      "max_wait_hours": 24,
       "accept_downgrade": true,
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 45
+      "urgency_score": 55
     },
     "PAX-106721": {
       "max_wait_hours": 36,
@@ -5311,23 +5439,23 @@
       "urgency_score": 65
     },
     "PAX-106817": {
-      "max_wait_hours": 24,
+      "max_wait_hours": 36,
       "accept_downgrade": true,
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 60
+      "urgency_score": 65
     },
     "PAX-107191": {
       "max_wait_hours": 24,
-      "accept_downgrade": true,
+      "accept_downgrade": false,
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
       "urgency_score": 50
     },
     "PAX-108317": {
-      "max_wait_hours": 24,
+      "max_wait_hours": 36,
       "accept_downgrade": true,
       "accept_split_party": false,
       "accept_nearby_airport": true,
@@ -5352,19 +5480,19 @@
     },
     "PAX-113174": {
       "max_wait_hours": 24,
-      "accept_downgrade": false,
-      "accept_split_party": false,
-      "accept_nearby_airport": true,
-      "needs_hotel": true,
-      "urgency_score": 55
-    },
-    "PAX-113850": {
-      "max_wait_hours": 24,
       "accept_downgrade": true,
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 55
+      "urgency_score": 65
+    },
+    "PAX-113850": {
+      "max_wait_hours": 24,
+      "accept_downgrade": false,
+      "accept_split_party": false,
+      "accept_nearby_airport": true,
+      "needs_hotel": true,
+      "urgency_score": 50
     },
     "PAX-114902": {
       "max_wait_hours": 36,
@@ -5391,12 +5519,12 @@
       "urgency_score": 50
     },
     "PAX-118908": {
-      "max_wait_hours": 24,
-      "accept_downgrade": false,
+      "max_wait_hours": 36,
+      "accept_downgrade": true,
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 60
+      "urgency_score": 65
     },
     "PAX-100314": {
       "max_wait_hours": 24,
@@ -5412,7 +5540,7 @@
       "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 75
+      "urgency_score": 85
     },
     "PAX-102035": {
       "max_wait_hours": 24,
@@ -5420,7 +5548,7 @@
       "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 85
+      "urgency_score": 80
     },
     "PAX-104231": {
       "max_wait_hours": 24,
@@ -5468,7 +5596,7 @@
       "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 80
+      "urgency_score": 75
     },
     "PAX-117050": {
       "max_wait_hours": 24,
@@ -5492,7 +5620,7 @@
       "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 75
+      "urgency_score": 80
     },
     "PAX-119072": {
       "max_wait_hours": 24,
@@ -5527,7 +5655,7 @@
       "urgency_score": 85
     },
     "PAX-102711": {
-      "max_wait_hours": 12,
+      "max_wait_hours": 18,
       "accept_downgrade": false,
       "accept_split_party": false,
       "accept_nearby_airport": true,
@@ -5535,8 +5663,8 @@
       "urgency_score": 85
     },
     "PAX-102860": {
-      "max_wait_hours": 18,
-      "accept_downgrade": true,
+      "max_wait_hours": 24,
+      "accept_downgrade": false,
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
@@ -5591,8 +5719,8 @@
       "urgency_score": 85
     },
     "PAX-112513": {
-      "max_wait_hours": 18,
-      "accept_downgrade": false,
+      "max_wait_hours": 24,
+      "accept_downgrade": true,
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
@@ -5632,7 +5760,7 @@
     },
     "PAX-119722": {
       "max_wait_hours": 18,
-      "accept_downgrade": false,
+      "accept_downgrade": true,
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
@@ -5761,7 +5889,7 @@
     "PAX-101088": {
       "max_wait_hours": 24,
       "accept_downgrade": true,
-      "accept_split_party": true,
+      "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
       "urgency_score": 75
@@ -5788,7 +5916,7 @@
       "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 80
+      "urgency_score": 85
     },
     "PAX-103585": {
       "max_wait_hours": 24,
@@ -5799,7 +5927,7 @@
       "urgency_score": 75
     },
     "PAX-104105": {
-      "max_wait_hours": 18,
+      "max_wait_hours": 24,
       "accept_downgrade": true,
       "accept_split_party": false,
       "accept_nearby_airport": true,
@@ -5833,10 +5961,10 @@
     "PAX-108310": {
       "max_wait_hours": 24,
       "accept_downgrade": true,
-      "accept_split_party": false,
+      "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 75
+      "urgency_score": 80
     },
     "PAX-110491": {
       "max_wait_hours": 24,
@@ -5860,7 +5988,7 @@
       "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 80
+      "urgency_score": 85
     },
     "PAX-112763": {
       "max_wait_hours": 24,
@@ -5876,7 +6004,7 @@
       "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 85
+      "urgency_score": 80
     },
     "PAX-100580": {
       "max_wait_hours": 24,
@@ -5884,15 +6012,15 @@
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 65
+      "urgency_score": 50
     },
     "PAX-101322": {
       "max_wait_hours": 24,
       "accept_downgrade": true,
       "accept_split_party": false,
       "accept_nearby_airport": true,
-      "needs_hotel": true,
-      "urgency_score": 65
+      "needs_hotel": false,
+      "urgency_score": 55
     },
     "PAX-102632": {
       "max_wait_hours": 24,
@@ -5908,7 +6036,7 @@
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 50
+      "urgency_score": 55
     },
     "PAX-104129": {
       "max_wait_hours": 24,
@@ -5972,7 +6100,7 @@
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 60
+      "urgency_score": 50
     },
     "PAX-111598": {
       "max_wait_hours": 24,
@@ -5980,7 +6108,7 @@
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 65
+      "urgency_score": 55
     },
     "PAX-112773": {
       "max_wait_hours": 24,
@@ -5988,7 +6116,7 @@
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 55
+      "urgency_score": 50
     },
     "PAX-112795": {
       "max_wait_hours": 24,
@@ -5996,7 +6124,7 @@
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 65
+      "urgency_score": 55
     },
     "PAX-101203": {
       "max_wait_hours": 18,
@@ -6063,7 +6191,7 @@
       "urgency_score": 55
     },
     "PAX-110951": {
-      "max_wait_hours": 12,
+      "max_wait_hours": 16,
       "accept_downgrade": true,
       "accept_split_party": false,
       "accept_nearby_airport": true,
@@ -6084,7 +6212,7 @@
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 55
+      "urgency_score": 50
     },
     "PAX-115206": {
       "max_wait_hours": 24,
@@ -6095,7 +6223,7 @@
       "urgency_score": 55
     },
     "PAX-116368": {
-      "max_wait_hours": 12,
+      "max_wait_hours": 24,
       "accept_downgrade": true,
       "accept_split_party": false,
       "accept_nearby_airport": true,
@@ -6116,15 +6244,15 @@
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 65
+      "urgency_score": 55
     },
     "PAX-101175": {
       "max_wait_hours": 18,
       "accept_downgrade": true,
-      "accept_split_party": true,
+      "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 85
+      "urgency_score": 80
     },
     "PAX-101262": {
       "max_wait_hours": 18,
@@ -6132,7 +6260,7 @@
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 85
+      "urgency_score": 80
     },
     "PAX-101786": {
       "max_wait_hours": 24,
@@ -6156,7 +6284,7 @@
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 85
+      "urgency_score": 80
     },
     "PAX-110135": {
       "max_wait_hours": 24,
@@ -6180,7 +6308,7 @@
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 85
+      "urgency_score": 80
     },
     "PAX-113524": {
       "max_wait_hours": 24,
@@ -6191,7 +6319,7 @@
       "urgency_score": 80
     },
     "PAX-114204": {
-      "max_wait_hours": 24,
+      "max_wait_hours": 18,
       "accept_downgrade": true,
       "accept_split_party": false,
       "accept_nearby_airport": true,
@@ -6207,7 +6335,7 @@
       "urgency_score": 85
     },
     "PAX-114892": {
-      "max_wait_hours": 18,
+      "max_wait_hours": 24,
       "accept_downgrade": true,
       "accept_split_party": false,
       "accept_nearby_airport": true,
@@ -6228,7 +6356,7 @@
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 75
+      "urgency_score": 85
     },
     "PAX-117018": {
       "max_wait_hours": 18,
@@ -6284,7 +6412,7 @@
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 65
+      "urgency_score": 75
     },
     "PAX-110023": {
       "max_wait_hours": 24,
@@ -6292,7 +6420,7 @@
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 75
+      "urgency_score": 65
     },
     "PAX-110948": {
       "max_wait_hours": 24,
@@ -6324,7 +6452,7 @@
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 65
+      "urgency_score": 75
     },
     "PAX-112997": {
       "max_wait_hours": 24,
@@ -6367,12 +6495,12 @@
       "urgency_score": 65
     },
     "PAX-103224": {
-      "max_wait_hours": 36,
-      "accept_downgrade": false,
+      "max_wait_hours": 24,
+      "accept_downgrade": true,
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 65
+      "urgency_score": 75
     },
     "PAX-103640": {
       "max_wait_hours": 24,
@@ -6380,11 +6508,11 @@
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 65
+      "urgency_score": 75
     },
     "PAX-104695": {
       "max_wait_hours": 24,
-      "accept_downgrade": false,
+      "accept_downgrade": true,
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
@@ -6407,7 +6535,7 @@
       "urgency_score": 75
     },
     "PAX-107871": {
-      "max_wait_hours": 24,
+      "max_wait_hours": 36,
       "accept_downgrade": true,
       "accept_split_party": false,
       "accept_nearby_airport": true,
@@ -6436,7 +6564,7 @@
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 60
+      "urgency_score": 65
     },
     "PAX-113834": {
       "max_wait_hours": 24,
@@ -6508,7 +6636,7 @@
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 55
+      "urgency_score": 60
     },
     "PAX-103154": {
       "max_wait_hours": 24,
@@ -6524,7 +6652,7 @@
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 50
+      "urgency_score": 55
     },
     "PAX-104027": {
       "max_wait_hours": 24,
@@ -6532,15 +6660,15 @@
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 55
+      "urgency_score": 50
     },
     "PAX-104143": {
       "max_wait_hours": 24,
       "accept_downgrade": true,
       "accept_split_party": false,
       "accept_nearby_airport": true,
-      "needs_hotel": false,
-      "urgency_score": 45
+      "needs_hotel": true,
+      "urgency_score": 65
     },
     "PAX-104396": {
       "max_wait_hours": 24,
@@ -6548,7 +6676,7 @@
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 45
+      "urgency_score": 50
     },
     "PAX-106424": {
       "max_wait_hours": 24,
@@ -6588,7 +6716,7 @@
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 60
+      "urgency_score": 45
     },
     "PAX-116398": {
       "max_wait_hours": 24,
@@ -6599,9 +6727,9 @@
       "urgency_score": 55
     },
     "PAX-100273": {
-      "max_wait_hours": 24,
+      "max_wait_hours": 36,
       "accept_downgrade": true,
-      "accept_split_party": false,
+      "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
       "urgency_score": 65
@@ -6615,12 +6743,12 @@
       "urgency_score": 65
     },
     "PAX-101962": {
-      "max_wait_hours": 24,
+      "max_wait_hours": 36,
       "accept_downgrade": true,
       "accept_split_party": false,
       "accept_nearby_airport": true,
-      "needs_hotel": true,
-      "urgency_score": 60
+      "needs_hotel": false,
+      "urgency_score": 55
     },
     "PAX-103514": {
       "max_wait_hours": 24,
@@ -6633,9 +6761,9 @@
     "PAX-105082": {
       "max_wait_hours": 36,
       "accept_downgrade": true,
-      "accept_split_party": true,
+      "accept_split_party": false,
       "accept_nearby_airport": true,
-      "needs_hotel": false,
+      "needs_hotel": true,
       "urgency_score": 65
     },
     "PAX-105760": {
@@ -6659,8 +6787,8 @@
       "accept_downgrade": true,
       "accept_split_party": true,
       "accept_nearby_airport": true,
-      "needs_hotel": false,
-      "urgency_score": 60
+      "needs_hotel": true,
+      "urgency_score": 65
     },
     "PAX-111008": {
       "max_wait_hours": 36,
@@ -6692,7 +6820,7 @@
       "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 60
+      "urgency_score": 65
     },
     "PAX-115230": {
       "max_wait_hours": 24,
@@ -6700,7 +6828,7 @@
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 60
+      "urgency_score": 65
     },
     "PAX-116331": {
       "max_wait_hours": 24,
@@ -6752,14 +6880,14 @@
     },
     "PAX-102186": {
       "max_wait_hours": 12,
-      "accept_downgrade": true,
+      "accept_downgrade": false,
       "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 65
+      "urgency_score": 75
     },
     "PAX-102218": {
-      "max_wait_hours": 18,
+      "max_wait_hours": 12,
       "accept_downgrade": true,
       "accept_split_party": true,
       "accept_nearby_airport": true,
@@ -6807,7 +6935,7 @@
       "urgency_score": 65
     },
     "PAX-110179": {
-      "max_wait_hours": 12,
+      "max_wait_hours": 18,
       "accept_downgrade": true,
       "accept_split_party": true,
       "accept_nearby_airport": true,
@@ -6831,7 +6959,7 @@
       "urgency_score": 75
     },
     "PAX-111496": {
-      "max_wait_hours": 12,
+      "max_wait_hours": 18,
       "accept_downgrade": true,
       "accept_split_party": true,
       "accept_nearby_airport": true,
@@ -6866,7 +6994,7 @@
       "max_wait_hours": 24,
       "accept_downgrade": true,
       "accept_split_party": true,
-      "accept_nearby_airport": false,
+      "accept_nearby_airport": true,
       "needs_hotel": true,
       "urgency_score": 80
     },
@@ -7020,12 +7148,12 @@
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 75
+      "urgency_score": 80
     },
     "PAX-105514": {
       "max_wait_hours": 18,
       "accept_downgrade": true,
-      "accept_split_party": true,
+      "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
       "urgency_score": 85
@@ -7036,7 +7164,7 @@
       "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 80
+      "urgency_score": 85
     },
     "PAX-108687": {
       "max_wait_hours": 18,
@@ -7047,7 +7175,7 @@
       "urgency_score": 85
     },
     "PAX-109855": {
-      "max_wait_hours": 18,
+      "max_wait_hours": 14,
       "accept_downgrade": true,
       "accept_split_party": true,
       "accept_nearby_airport": true,
@@ -7087,7 +7215,7 @@
       "urgency_score": 85
     },
     "PAX-100563": {
-      "max_wait_hours": 18,
+      "max_wait_hours": 24,
       "accept_downgrade": true,
       "accept_split_party": true,
       "accept_nearby_airport": true,
@@ -7103,7 +7231,7 @@
       "urgency_score": 85
     },
     "PAX-101492": {
-      "max_wait_hours": 18,
+      "max_wait_hours": 24,
       "accept_downgrade": true,
       "accept_split_party": true,
       "accept_nearby_airport": true,
@@ -7124,7 +7252,7 @@
       "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 80
+      "urgency_score": 85
     },
     "PAX-103623": {
       "max_wait_hours": 24,
@@ -7167,12 +7295,12 @@
       "urgency_score": 80
     },
     "PAX-112663": {
-      "max_wait_hours": 18,
+      "max_wait_hours": 24,
       "accept_downgrade": true,
       "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 85
+      "urgency_score": 80
     },
     "PAX-113070": {
       "max_wait_hours": 24,
@@ -7208,7 +7336,7 @@
     },
     "PAX-101399": {
       "max_wait_hours": 24,
-      "accept_downgrade": true,
+      "accept_downgrade": false,
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
@@ -7224,15 +7352,15 @@
     },
     "PAX-102113": {
       "max_wait_hours": 24,
-      "accept_downgrade": false,
+      "accept_downgrade": true,
       "accept_split_party": false,
       "accept_nearby_airport": true,
-      "needs_hotel": true,
+      "needs_hotel": false,
       "urgency_score": 65
     },
     "PAX-104297": {
       "max_wait_hours": 24,
-      "accept_downgrade": true,
+      "accept_downgrade": false,
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
@@ -7260,7 +7388,7 @@
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 65
+      "urgency_score": 60
     },
     "PAX-109308": {
       "max_wait_hours": 24,
@@ -7299,7 +7427,7 @@
       "accept_downgrade": true,
       "accept_split_party": false,
       "accept_nearby_airport": true,
-      "needs_hotel": false,
+      "needs_hotel": true,
       "urgency_score": 65
     },
     "PAX-110447": {
@@ -7308,7 +7436,7 @@
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 75
+      "urgency_score": 65
     },
     "PAX-114031": {
       "max_wait_hours": 24,
@@ -7332,7 +7460,7 @@
       "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 60
+      "urgency_score": 65
     },
     "PAX-103471": {
       "max_wait_hours": 24,
@@ -7364,7 +7492,7 @@
       "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 50
+      "urgency_score": 65
     },
     "PAX-105603": {
       "max_wait_hours": 24,
@@ -7396,7 +7524,7 @@
       "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 50
+      "urgency_score": 65
     },
     "PAX-109196": {
       "max_wait_hours": 24,
@@ -7404,7 +7532,7 @@
       "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 50
+      "urgency_score": 55
     },
     "PAX-110634": {
       "max_wait_hours": 24,
@@ -7423,6 +7551,14 @@
       "urgency_score": 50
     },
     "PAX-112312": {
+      "max_wait_hours": 24,
+      "accept_downgrade": true,
+      "accept_split_party": true,
+      "accept_nearby_airport": true,
+      "needs_hotel": true,
+      "urgency_score": 65
+    },
+    "PAX-114232": {
       "max_wait_hours": 24,
       "accept_downgrade": true,
       "accept_split_party": true,
@@ -7452,7 +7588,7 @@
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 80
+      "urgency_score": 85
     },
     "PAX-103280": {
       "max_wait_hours": 12,
@@ -7481,7 +7617,7 @@
     "PAX-106009": {
       "max_wait_hours": 12,
       "accept_downgrade": true,
-      "accept_split_party": true,
+      "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
       "urgency_score": 85
@@ -7494,10 +7630,18 @@
       "needs_hotel": true,
       "urgency_score": 85
     },
+    "PAX-107667": {
+      "max_wait_hours": 18,
+      "accept_downgrade": true,
+      "accept_split_party": false,
+      "accept_nearby_airport": true,
+      "needs_hotel": true,
+      "urgency_score": 85
+    },
     "PAX-107702": {
       "max_wait_hours": 18,
       "accept_downgrade": true,
-      "accept_split_party": true,
+      "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
       "urgency_score": 85
@@ -7505,28 +7649,12 @@
     "PAX-108186": {
       "max_wait_hours": 12,
       "accept_downgrade": true,
-      "accept_split_party": true,
-      "accept_nearby_airport": true,
-      "needs_hotel": true,
-      "urgency_score": 85
-    },
-    "PAX-109170": {
-      "max_wait_hours": 18,
-      "accept_downgrade": true,
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 75
+      "urgency_score": 80
     },
-    "PAX-109575": {
-      "max_wait_hours": 18,
-      "accept_downgrade": true,
-      "accept_split_party": true,
-      "accept_nearby_airport": true,
-      "needs_hotel": true,
-      "urgency_score": 85
-    },
-    "PAX-112713": {
+    "PAX-108970": {
       "max_wait_hours": 18,
       "accept_downgrade": true,
       "accept_split_party": false,
@@ -7534,13 +7662,45 @@
       "needs_hotel": true,
       "urgency_score": 80
     },
+    "PAX-109170": {
+      "max_wait_hours": 12,
+      "accept_downgrade": true,
+      "accept_split_party": false,
+      "accept_nearby_airport": true,
+      "needs_hotel": true,
+      "urgency_score": 85
+    },
+    "PAX-109575": {
+      "max_wait_hours": 18,
+      "accept_downgrade": true,
+      "accept_split_party": false,
+      "accept_nearby_airport": true,
+      "needs_hotel": true,
+      "urgency_score": 80
+    },
+    "PAX-112713": {
+      "max_wait_hours": 18,
+      "accept_downgrade": true,
+      "accept_split_party": false,
+      "accept_nearby_airport": true,
+      "needs_hotel": true,
+      "urgency_score": 85
+    },
     "PAX-100318": {
       "max_wait_hours": 24,
       "accept_downgrade": true,
       "accept_split_party": true,
       "accept_nearby_airport": true,
-      "needs_hotel": false,
-      "urgency_score": 50
+      "needs_hotel": true,
+      "urgency_score": 45
+    },
+    "PAX-100795": {
+      "max_wait_hours": 24,
+      "accept_downgrade": true,
+      "accept_split_party": true,
+      "accept_nearby_airport": true,
+      "needs_hotel": true,
+      "urgency_score": 65
     },
     "PAX-100808": {
       "max_wait_hours": 24,
@@ -7556,12 +7716,12 @@
       "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 55
+      "urgency_score": 65
     },
     "PAX-103669": {
       "max_wait_hours": 24,
       "accept_downgrade": true,
-      "accept_split_party": true,
+      "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
       "urgency_score": 65
@@ -7596,7 +7756,7 @@
       "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 55
+      "urgency_score": 45
     },
     "PAX-108334": {
       "max_wait_hours": 24,
@@ -7604,7 +7764,7 @@
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 60
+      "urgency_score": 50
     },
     "PAX-110000": {
       "max_wait_hours": 24,
@@ -7612,7 +7772,7 @@
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 55
+      "urgency_score": 50
     },
     "PAX-113268": {
       "max_wait_hours": 24,
@@ -7620,31 +7780,31 @@
       "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 65
+      "urgency_score": 60
     },
     "PAX-113578": {
       "max_wait_hours": 24,
-      "accept_downgrade": true,
-      "accept_split_party": false,
-      "accept_nearby_airport": true,
-      "needs_hotel": true,
-      "urgency_score": 50
-    },
-    "PAX-114793": {
-      "max_wait_hours": 36,
       "accept_downgrade": true,
       "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
       "urgency_score": 65
     },
-    "PAX-114974": {
+    "PAX-114793": {
       "max_wait_hours": 24,
       "accept_downgrade": true,
       "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
       "urgency_score": 60
+    },
+    "PAX-114974": {
+      "max_wait_hours": 36,
+      "accept_downgrade": true,
+      "accept_split_party": true,
+      "accept_nearby_airport": true,
+      "needs_hotel": true,
+      "urgency_score": 65
     },
     "PAX-101302": {
       "max_wait_hours": 24,
@@ -7662,10 +7822,18 @@
       "needs_hotel": true,
       "urgency_score": 65
     },
+    "PAX-102707": {
+      "max_wait_hours": 24,
+      "accept_downgrade": true,
+      "accept_split_party": false,
+      "accept_nearby_airport": true,
+      "needs_hotel": true,
+      "urgency_score": 60
+    },
     "PAX-103759": {
       "max_wait_hours": 24,
       "accept_downgrade": true,
-      "accept_split_party": true,
+      "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
       "urgency_score": 75
@@ -7681,23 +7849,31 @@
     "PAX-106310": {
       "max_wait_hours": 24,
       "accept_downgrade": true,
-      "accept_split_party": false,
-      "accept_nearby_airport": true,
-      "needs_hotel": true,
-      "urgency_score": 70
-    },
-    "PAX-108114": {
-      "max_wait_hours": 24,
-      "accept_downgrade": true,
       "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
       "urgency_score": 75
     },
+    "PAX-108114": {
+      "max_wait_hours": 24,
+      "accept_downgrade": true,
+      "accept_split_party": false,
+      "accept_nearby_airport": true,
+      "needs_hotel": true,
+      "urgency_score": 60
+    },
     "PAX-108440": {
       "max_wait_hours": 24,
       "accept_downgrade": true,
       "accept_split_party": true,
+      "accept_nearby_airport": true,
+      "needs_hotel": true,
+      "urgency_score": 65
+    },
+    "PAX-108591": {
+      "max_wait_hours": 24,
+      "accept_downgrade": true,
+      "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
       "urgency_score": 65
@@ -7721,18 +7897,18 @@
     "PAX-110698": {
       "max_wait_hours": 24,
       "accept_downgrade": true,
-      "accept_split_party": true,
-      "accept_nearby_airport": true,
-      "needs_hotel": true,
-      "urgency_score": 75
-    },
-    "PAX-110747": {
-      "max_wait_hours": 24,
-      "accept_downgrade": true,
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
       "urgency_score": 65
+    },
+    "PAX-110747": {
+      "max_wait_hours": 24,
+      "accept_downgrade": true,
+      "accept_split_party": true,
+      "accept_nearby_airport": true,
+      "needs_hotel": true,
+      "urgency_score": 75
     },
     "PAX-111823": {
       "max_wait_hours": 24,
@@ -7740,7 +7916,7 @@
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 70
+      "urgency_score": 75
     },
     "PAX-112086": {
       "max_wait_hours": 24,
@@ -7748,7 +7924,7 @@
       "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 75
+      "urgency_score": 65
     },
     "PAX-100725": {
       "max_wait_hours": 24,
@@ -7764,7 +7940,7 @@
       "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 85
+      "urgency_score": 80
     },
     "PAX-103659": {
       "max_wait_hours": 24,
@@ -7772,7 +7948,7 @@
       "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 80
+      "urgency_score": 85
     },
     "PAX-104775": {
       "max_wait_hours": 18,
@@ -7815,12 +7991,12 @@
       "urgency_score": 85
     },
     "PAX-108041": {
-      "max_wait_hours": 18,
+      "max_wait_hours": 24,
       "accept_downgrade": true,
       "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 80
+      "urgency_score": 85
     },
     "PAX-108202": {
       "max_wait_hours": 24,
@@ -7831,12 +8007,12 @@
       "urgency_score": 80
     },
     "PAX-108312": {
-      "max_wait_hours": 18,
+      "max_wait_hours": 24,
       "accept_downgrade": true,
       "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 80
+      "urgency_score": 85
     },
     "PAX-110574": {
       "max_wait_hours": 24,
@@ -7847,15 +8023,15 @@
       "urgency_score": 80
     },
     "PAX-111666": {
-      "max_wait_hours": 18,
+      "max_wait_hours": 24,
       "accept_downgrade": true,
       "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 80
+      "urgency_score": 75
     },
     "PAX-112330": {
-      "max_wait_hours": 18,
+      "max_wait_hours": 24,
       "accept_downgrade": true,
       "accept_split_party": true,
       "accept_nearby_airport": true,
@@ -7863,6 +8039,14 @@
       "urgency_score": 75
     },
     "PAX-112766": {
+      "max_wait_hours": 24,
+      "accept_downgrade": true,
+      "accept_split_party": true,
+      "accept_nearby_airport": true,
+      "needs_hotel": true,
+      "urgency_score": 85
+    },
+    "PAX-100188": {
       "max_wait_hours": 24,
       "accept_downgrade": true,
       "accept_split_party": true,
@@ -7884,7 +8068,7 @@
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 85
+      "urgency_score": 80
     },
     "PAX-101595": {
       "max_wait_hours": 24,
@@ -7900,7 +8084,7 @@
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 85
+      "urgency_score": 75
     },
     "PAX-101844": {
       "max_wait_hours": 24,
@@ -7926,6 +8110,22 @@
       "needs_hotel": true,
       "urgency_score": 75
     },
+    "PAX-104652": {
+      "max_wait_hours": 24,
+      "accept_downgrade": true,
+      "accept_split_party": false,
+      "accept_nearby_airport": true,
+      "needs_hotel": true,
+      "urgency_score": 75
+    },
+    "PAX-105049": {
+      "max_wait_hours": 24,
+      "accept_downgrade": true,
+      "accept_split_party": false,
+      "accept_nearby_airport": true,
+      "needs_hotel": true,
+      "urgency_score": 75
+    },
     "PAX-106693": {
       "max_wait_hours": 24,
       "accept_downgrade": true,
@@ -7934,6 +8134,14 @@
       "needs_hotel": true,
       "urgency_score": 75
     },
+    "PAX-106804": {
+      "max_wait_hours": 24,
+      "accept_downgrade": true,
+      "accept_split_party": false,
+      "accept_nearby_airport": true,
+      "needs_hotel": true,
+      "urgency_score": 80
+    },
     "PAX-106978": {
       "max_wait_hours": 24,
       "accept_downgrade": true,
@@ -7941,6 +8149,22 @@
       "accept_nearby_airport": true,
       "needs_hotel": true,
       "urgency_score": 80
+    },
+    "PAX-107271": {
+      "max_wait_hours": 24,
+      "accept_downgrade": true,
+      "accept_split_party": false,
+      "accept_nearby_airport": true,
+      "needs_hotel": true,
+      "urgency_score": 80
+    },
+    "PAX-107377": {
+      "max_wait_hours": 24,
+      "accept_downgrade": true,
+      "accept_split_party": false,
+      "accept_nearby_airport": true,
+      "needs_hotel": true,
+      "urgency_score": 85
     },
     "PAX-100029": {
       "max_wait_hours": 18,
@@ -7951,15 +8175,31 @@
       "urgency_score": 85
     },
     "PAX-100526": {
+      "max_wait_hours": 18,
+      "accept_downgrade": true,
+      "accept_split_party": true,
+      "accept_nearby_airport": true,
+      "needs_hotel": true,
+      "urgency_score": 85
+    },
+    "PAX-102710": {
       "max_wait_hours": 24,
       "accept_downgrade": true,
       "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 80
+      "urgency_score": 85
+    },
+    "PAX-102879": {
+      "max_wait_hours": 24,
+      "accept_downgrade": true,
+      "accept_split_party": true,
+      "accept_nearby_airport": true,
+      "needs_hotel": true,
+      "urgency_score": 85
     },
     "PAX-104014": {
-      "max_wait_hours": 24,
+      "max_wait_hours": 18,
       "accept_downgrade": true,
       "accept_split_party": true,
       "accept_nearby_airport": true,
@@ -8015,7 +8255,7 @@
       "urgency_score": 85
     },
     "PAX-110112": {
-      "max_wait_hours": 18,
+      "max_wait_hours": 24,
       "accept_downgrade": true,
       "accept_split_party": true,
       "accept_nearby_airport": true,
@@ -8028,7 +8268,7 @@
       "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 85
+      "urgency_score": 75
     },
     "PAX-112518": {
       "max_wait_hours": 24,
@@ -8044,7 +8284,7 @@
       "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 75
+      "urgency_score": 80
     },
     "PAX-100811": {
       "max_wait_hours": 24,
@@ -8072,11 +8312,11 @@
     },
     "PAX-101012": {
       "max_wait_hours": 24,
-      "accept_downgrade": true,
+      "accept_downgrade": false,
       "accept_split_party": false,
       "accept_nearby_airport": true,
-      "needs_hotel": true,
-      "urgency_score": 70
+      "needs_hotel": false,
+      "urgency_score": 55
     },
     "PAX-101675": {
       "max_wait_hours": 24,
@@ -8167,7 +8407,7 @@
       "urgency_score": 65
     },
     "PAX-100030": {
-      "max_wait_hours": 24,
+      "max_wait_hours": 18,
       "accept_downgrade": true,
       "accept_split_party": true,
       "accept_nearby_airport": true,
@@ -8183,7 +8423,7 @@
       "urgency_score": 85
     },
     "PAX-101585": {
-      "max_wait_hours": 18,
+      "max_wait_hours": 24,
       "accept_downgrade": true,
       "accept_split_party": true,
       "accept_nearby_airport": true,
@@ -8207,7 +8447,7 @@
       "urgency_score": 85
     },
     "PAX-102338": {
-      "max_wait_hours": 18,
+      "max_wait_hours": 12,
       "accept_downgrade": true,
       "accept_split_party": true,
       "accept_nearby_airport": true,
@@ -8223,7 +8463,7 @@
       "urgency_score": 85
     },
     "PAX-103712": {
-      "max_wait_hours": 24,
+      "max_wait_hours": 12,
       "accept_downgrade": true,
       "accept_split_party": true,
       "accept_nearby_airport": true,
@@ -8231,7 +8471,7 @@
       "urgency_score": 85
     },
     "PAX-104659": {
-      "max_wait_hours": 18,
+      "max_wait_hours": 24,
       "accept_downgrade": true,
       "accept_split_party": true,
       "accept_nearby_airport": true,
@@ -8239,6 +8479,14 @@
       "urgency_score": 85
     },
     "PAX-104974": {
+      "max_wait_hours": 24,
+      "accept_downgrade": true,
+      "accept_split_party": true,
+      "accept_nearby_airport": true,
+      "needs_hotel": true,
+      "urgency_score": 85
+    },
+    "PAX-105592": {
       "max_wait_hours": 24,
       "accept_downgrade": true,
       "accept_split_party": true,
@@ -8255,7 +8503,7 @@
       "urgency_score": 85
     },
     "PAX-107318": {
-      "max_wait_hours": 18,
+      "max_wait_hours": 24,
       "accept_downgrade": true,
       "accept_split_party": true,
       "accept_nearby_airport": true,
@@ -8278,6 +8526,14 @@
       "needs_hotel": true,
       "urgency_score": 85
     },
+    "PAX-100440": {
+      "max_wait_hours": 24,
+      "accept_downgrade": true,
+      "accept_split_party": false,
+      "accept_nearby_airport": true,
+      "needs_hotel": true,
+      "urgency_score": 55
+    },
     "PAX-101483": {
       "max_wait_hours": 16,
       "accept_downgrade": true,
@@ -8289,7 +8545,7 @@
     "PAX-101841": {
       "max_wait_hours": 24,
       "accept_downgrade": true,
-      "accept_split_party": true,
+      "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
       "urgency_score": 55
@@ -8300,7 +8556,7 @@
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 50
+      "urgency_score": 55
     },
     "PAX-102129": {
       "max_wait_hours": 24,
@@ -8308,7 +8564,7 @@
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 55
+      "urgency_score": 50
     },
     "PAX-102581": {
       "max_wait_hours": 24,
@@ -8316,7 +8572,7 @@
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 55
+      "urgency_score": 50
     },
     "PAX-103786": {
       "max_wait_hours": 12,
@@ -8324,23 +8580,23 @@
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 50
+      "urgency_score": 55
     },
     "PAX-104966": {
+      "max_wait_hours": 12,
+      "accept_downgrade": true,
+      "accept_split_party": false,
+      "accept_nearby_airport": true,
+      "needs_hotel": true,
+      "urgency_score": 65
+    },
+    "PAX-105315": {
       "max_wait_hours": 24,
       "accept_downgrade": true,
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 55
-    },
-    "PAX-105315": {
-      "max_wait_hours": 24,
-      "accept_downgrade": true,
-      "accept_split_party": true,
-      "accept_nearby_airport": true,
-      "needs_hotel": true,
-      "urgency_score": 55
+      "urgency_score": 50
     },
     "PAX-105695": {
       "max_wait_hours": 24,
@@ -8367,7 +8623,7 @@
       "urgency_score": 60
     },
     "PAX-106667": {
-      "max_wait_hours": 12,
+      "max_wait_hours": 24,
       "accept_downgrade": true,
       "accept_split_party": false,
       "accept_nearby_airport": true,
@@ -8377,10 +8633,10 @@
     "PAX-107474": {
       "max_wait_hours": 24,
       "accept_downgrade": true,
-      "accept_split_party": true,
+      "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 55
+      "urgency_score": 50
     },
     "PAX-107660": {
       "max_wait_hours": 24,
@@ -8404,7 +8660,7 @@
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 50
+      "urgency_score": 45
     },
     "PAX-101945": {
       "max_wait_hours": 24,
@@ -8420,7 +8676,7 @@
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 50
+      "urgency_score": 55
     },
     "PAX-102790": {
       "max_wait_hours": 24,
@@ -8428,7 +8684,7 @@
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 50
+      "urgency_score": 55
     },
     "PAX-102878": {
       "max_wait_hours": 24,
@@ -8452,7 +8708,7 @@
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 45
+      "urgency_score": 50
     },
     "PAX-105265": {
       "max_wait_hours": 24,
@@ -8524,7 +8780,7 @@
       "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 75
+      "urgency_score": 85
     },
     "PAX-101558": {
       "max_wait_hours": 24,
@@ -8543,12 +8799,12 @@
       "urgency_score": 80
     },
     "PAX-101851": {
-      "max_wait_hours": 18,
+      "max_wait_hours": 24,
       "accept_downgrade": true,
       "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 85
+      "urgency_score": 75
     },
     "PAX-102498": {
       "max_wait_hours": 24,
@@ -8572,7 +8828,7 @@
       "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 80
+      "urgency_score": 85
     },
     "PAX-106183": {
       "max_wait_hours": 24,
@@ -8640,11 +8896,11 @@
     },
     "PAX-100445": {
       "max_wait_hours": 24,
-      "accept_downgrade": false,
+      "accept_downgrade": true,
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 55
+      "urgency_score": 65
     },
     "PAX-100459": {
       "max_wait_hours": 24,
@@ -8700,7 +8956,7 @@
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 50
+      "urgency_score": 60
     },
     "PAX-102287": {
       "max_wait_hours": 24,
@@ -8716,11 +8972,11 @@
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 65
+      "urgency_score": 50
     },
     "PAX-104281": {
       "max_wait_hours": 24,
-      "accept_downgrade": true,
+      "accept_downgrade": false,
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
@@ -8804,7 +9060,7 @@
       "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 60
+      "urgency_score": 65
     },
     "PAX-104264": {
       "max_wait_hours": 24,
@@ -8812,7 +9068,7 @@
       "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 50
+      "urgency_score": 65
     },
     "PAX-105873": {
       "max_wait_hours": 24,
@@ -8884,7 +9140,7 @@
       "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 75
+      "urgency_score": 65
     },
     "PAX-100926": {
       "max_wait_hours": 24,
@@ -8900,14 +9156,14 @@
       "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 70
+      "urgency_score": 65
     },
     "PAX-101292": {
       "max_wait_hours": 24,
       "accept_downgrade": true,
       "accept_split_party": true,
       "accept_nearby_airport": true,
-      "needs_hotel": true,
+      "needs_hotel": false,
       "urgency_score": 65
     },
     "PAX-102757": {
@@ -8940,7 +9196,7 @@
       "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 65
+      "urgency_score": 70
     },
     "PAX-103734": {
       "max_wait_hours": 24,
@@ -8988,7 +9244,7 @@
       "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 65
+      "urgency_score": 75
     },
     "PAX-100251": {
       "max_wait_hours": 24,
@@ -8996,19 +9252,19 @@
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 65
+      "urgency_score": 70
     },
     "PAX-101212": {
       "max_wait_hours": 24,
-      "accept_downgrade": false,
+      "accept_downgrade": true,
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 65
+      "urgency_score": 75
     },
     "PAX-101359": {
       "max_wait_hours": 24,
-      "accept_downgrade": true,
+      "accept_downgrade": false,
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
@@ -9024,11 +9280,11 @@
     },
     "PAX-103079": {
       "max_wait_hours": 24,
-      "accept_downgrade": true,
+      "accept_downgrade": false,
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 65
+      "urgency_score": 55
     },
     "PAX-104356": {
       "max_wait_hours": 24,
@@ -9036,11 +9292,11 @@
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 55
+      "urgency_score": 65
     },
     "PAX-104358": {
       "max_wait_hours": 24,
-      "accept_downgrade": false,
+      "accept_downgrade": true,
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
@@ -9056,7 +9312,7 @@
     },
     "PAX-104738": {
       "max_wait_hours": 24,
-      "accept_downgrade": false,
+      "accept_downgrade": true,
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
@@ -9074,7 +9330,7 @@
       "max_wait_hours": 24,
       "accept_downgrade": false,
       "accept_split_party": false,
-      "accept_nearby_airport": false,
+      "accept_nearby_airport": true,
       "needs_hotel": true,
       "urgency_score": 65
     },
@@ -9096,11 +9352,11 @@
     },
     "PAX-107732": {
       "max_wait_hours": 24,
-      "accept_downgrade": false,
+      "accept_downgrade": true,
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 65
+      "urgency_score": 75
     },
     "PAX-109092": {
       "max_wait_hours": 24,
@@ -9116,34 +9372,34 @@
       "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 55
+      "urgency_score": 60
     },
     "PAX-100788": {
-      "max_wait_hours": 12,
+      "max_wait_hours": 24,
       "accept_downgrade": true,
       "accept_split_party": true,
       "accept_nearby_airport": true,
-      "needs_hotel": false,
-      "urgency_score": 50
+      "needs_hotel": true,
+      "urgency_score": 65
     },
     "PAX-101196": {
-      "max_wait_hours": 24,
+      "max_wait_hours": 12,
       "accept_downgrade": true,
       "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 50
+      "urgency_score": 65
     },
     "PAX-101277": {
-      "max_wait_hours": 24,
+      "max_wait_hours": 18,
       "accept_downgrade": true,
       "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 50
+      "urgency_score": 65
     },
     "PAX-103470": {
-      "max_wait_hours": 12,
+      "max_wait_hours": 24,
       "accept_downgrade": true,
       "accept_split_party": true,
       "accept_nearby_airport": true,
@@ -9164,7 +9420,7 @@
       "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 60
+      "urgency_score": 50
     },
     "PAX-103848": {
       "max_wait_hours": 24,
@@ -9183,7 +9439,7 @@
       "urgency_score": 65
     },
     "PAX-104692": {
-      "max_wait_hours": 12,
+      "max_wait_hours": 24,
       "accept_downgrade": true,
       "accept_split_party": true,
       "accept_nearby_airport": true,
@@ -9215,14 +9471,6 @@
       "urgency_score": 55
     },
     "PAX-105334": {
-      "max_wait_hours": 18,
-      "accept_downgrade": true,
-      "accept_split_party": true,
-      "accept_nearby_airport": true,
-      "needs_hotel": true,
-      "urgency_score": 55
-    },
-    "PAX-105764": {
       "max_wait_hours": 24,
       "accept_downgrade": true,
       "accept_split_party": true,
@@ -9230,8 +9478,16 @@
       "needs_hotel": true,
       "urgency_score": 65
     },
+    "PAX-105764": {
+      "max_wait_hours": 24,
+      "accept_downgrade": true,
+      "accept_split_party": true,
+      "accept_nearby_airport": true,
+      "needs_hotel": true,
+      "urgency_score": 50
+    },
     "PAX-100026": {
-      "max_wait_hours": 18,
+      "max_wait_hours": 12,
       "accept_downgrade": true,
       "accept_split_party": true,
       "accept_nearby_airport": true,
@@ -9247,23 +9503,23 @@
       "urgency_score": 85
     },
     "PAX-101746": {
-      "max_wait_hours": 18,
-      "accept_downgrade": true,
-      "accept_split_party": true,
-      "accept_nearby_airport": true,
-      "needs_hotel": true,
-      "urgency_score": 80
-    },
-    "PAX-101863": {
       "max_wait_hours": 24,
       "accept_downgrade": true,
       "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 80
+      "urgency_score": 85
+    },
+    "PAX-101863": {
+      "max_wait_hours": 12,
+      "accept_downgrade": true,
+      "accept_split_party": true,
+      "accept_nearby_airport": true,
+      "needs_hotel": true,
+      "urgency_score": 85
     },
     "PAX-102485": {
-      "max_wait_hours": 12,
+      "max_wait_hours": 18,
       "accept_downgrade": true,
       "accept_split_party": true,
       "accept_nearby_airport": true,
@@ -9319,7 +9575,7 @@
       "urgency_score": 85
     },
     "PAX-104315": {
-      "max_wait_hours": 12,
+      "max_wait_hours": 18,
       "accept_downgrade": true,
       "accept_split_party": true,
       "accept_nearby_airport": true,
@@ -9372,7 +9628,7 @@
       "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 55
+      "urgency_score": 50
     },
     "PAX-101114": {
       "max_wait_hours": 24,
@@ -9402,7 +9658,7 @@
       "max_wait_hours": 24,
       "accept_downgrade": true,
       "accept_split_party": true,
-      "accept_nearby_airport": false,
+      "accept_nearby_airport": true,
       "needs_hotel": true,
       "urgency_score": 50
     },
@@ -9420,7 +9676,7 @@
       "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 50
+      "urgency_score": 65
     },
     "PAX-103983": {
       "max_wait_hours": 24,
@@ -9452,7 +9708,7 @@
       "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 50
+      "urgency_score": 65
     },
     "PAX-104811": {
       "max_wait_hours": 24,
@@ -9492,7 +9748,7 @@
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 55
+      "urgency_score": 50
     },
     "PAX-101240": {
       "max_wait_hours": 24,
@@ -9516,7 +9772,7 @@
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 65
+      "urgency_score": 55
     },
     "PAX-102496": {
       "max_wait_hours": 24,
@@ -9524,7 +9780,7 @@
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 55
+      "urgency_score": 65
     },
     "PAX-102525": {
       "max_wait_hours": 24,
@@ -9544,11 +9800,11 @@
     },
     "PAX-102624": {
       "max_wait_hours": 24,
-      "accept_downgrade": false,
+      "accept_downgrade": true,
       "accept_split_party": false,
       "accept_nearby_airport": true,
-      "needs_hotel": true,
-      "urgency_score": 65
+      "needs_hotel": false,
+      "urgency_score": 60
     },
     "PAX-102689": {
       "max_wait_hours": 24,
@@ -9604,7 +9860,7 @@
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 65
+      "urgency_score": 55
     },
     "PAX-100522": {
       "max_wait_hours": 24,
@@ -9620,7 +9876,7 @@
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 55
+      "urgency_score": 65
     },
     "PAX-101097": {
       "max_wait_hours": 24,
@@ -9652,7 +9908,7 @@
       "accept_split_party": false,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 65
+      "urgency_score": 55
     },
     "PAX-101805": {
       "max_wait_hours": 24,
@@ -9680,10 +9936,10 @@
     },
     "PAX-102144": {
       "max_wait_hours": 24,
-      "accept_downgrade": false,
+      "accept_downgrade": true,
       "accept_split_party": false,
       "accept_nearby_airport": true,
-      "needs_hotel": false,
+      "needs_hotel": true,
       "urgency_score": 50
     },
     "PAX-102505": {
@@ -9775,7 +10031,7 @@
       "urgency_score": 85
     },
     "PAX-102328": {
-      "max_wait_hours": 12,
+      "max_wait_hours": 18,
       "accept_downgrade": true,
       "accept_split_party": true,
       "accept_nearby_airport": true,
@@ -9892,7 +10148,7 @@
       "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 65
+      "urgency_score": 50
     },
     "PAX-101603": {
       "max_wait_hours": 24,
@@ -9900,7 +10156,7 @@
       "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 65
+      "urgency_score": 60
     },
     "PAX-101604": {
       "max_wait_hours": 24,
@@ -9916,7 +10172,7 @@
       "accept_split_party": true,
       "accept_nearby_airport": true,
       "needs_hotel": true,
-      "urgency_score": 55
+      "urgency_score": 50
     },
     "PAX-102008": {
       "max_wait_hours": 24,

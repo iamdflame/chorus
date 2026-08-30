@@ -305,17 +305,19 @@ most sit alone in their bucket and the shared thought under test is never shared
 
 | arm | souls seated | satisfaction (weighted) | satisfaction (blind) | p95 wait | gini | calls |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| B4 collapsed | 73 | 113.2 | 79.4 | 31.0h | 0.330 | **45** |
-| B4t + tie-break | 73 | 103.1 | 86.2 | 31.0h | 0.330 | 45 |
-| B5 uncollapsed | 60 | **128.6** | **105.4** | **22.8h** | **0.297** | 584 |
+| B4 collapsed | 73 | 108.3 | 80.0 | 31.0h | 0.330 | **40** |
+| B4t + tie-break | 73 | 100.6 | 87.4 | 31.0h | 0.325 | 40 |
+| B5 uncollapsed | 60 | **124.4** | **105.1** | **23.5h** | **0.301** | 600 |
+
+<sub>40 calls for 40 cohorts — exactly one thought per situation, 15.0× within the sample.</sub>
 
 <sub>Regenerate: `python -m bench.fidelity --cohorts 40 --per-cohort 15`</sub>
 
 **Collapse is lossy here, and the plan for this section expected it not to be.** The target
 claim was `B4 ≈ B5` at a fraction of the cost. The measurement says otherwise and is
-published unchanged: collapsed reasoning costs **12–17% of tier-weighted satisfaction**,
-replicated across two independent runs, and loses on every metric — equity and worst-case
-wait included.
+published unchanged: collapsed reasoning costs **13% of tier-weighted satisfaction**
+(−12.9%, −12.0% and −16.9% across three independent runs) and loses on every metric —
+equity and worst-case wait included. The same five cohorts came last in all three.
 
 **B4 seats more people and serves them worse.** The mechanism is visible in the rank
 correlation: −0.04 on `urgency_score`. Every member of a cohort receives an identical score,
@@ -337,16 +339,16 @@ cohorts. Per-cohort agreement is exactly that signal, and spending it selectivel
 
 | cohorts escalated | travellers | calls | satisfaction | gap closed | cost |
 | ---: | ---: | ---: | ---: | ---: | ---: |
-| 0 | 0 | 40 | 113.2 | 0% | 1.0× |
-| 4 | 60 | 96 | 130.4 | 49% | 2.4× |
-| **12** | **180** | **208** | **142.0** | **82%** | **5.2×** |
-| 40 (all) | 584 | 584 | 148.3 | 100% | 14.6× |
+| 0 | 0 | 40 | 108.3 | 0% | 1.0× |
+| 4 | 60 | 96 | 126.0 | 45% | 2.4× |
+| **12** | **180** | **208** | **141.6** | **85%** | **5.2×** |
+| 40 (all) | 600 | 600 | 147.4 | 100% | 15.0× |
 
-**Escalating 30% of cohorts recovers 82% of what collapse loses, at a third of the cost of
+**Escalating 30% of cohorts recovers 85% of what collapse loses, at a third of the cost of
 not collapsing at all.** Two honest caveats: escalating the two worst cohorts recovers
-nothing, because agreement is not the same as decision impact and a better ordering would
-weight it by seat contention; and the 20-cohort row overshoots B5, which is a mixing effect
-rather than a result to claim.
+almost nothing (2%), because agreement is not the same as decision impact and a better
+ordering would weight it by seat contention; and the 20-cohort row overshoots B5, which is a
+mixing effect rather than a result to claim.
 
 ### Where collapse is lossy
 
@@ -683,7 +685,7 @@ export GOOGLE_CLOUD_PROJECT=YOUR_PROJECT
 | All six arms, scored identically | `python -m bench.run --agents 8000` |
 | Not a cache (3-arm ablation) | `scripts/ablation.py --agents 2000` |
 | Collapse is lossy here, and by how much | `python -m bench.fidelity` |
-| Escalation recovers 82% at a third the cost | `scripts/escalation_sweep.py` |
+| Escalation recovers 85% at a third the cost | `scripts/escalation_sweep.py` |
 | 39,996 spans, 1,965 executed | `scripts/trace_run.py` |
 | Injection cannot reach a shared address | `scripts/verify_armor.py` |
 | The allocator cannot call a model, and is denied | `scripts/verify_controls.sh` |

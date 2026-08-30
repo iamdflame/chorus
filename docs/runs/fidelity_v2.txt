@@ -1,39 +1,39 @@
 
 
-  Agreement on 584 travellers answered by both arms
+  Agreement on 600 travellers answered by both arms
 
   field                      agree
   ----------------------------------
-  accept_downgrade           87.0%
-  accept_split_party         66.6%
-  accept_nearby_airport      90.1%
-  needs_hotel                90.2%
-  max_wait_hours             19.2%  (±2)
-  urgency_score              41.1%  (±10)
+  accept_downgrade           85.0%
+  accept_split_party         65.8%
+  accept_nearby_airport      93.5%
+  needs_hotel                98.2%
+  max_wait_hours             15.3%  (±2)
+  urgency_score              42.5%  (±10)
   ----------------------------------
-  all six fields              5.5%
+  all six fields              4.7%
 
   numeric                     bias   spearman
   -------------------------------------------
-  max_wait_hours             -6.50      0.309
-  urgency_score              +7.81     -0.044
+  max_wait_hours             -7.05      0.312
+  urgency_score              +7.67     -0.049
 
   bias is B4 − B5; spearman is rank agreement, which is what the allocator
   actually consumes.
 
-  Same flight, all sampled        83.0%   (485/584)
-  Same flight, contested set       2.0%   (2/101 either arm seated)
+  Same flight, all sampled        83.2%   (499/600)
+  Same flight, contested set       1.0%   (1/102 either arm seated)
 
   arm                 seated   sat(w)  sat(blind)  p95 wait    gini   calls      cost
   -----------------------------------------------------------------------------------
-  B4 collapsed            73  113.200      79.400      31.0   0.330      45    0.0412
-  B4t +tie-break          73  103.100      86.200      31.0   0.330      45    0.0412
-  B5 uncollapsed          60  128.600     105.400      22.8   0.297     584    0.5857
+  B4 collapsed            73  108.300      80.000      31.0   0.330      40    0.0366
+  B4t +tie-break          73  100.600      87.400      31.0   0.325      40    0.0366
+  B5 uncollapsed          60  124.400     105.100      23.5   0.301     600    0.6017
 
-  Outcome delta (B4 − B5), tier-weighted: -15.4 (-12.0%)
+  Outcome delta (B4 − B5), tier-weighted: -16.1 (-12.9%)
 
-  Outcome delta (B4t − B5), tier-weighted: -25.5 (-19.8%)
-  Cost ratio within this sample: 13.0× — and it grows with population, while agreement does not.
+  Outcome delta (B4t − B5), tier-weighted: -23.8 (-19.1%)
+  Cost ratio within this sample: 15.0× — and it grows with population, while agreement does not.
 
   Worst-agreeing cohorts — where the bucket loses signal:
 
