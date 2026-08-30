@@ -56,6 +56,18 @@ jobs:
         # saturation property, checked without spending a token.
         run: python scripts/verify_collapse.py
 
+      - name: Containment proof
+        # Collapse amplifies an injection by the collapse ratio, so the airlock is
+        # load-bearing rather than hygiene. Fails if a single attacker-controlled byte
+        # can reach a shared prompt, if an attacker can mint or steer a shared address,
+        # or if the screen starts blocking real travellers.
+        run: python scripts/verify_armor.py
+
+      - name: Extraction, keyword arm
+        # The zero-model control. Its score is the bar the model has to clear for the
+        # extraction stage to be worth paying for at all.
+        run: python scripts/verify_extraction.py
+
   console:
     runs-on: ubuntu-latest
     steps:
