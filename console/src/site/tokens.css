@@ -1,221 +1,224 @@
-/* Chorus design system.
-   The population is the visual language: everything is built from the same atoms as the
-   product — many small marks, cohorts, ignition. Serif carries the claim, mono carries
-   the evidence. That contrast is the whole editorial idea; dev-tool sites are almost
-   always all-sans or all-mono, so a serif voice for the argument reads as deliberate. */
+/* Chorus design system — Plate and Instrument.
+ *
+ * The subject is an execution substrate that records every boundary an agent crosses and
+ * addresses it by its causal history. The vernacular of that subject is physics: light
+ * cones, propagation, emission, provenance. So the visual language is borrowed from the
+ * instruments that record physics — particle-detector event displays for the live side,
+ * archival plate photography for the record — rather than picked from a moodboard. That
+ * is what makes it answerable when someone asks why it looks like this.
+ *
+ * Chorus is two things at once, so the interface is two places:
+ *
+ *   THE PLATE       light. The permanent record — evidence, ledger, provenance. Archival
+ *                   grey-white like photographic paper. Still, precise, typographic.
+ *   THE INSTRUMENT  dark. The live detector — the console, the running swarm, the field.
+ *                   Warm graphite, emissive, in motion.
+ *
+ * This is not a theme toggle, it is a place you travel between, and the travelling is a
+ * lighting change. `data-place` on <html> selects one; everything else reads the same
+ * token names in both, so no component knows where it is.
+ */
 
-@import url("https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@300;400;500&display=swap");
+/* ── Fonts ──────────────────────────────────────────────────────────────────
+ * Self-hosted and Latin-subset: 102KB for both, no third-party connection on
+ * first paint, and no layout shift from a stylesheet that has to resolve first.
+ * Both are SIL OFL — see console/public/fonts/OFL.txt. */
+
+/* The variable file, carrying wght 1-1000, wdth 25-151 and ROND 0-100 — verified with
+ * fontTools rather than assumed. Google Fonts serves an axis-pinned static instance
+ * unless the axes are named in the request, and the first file fetched here was one:
+ * it rendered correctly and silently ignored every font-variation-settings on the page,
+ * which is the failure mode that would have made the typography argument decoration. */
+@font-face {
+  font-family: "Google Sans Flex";
+  src: url("/fonts/GoogleSansFlex.woff2") format("woff2");
+  font-weight: 1 1000;
+  font-stretch: 25% 151%;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Google Sans Code";
+  src: url("/fonts/GoogleSansCode.woff2") format("woff2");
+  font-weight: 300 800;
+  font-display: swap;
+}
 
 :root {
-  /* Ground is near-black, never pure: pure black kills the sense of depth the dot field
-     depends on, and clips on OLED. */
-  --ground: #06070a;
-  --ground-1: #0a0c11;
-  --ground-2: #10131a;
+  /* ── The Instrument (default) ─────────────────────────────────────────────
+   * Warm graphite rather than blue-black. The previous build was #10131a with a
+   * #5ef0c8 acid mint accent, which is one of the three looks machine-generated
+   * design reliably converges on — the single thing about it that read as
+   * templated. */
+  --housing: #15161b;
+  --housing-deep: #101116;
+  --chassis: #1e2027;
+  --chassis-hi: #262932;
+  --rule: #2c2f38;
+  --rule-hi: #3a3e49;
 
-  --rule: #171b22;
-  --rule-lit: #232935;
+  /* The core semantic is paid vs free, and red/green is both the obvious default
+   * and hostile to the ~8% of male viewers with a colour-vision deficiency. Use
+   * the physics instead: a thought that was COMPUTED emits light; a thought that
+   * was REUSED is lit by another's. Incandescent against reflected — separated in
+   * luminance as well as hue, and reinforced by shape (filled disc vs open ring)
+   * so colour is never the only channel carrying the meaning. */
+  --filament: #ff9d4d;
+  --filament-hot: #ffc48a;
+  --filament-dim: #b06a2c;
+  --reflect: #a8d5e5;
+  --reflect-dim: #5b7f8d;
+  --counterfact: #b69cf7;
+  --breach: #ff5470;
 
-  --ink-faint: #454c5a;
-  --ink-dim: #6b7484;
-  --ink: #a3adbd;
-  --ink-bright: #eef1f6;
+  --text-hi: #ecedf0;
+  --text: #b9bec9;
+  --text-lo: #8c929e;
+  --text-faint: #5d626d;
 
-  /* One accent. Semantic colours below carry meaning, not decoration. */
-  --accent: #5ef0c8;
-  --accent-deep: #1f7a66;
-  --accent-glow: #5ef0c833;
-  --hot: #ffffff;
-  --warn: #f5a524;
-  --danger: #ff5c5c;
+  --ground: var(--housing);
+  --surface: var(--chassis);
 
-  --serif: "Instrument Serif", "Times New Roman", serif;
-  --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  /* ── Type ───────────────────────────────────────────────────────────────────
+   * The axes are design tokens, not decoration. ROND carries the Plate/Instrument
+   * duality: the same typeface speaks in two registers depending on where you are. */
+  --sans: "Google Sans Flex", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --data: "Google Sans Code", ui-monospace, "SF Mono", Menlo, monospace;
+
+  --axis-display: "wght" 620, "wdth" 88, "ROND" 0;
+  --axis-body: "wght" 400, "wdth" 96, "ROND" 0;
+  --axis-data: "wght" 450;
+
+  /* A 1.25 minor third, with exactly one deliberate break — the hero collapse
+   * figure, which ignores the scale entirely. One number is allowed to be
+   * enormous; nothing else is. */
+  --t-xs: 0.75rem;
+  --t-sm: 0.875rem;
+  --t-base: 1rem;
+  --t-md: 1.25rem;
+  --t-lg: 1.563rem;
+  --t-xl: 1.953rem;
+  --t-2xl: 2.441rem;
+  --t-3xl: 3.052rem;
+  --t-hero: clamp(4rem, 14vw, 11rem);
+
+  /* ── Motion ─────────────────────────────────────────────────────────────────
+   * Material 3 Expressive found that expressive motion let people locate key
+   * elements up to four times faster, and equalised detection across age groups.
+   * So motion here is functional. Springs settle; nothing linearly interpolates. */
+  --spring-snap: linear(0, 0.35 8%, 0.82 18%, 1.04 27%, 1.06 34%, 1 45%, 0.997 60%, 1);
+  --spring-settle: linear(0, 0.16 7%, 0.55 18%, 0.86 30%, 1.01 42%, 1.02 55%, 1);
+  --ease-place: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --dur-ignite: 140ms;   /* a thought is paid for */
+  --dur-reflect: 90ms;   /* a thought is reused */
+  --dur-place: 420ms;    /* Plate <-> Instrument */
 
   --gutter: clamp(20px, 5vw, 88px);
   --measure: 68ch;
   --shell: 1440px;
+  --nav-h: 68px;
+}
 
-  --ease: cubic-bezier(0.22, 1, 0.36, 1);
-  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+/* ── The Plate ────────────────────────────────────────────────────────────────
+ * #e9eae5 has a green-grey cast like archival board — specifically not the warm
+ * cream that AI-generated design defaults to. Accents are darkened versions of
+ * the same two emissions, so the semantic survives the journey between places. */
+:root[data-place="plate"] {
+  --housing: #e9eae5;
+  --housing-deep: #dcddd6;
+  --chassis: #f2f2ee;
+  --chassis-hi: #ffffff;
+  --rule: #cbccc4;
+  --rule-hi: #b3b5ab;
+
+  --filament: #c2611a;
+  --filament-hot: #9c4d12;
+  --filament-dim: #d99a63;
+  --reflect: #2c6b85;
+  --reflect-dim: #7ba5b6;
+  --counterfact: #6247a8;
+  --breach: #b3213c;
+
+  --text-hi: #14151a;
+  --text: #34363d;
+  --text-lo: #5c5f68;
+  --text-faint: #8b8e95;
+
+  /* Wider, softer, less insistent. The record is read; the instrument is watched. */
+  --axis-display: "wght" 520, "wdth" 104, "ROND" 45;
+  --axis-body: "wght" 400, "wdth" 100, "ROND" 28;
 }
 
 * { box-sizing: border-box; }
 
 html {
   scroll-behavior: smooth;
-  /* Anchors land below the fixed nav rather than under it. */
-  scroll-padding-top: 92px;
+  scroll-padding-top: calc(var(--nav-h) + 24px);
+  color-scheme: dark;
 }
-@media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-}
+
+html[data-place="plate"] { color-scheme: light; }
 
 body {
   margin: 0;
-  background: var(--ground);
-  color: var(--ink);
-  font-family: var(--mono);
-  font-size: 14px;
-  font-weight: 300;
-  line-height: 1.65;
+  background: var(--housing);
+  color: var(--text);
+  font-family: var(--sans);
+  font-variation-settings: var(--axis-body);
+  font-size: var(--t-base);
+  line-height: 1.55;
   -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
+  /* The travelling between places is the signature transition, so the background
+     and text crossfade rather than cutting. */
+  transition: background var(--dur-place) var(--ease-place),
+              color var(--dur-place) var(--ease-place);
 }
 
-::selection { background: var(--accent); color: var(--ground); }
-
-/* -- the grid ------------------------------------------------------------- */
-/* Structural texture, not decoration: it establishes the module everything else aligns
-   to, and gives the dark ground a sense of surface so the dot fields read as sitting on
-   something rather than floating in void. */
-
-.grid-field {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-  background-image:
-    linear-gradient(to right, var(--rule) 1px, transparent 1px),
-    linear-gradient(to bottom, var(--rule) 1px, transparent 1px);
-  background-size: 88px 88px;
-  opacity: 0.5;
-  mask-image: radial-gradient(ellipse 120% 90% at 50% 0%, #000 20%, transparent 78%);
-}
-
-/* -- type ----------------------------------------------------------------- */
-
-.display {
-  font-family: var(--serif);
-  font-weight: 400;
-  color: var(--ink-bright);
-  letter-spacing: -0.015em;
-  line-height: 0.94;
-  margin: 0;
-}
-.display em { font-style: italic; color: var(--accent); }
-
-.h1 { font-size: clamp(46px, 8.2vw, 132px); }
-.h2 { font-size: clamp(34px, 5.4vw, 78px); }
-.h3 { font-size: clamp(25px, 3vw, 42px); }
-
-.eyebrow {
-  font-family: var(--mono);
-  font-size: 10px;
-  font-weight: 400;
-  letter-spacing: 0.32em;
-  text-transform: uppercase;
-  color: var(--ink-faint);
-  margin: 0 0 22px;
-}
-
-.lede {
-  font-size: clamp(15px, 1.35vw, 18px);
-  line-height: 1.7;
-  color: var(--ink);
-  max-width: var(--measure);
-  margin: 0;
-}
-.lede strong { color: var(--ink-bright); font-weight: 400; }
-
-.fig {
+/* Tabular numerals are non-negotiable for anything that counts: proportional
+   digits make a live counter jitter horizontally as it climbs. */
+.data, code, pre, .fig, .num {
+  font-family: var(--data);
+  font-variation-settings: var(--axis-data);
   font-variant-numeric: tabular-nums;
-  letter-spacing: -0.04em;
-  font-weight: 300;
-  color: var(--ink-bright);
+  letter-spacing: -0.01em;
 }
 
-/* -- layout --------------------------------------------------------------- */
-
-.shell { max-width: var(--shell); margin: 0 auto; padding-inline: var(--gutter); }
-
-.section {
-  position: relative;
-  z-index: 1;
-  padding-block: clamp(84px, 13vh, 172px);
-  border-top: 1px solid var(--rule);
+h1, h2, h3, .display {
+  font-family: var(--sans);
+  font-variation-settings: var(--axis-display);
+  color: var(--text-hi);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  margin: 0;
+  text-wrap: balance;
 }
-.section:first-of-type { border-top: 0; }
 
-/* -- scroll-driven reveals ------------------------------------------------ */
-/* Native scroll-driven animation: runs on the compositor, no observers, no scroll
-   listeners, no main-thread work. Degrades to simply visible where unsupported, which is
-   the correct failure — content must never depend on animation to be readable. */
+a { color: inherit; }
 
-@supports (animation-timeline: view()) {
-  .reveal {
-    animation: reveal-in linear both;
-    animation-timeline: view();
-    animation-range: entry 5% cover 26%;
+::selection {
+  background: color-mix(in oklab, var(--filament) 30%, transparent);
+  color: var(--text-hi);
+}
+
+/* Keyboard focus is visible everywhere, in the emission colour, at 2px. */
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--filament);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* ── Reduced motion ───────────────────────────────────────────────────────────
+ * Honoured completely: particles render to their final state instantly, ignition
+ * becomes a static colour, propagation becomes an immediate highlight. The
+ * information is identical; only the theatre is removed. Never a blank screen. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
   }
-  .reveal-late { animation-range: entry 12% cover 40%; }
-}
-
-@keyframes reveal-in {
-  from { opacity: 0; transform: translateY(26px); }
-  to   { opacity: 1; transform: none; }
-}
-
-/* Staggered children, so a row of figures assembles rather than appearing at once. */
-.stagger > * { --i: 0; }
-@supports (animation-timeline: view()) {
-  .stagger > * {
-    animation: reveal-in linear both;
-    animation-timeline: view();
-    animation-range: entry calc(4% + var(--i) * 3%) cover calc(24% + var(--i) * 4%);
-  }
-}
-
-/* -- controls ------------------------------------------------------------- */
-
-.btn {
-  --btn-fg: var(--ground);
-  --btn-bg: var(--accent);
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  padding: 13px 22px;
-  border: 1px solid var(--btn-bg);
-  background: var(--btn-bg);
-  color: var(--btn-fg);
-  font: inherit;
-  font-size: 12px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  text-decoration: none;
-  cursor: pointer;
-  transition: transform 260ms var(--ease), background 220ms var(--ease),
-              color 220ms var(--ease), border-color 220ms var(--ease);
-}
-.btn:hover { transform: translateY(-2px); }
-.btn[data-variant="ghost"] {
-  --btn-bg: transparent;
-  --btn-fg: var(--ink-bright);
-  border-color: var(--rule-lit);
-}
-.btn[data-variant="ghost"]:hover { border-color: var(--accent); color: var(--accent); }
-.btn .arrow { transition: transform 260ms var(--ease); }
-.btn:hover .arrow { transform: translateX(4px); }
-
-/* -- view transitions ----------------------------------------------------- */
-/* Native cross-route transitions. The old view fades under the new one rather than
-   cross-dissolving, so navigation reads as moving forward instead of swapping. */
-
-@view-transition { navigation: auto; }
-
-::view-transition-old(root) {
-  animation: fade-out 220ms var(--ease-in-out) both;
-}
-::view-transition-new(root) {
-  animation: rise-in 420ms var(--ease) both;
-}
-@keyframes fade-out { to { opacity: 0; } }
-@keyframes rise-in {
-  from { opacity: 0; transform: translateY(14px); }
-  to   { opacity: 1; transform: none; }
 }
