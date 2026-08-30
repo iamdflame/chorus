@@ -6,8 +6,12 @@ import { Link, useRoute } from "./router";
 // Four in the bar, everything in the sheet. Seven destinations across one row on a
 // laptop crowds the mark and pushes the actions into it, which is exactly how the
 // previous build ended up with "Source" sitting underneath the console button.
+// Every destination is in the bar at desktop width. An earlier split kept Intake in the
+// sheet only, and the sheet is display:none above 60rem — so the page was unreachable
+// from the interface at every size a judge would use.
 const ROUTES = [
   { to: "/mechanism", label: "Mechanism" },
+  { to: "/intake", label: "Intake" },
   { to: "/ledger", label: "Ledger" },
   { to: "/evidence", label: "Evidence" },
   { to: "/incident", label: "Incident" },
@@ -16,7 +20,6 @@ const ROUTES = [
 const SHEET = [
   { to: "/", label: "Overview" },
   ...ROUTES,
-  { to: "/intake", label: "Intake" },
   { to: "/console", label: "Console" },
 ];
 

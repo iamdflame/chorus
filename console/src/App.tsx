@@ -4,6 +4,7 @@ import { Nav } from "./site/Nav";
 import { Evidence } from "./site/pages/Evidence";
 import { Home } from "./site/pages/Home";
 import { Incident } from "./site/pages/Incident";
+import { Intake } from "./site/pages/Intake";
 import { LedgerPage } from "./site/pages/Ledger";
 import { Mechanism } from "./site/pages/Mechanism";
 import { RouterProvider, useRoute } from "./site/router";
@@ -31,6 +32,7 @@ function Routes() {
           : path === "/evidence" ? <Evidence />
           : path === "/ledger" ? <LedgerPage />
           : path === "/incident" ? <Incident />
+          : path === "/intake" ? <Intake />
           : <Home />}
       </main>
       <Footer />

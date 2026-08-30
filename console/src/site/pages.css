@@ -574,3 +574,178 @@
 .prose-head { padding-block: calc(var(--nav-h) + 4rem) 1rem; }
 .prose { max-width: var(--measure); }
 .prose p { margin: 0 0 1.1rem; }
+
+/* ── Address demo ────────────────────────────────────────────────────────────
+ * The teaching moment. Two cards, one verdict, and the verdict changes as you type. */
+
+.addr { border: 1px solid var(--rule); border-radius: 2px; background: var(--chassis); }
+
+.addr-cards { display: grid; grid-template-columns: 1fr; }
+
+@media (min-width: 46rem) {
+  .addr-cards { grid-template-columns: 1fr 1fr; }
+  .addr-card + .addr-card { border-left: 1px solid var(--rule); border-top: 0; }
+}
+
+.addr-card { padding: 1.25rem; }
+.addr-card + .addr-card { border-top: 1px solid var(--rule); }
+
+.addr-name {
+  margin: 0 0 1rem;
+  font-size: var(--t-md);
+  color: var(--text-hi);
+  font-variation-settings: "wght" 600, "wdth" 92, "ROND" 0;
+}
+
+.addr-field {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.45rem 0;
+  border-bottom: 1px solid var(--rule);
+  font-size: var(--t-sm);
+  color: var(--text-lo);
+}
+
+.addr-field.addr-check { grid-template-columns: auto 1fr; justify-content: start; }
+
+.addr-field select,
+.addr-field input[type="number"] {
+  font-family: var(--data);
+  font-size: var(--t-sm);
+  color: var(--text-hi);
+  background: var(--housing);
+  border: 1px solid var(--rule-hi);
+  border-radius: 2px;
+  padding: 0.3rem 0.45rem;
+  min-width: 7.5rem;
+}
+
+.addr-field input[type="checkbox"] { accent-color: var(--filament); width: 16px; height: 16px; }
+
+.addr-key {
+  margin: 1rem 0 0;
+  font-size: var(--t-xs);
+  color: var(--filament);
+  overflow-wrap: anywhere;
+  line-height: 1.5;
+}
+
+.addr-verdict {
+  padding: 1.25rem;
+  border-top: 1px solid var(--rule);
+  background: var(--housing-deep);
+}
+
+.addr-verdict-head {
+  margin: 0 0 0.4rem;
+  font-family: var(--data);
+  font-size: var(--t-sm);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--filament);
+}
+
+/* Two thoughts is the more expensive state, so it is the one that reads cooler — the
+   emission colours are consistent everywhere, including here. */
+.addr-verdict[data-same="false"] .addr-verdict-head { color: var(--reflect); }
+
+.addr-verdict p:last-child { margin: 0; max-width: 66ch; }
+
+/* The element spans the panel so its top rule does too; the measure is applied to the
+   text inside it. A max-width on the element left the hairline stopping halfway across,
+   which reads as a broken border rather than a considered one. */
+.addr-foot {
+  margin: 0;
+  padding: 0.9rem 1.25rem 1.1rem;
+  border-top: 1px solid var(--rule);
+  font-size: var(--t-xs);
+  line-height: 1.6;
+}
+
+.addr-foot > span { display: block; max-width: 78ch; }
+
+/* ── Cardinality panel ──────────────────────────────────────────────────────── */
+
+.ceiling {
+  border: 1px solid var(--rule);
+  border-left: 2px solid var(--filament);
+  padding: 1.25rem;
+  background: var(--chassis);
+  max-width: 74ch;
+}
+
+.ceiling p { margin: 0 0 0.8rem; }
+.ceiling p:last-child { margin: 0; }
+
+/* ── Intake ─────────────────────────────────────────────────────────────────── */
+
+.intake-body { padding: 1.5rem; }
+
+.intake-said {
+  margin: 0 0 1rem;
+  font-size: var(--t-md);
+  color: var(--text-hi);
+  max-width: 68ch;
+  line-height: 1.5;
+}
+
+.intake-meta { margin: 1.25rem 0 0; font-size: var(--t-sm); max-width: 74ch; }
+
+.intake-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(14rem, 100%), 1fr));
+  gap: 1.25rem;
+  margin: 0;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--rule);
+}
+
+.intake-fields dt {
+  font-family: var(--data);
+  font-size: var(--t-xs);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.intake-fields dd {
+  margin: 0.2rem 0 0;
+  font-size: var(--t-md);
+  color: var(--filament);
+}
+
+/* The span the model actually heard, quoted back. An extractor that cannot point at its
+   evidence is asking to be trusted rather than checked. */
+.intake-evidence {
+  margin: 0.35rem 0 0;
+  font-size: var(--t-xs);
+  color: var(--text-lo);
+  border-left: 2px solid var(--reflect-dim);
+  padding-left: 0.6rem;
+}
+
+.intake-langs { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.9rem; }
+
+.intake-langs li {
+  display: grid;
+  grid-template-columns: 5.5rem 1fr;
+  gap: 1rem;
+  align-items: baseline;
+  padding-bottom: 0.9rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+.intake-lang { font-size: var(--t-xs); color: var(--text-faint); text-transform: uppercase; letter-spacing: 0.1em; }
+
+.intake-cell {
+  margin: 1.25rem 0 0;
+  padding: 0.8rem 1rem;
+  background: var(--housing-deep);
+  border-left: 2px solid var(--filament);
+  color: var(--filament);
+  font-size: var(--t-sm);
+  overflow-x: auto;
+  white-space: nowrap;
+}

@@ -1,3 +1,4 @@
+import { AddressDemo } from "../AddressDemo";
 import { Link } from "../router";
 
 const STEPS = [
@@ -87,6 +88,46 @@ export function Mechanism() {
           </div>
         </div>
       </section>
-    </div>
+    
+      <section className="section">
+        <div className="shell">
+          <p className="eyebrow reveal">The address, live</p>
+          <h2 className="display h2 reveal" style={{ maxWidth: "18ch" }}>
+            Change a field. Watch the bucket move.
+          </h2>
+          <p className="lede reveal" style={{ marginBottom: "2rem" }}>
+            Two travellers with different names, different bags and different departure
+            times. Whether they share a thought depends on nothing except whether their
+            projections land in the same cell.
+          </p>
+          <div className="reveal"><AddressDemo /></div>
+        </div>
+      </section>
+
+      <section className="section">
+        <div className="shell">
+          <p className="eyebrow reveal">Cardinality</p>
+          <h2 className="display h2 reveal" style={{ maxWidth: "20ch" }}>
+            Saturation is arithmetic, not discovery.
+          </h2>
+          <div className="ceiling reveal">
+            <p>
+              The projection lattice has <strong>2,304 cells</strong>: 4 tiers × 4
+              urgencies × 4 party sizes × 3 constraints × 3 hauls × 2 hotel × 2 misconnect.
+              Collapse is bounded above by that number <strong>by construction</strong> —
+              any bucketing scheme saturates, and publishing the ceiling is cheaper than
+              having it discovered.
+            </p>
+            <p className="muted">
+              So the interesting question is not whether it saturates. It is whether the
+              bucketing is <em>lossless</em> — and on this workload it is not. Collapsed
+              reasoning costs about 13% of tier-weighted satisfaction against reasoning per
+              traveller, replicated across three runs. That measurement, and what recovers
+              85% of it, is on the evidence page.
+            </p>
+          </div>
+        </div>
+      </section>
+</div>
   );
 }
