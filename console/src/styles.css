@@ -132,9 +132,18 @@
   gap: clamp(22px, 3.4vw, 52px);
   padding: 18px var(--pad) 20px;
   border-top: 1px solid var(--rule);
+  /* Reserved height and per-metric width so a changing number never reflows the row.
+     Without it the readout grows and shrinks as digits are added during a run, which
+     resizes the stage above it on every event — visible as a jittering layout, and
+     enough to keep the page permanently unstable. */
+  min-height: 86px;
+  flex-wrap: nowrap;
 }
 
-.cx-metric { display: flex; flex-direction: column; gap: 2px; }
+.cx-metric { min-width: 96px; }
+.cx-metric-value { font-variant-numeric: tabular-nums; }
+
+.cx-metric { display: flex; flex-direction: column; gap: 2px; flex: 0 0 auto; }
 .cx-metric-value {
   font-size: clamp(22px, 2.6vw, 36px);
   line-height: 0.94;
@@ -155,12 +164,19 @@
   font-size: 11px;
   color: var(--ink-dim);
   text-align: right;
-  max-width: 46ch;
+  max-width: 52ch;
+  /* One line, always. The status text changes length on every event during a run; left
+     free to wrap it grows the readout, which resizes the stage above it, which is a
+     layout that visibly jitters for the whole duration of the demo. */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
 }
 
 @media (max-width: 820px) {
-  .cx-readout { flex-wrap: wrap; gap: 20px; }
-  .cx-note { margin-left: 0; text-align: left; width: 100%; }
+  .cx-readout { flex-wrap: wrap; gap: 20px; min-height: 0; }
+  .cx-note { margin-left: 0; text-align: left; width: 100%; white-space: normal; }
   .cx-card { position: absolute; inset: auto var(--pad) var(--pad) var(--pad); width: auto; }
 }
 
