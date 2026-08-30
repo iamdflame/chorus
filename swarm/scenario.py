@@ -14,7 +14,9 @@ from __future__ import annotations
 
 import random
 from dataclasses import asdict, dataclass, field
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
+
+from kernel.clock import EPOCH, Clock
 from typing import Any
 
 HUB = "ORD"
@@ -109,7 +111,9 @@ class Scenario:
         }
 
 
-def build_scenario(*, passengers: int = 8000, seed: int = 20260829) -> Scenario:
+def build_scenario(
+    *, passengers: int = 8000, seed: int = 20260829, clock: Clock | None = None
+) -> Scenario:
     """A hub closure with genuine, deliberate scarcity.
 
     Seats are provisioned well below demand — roughly 60% of the souls needing to move —
@@ -117,7 +121,9 @@ def build_scenario(*, passengers: int = 8000, seed: int = 20260829) -> Scenario:
     problem, and the agents would never actually have to contend.
     """
     rng = random.Random(seed)
-    now = datetime.now(timezone.utc)
+    # Time is an input. Defaulting to the module epoch rather than the wall clock is what
+    # makes two runs on two days produce byte-identical scenarios.
+    now = (clock or Clock()).now()
 
     flights: list[Flight] = []
     for i in range(46):

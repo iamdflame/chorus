@@ -29,8 +29,10 @@ thoughts, and a distinction that does not change the decision buys nothing but c
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Any
+
+from swarm.scenario import EPOCH
 
 # -- bucketing ----------------------------------------------------------------
 
@@ -95,15 +97,21 @@ class Projection:
         }
 
 
-def project_passenger(passenger: dict[str, Any], *, now: datetime | None = None) -> Projection:
+def project_passenger(passenger: dict[str, Any], *, clock: Clock) -> Projection:
     """Reduce a passenger to the situation that determines their preferences.
 
-    Identity, destination and flight number are deliberately absent. They decide *which*
-    seat the passenger is matched to, never *what kind of itinerary they would accept* —
-    and including them would make every passenger's reasoning unique, which is exactly the
-    cost nobody can afford.
+    Identity and flight number are deliberately absent: they decide *which* seat the
+    passenger is matched to, and including them would make every passenger's reasoning
+    unique, which is exactly the cost nobody can afford.
+
+    `clock` is required and has no default. Urgency is a function of time-to-departure,
+    so an ambient `datetime.now()` here means the same passenger falls into a different
+    band tomorrow, which changes their projection, which changes every address derived
+    from it — and a run recorded today silently stops replaying next week. A default would
+    have hidden that; requiring the argument makes the type checker find every call site
+    that has not decided which instant it means.
     """
-    moment = now or datetime.now(timezone.utc)
+    moment = clock.now()
     try:
         scheduled = datetime.fromisoformat(passenger["scheduled_departure"])
         hours = (scheduled - moment).total_seconds() / 3600.0
@@ -132,7 +140,7 @@ def duty_band(hours_remaining: float) -> str:
     return "fresh"
 
 
-def project_crew(member: dict[str, Any]) -> Projection:
+def project_crew(member: dict[str, Any], *, clock: Clock | None = None) -> Projection:
     """Crew reason about duty legality and base position, not about their own name."""
     remaining = max(
         float(member.get("duty_hours_max", 14.0)) - float(member.get("duty_hours_used", 0.0)),
@@ -145,6 +153,15 @@ def project_crew(member: dict[str, Any]) -> Projection:
         party="based" if member.get("base") == "ORD" else "away",
         constraints=f"{len(member.get('qualified_types', []))}_types",
     )
+
+
+def bind(projector, clock: Clock):
+    """A projector with its clock already supplied.
+
+    `collapse` takes a callable of one argument, and threading a clock through every call
+    site by hand is exactly the kind of friction that makes someone reach for a default.
+    """
+    return lambda entity: projector(entity, clock=clock)
 
 
 def collapse(entities: list[dict[str, Any]], projector) -> dict[str, list[str]]:

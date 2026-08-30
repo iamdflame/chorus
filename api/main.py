@@ -291,12 +291,13 @@ def _cohort_layout(agents: int) -> str:
     """
     from dataclasses import asdict
 
-    from swarm.canonical import collapse, project_passenger
+    from kernel.clock import FIXED
+    from swarm.canonical import bind, collapse, project_passenger
     from swarm.scenario import build_scenario
 
     scenario = build_scenario(passengers=agents)
     passengers = [asdict(p) for p in scenario.passengers]
-    grouped = collapse(passengers, project_passenger)
+    grouped = collapse(passengers, bind(project_passenger, FIXED))
     return json.dumps({
         "agents": len(passengers),
         "scenario": scenario.summary(),

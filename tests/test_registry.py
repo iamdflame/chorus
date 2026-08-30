@@ -12,6 +12,7 @@ from dataclasses import asdict
 
 from fleet.registry import PASSENGER_NEVER_SEES, PASSENGER_SEES, build_registry
 from kernel.effect import Determinism
+from kernel.clock import FIXED
 from swarm.canonical import project_passenger
 from swarm.scenario import build_scenario
 
@@ -45,7 +46,7 @@ def test_the_passenger_projection_withholds_everything_the_card_says_it_does():
     """The compliance claim, checked against the projection that actually runs."""
     scenario = build_scenario(passengers=60)
     for passenger in (asdict(p) for p in scenario.passengers[:25]):
-        projection = project_passenger(passenger)
+        projection = project_passenger(passenger, clock=FIXED)
         emitted = projection.to_dict()
         rendered = projection.to_prompt()
 

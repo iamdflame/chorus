@@ -35,6 +35,7 @@ from google.genai import types
 from kernel.branch import PRIMARY
 from kernel.effect import Determinism, Effect, EffectKind, hash_payload
 from kernel.interposer import LightconePlugin, Mode
+from kernel.singleflight import SingleFlight
 from kernel.store import EffectStore
 from swarm.canonical import Projection
 
@@ -77,12 +78,15 @@ class SwarmMetrics:
     agents_invoked: int = 0
     model_calls: int = 0
     cache_hits: int = 0
+    # Duplicate calls suppressed while an identical question was already in flight.
+    coalesced: int = 0
     distinct_thoughts: int = 0
     tokens_in: int = 0
     tokens_out: int = 0
     cost_usd: float = 0.0
     cost_avoided_usd: float = 0.0
     wall_s: float = 0.0
+    failed: int = 0
     errors: list[str] = field(default_factory=list)
 
     @property
@@ -109,6 +113,7 @@ class SwarmMetrics:
             "agents_invoked": self.agents_invoked,
             "model_calls": self.model_calls,
             "cache_hits": self.cache_hits,
+            "coalesced": self.coalesced,
             "distinct_thoughts": self.distinct_thoughts,
             "collapse": round(self.collapse, 1),
             "tokens_in": self.tokens_in,
@@ -117,6 +122,7 @@ class SwarmMetrics:
             "cost_avoided_usd": round(self.cost_avoided_usd, 6),
             "naive_cost_usd": self.naive_cost_usd,
             "wall_s": round(self.wall_s, 1),
+            "failed": self.failed,
             "errors": len(self.errors),
         }
 
@@ -155,6 +161,10 @@ class Swarm:
         self.branch_id = branch_id
         self.mode = mode
         self.gate = asyncio.Semaphore(concurrency)
+        # One instance for the whole swarm. Each agent gets its own plugin, so a
+        # per-plugin coalescer would coalesce nothing -- the duplicates being
+        # suppressed are, by definition, in different invocations.
+        self.single_flight = SingleFlight()
         self.agents = {role: build_agent(role) for role in ("passenger", "crew")}
         self._sessions = InMemorySessionService()
 
@@ -179,7 +189,7 @@ class Swarm:
     ) -> tuple[dict[str, Any] | None, LightconePlugin]:
         plugin = LightconePlugin(
             store=self.store, branch_id=self.branch_id, mode=self.mode,
-            seed_parents=(anchor,),
+            seed_parents=(anchor,), single_flight=self.single_flight,
         )
         runner = Runner(
             app=App(name=APP_NAME, root_agent=self.agents[role], plugins=[plugin]),
@@ -225,6 +235,12 @@ class Swarm:
                 try:
                     answer, plugin = await self._invoke(role, projection, context, anchor)
                 except Exception as exc:  # noqa: BLE001 - one agent must not end the swarm
+                    # Counted before returning. Previously a failed agent never reached
+                    # the increment, so it disappeared from the denominator and every
+                    # ratio was computed over survivors — a swarm that failed half its
+                    # agents would have reported an unchanged collapse.
+                    metrics.agents_invoked += 1
+                    metrics.failed += 1
                     metrics.errors.append(f"{entity.get('id')}: {type(exc).__name__}: {exc}")
                     return
                 if answer is not None:
@@ -232,6 +248,7 @@ class Swarm:
                 metrics.agents_invoked += 1
                 metrics.model_calls += plugin.misses
                 metrics.cache_hits += plugin.hits
+                metrics.coalesced += plugin.coalesced
                 report = plugin.report()
                 metrics.tokens_in += report["tokens_in"]
                 metrics.tokens_out += report["tokens_out"]

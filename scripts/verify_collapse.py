@@ -25,7 +25,9 @@ from dataclasses import asdict
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
 
+from kernel.clock import FIXED
 from swarm.canonical import (
+    bind,
     collapse,
     constraint_band,
     party_band,
@@ -54,7 +56,7 @@ def main() -> int:
     for n in SCALES:
         scenario = build_scenario(passengers=n)
         passengers = [asdict(p) for p in scenario.passengers]
-        groups = collapse(passengers, project_passenger)
+        groups = collapse(passengers, bind(project_passenger, FIXED))
         measured.append((n, len(groups)))
         print(f"  {n:>9,}  {len(groups):>9}  {n / len(groups):>9.1f}x")
 
@@ -82,14 +84,14 @@ def main() -> int:
     sample = asdict(build_scenario(passengers=40).passengers[0])
     renamed = {**sample, "id": "PAX-999999", "name": "someone else",
                "order_id": "ORD-00000", "customer_id": "CUST-0000"}
-    if project_passenger(sample).key() != project_passenger(renamed).key():
+    if project_passenger(sample, clock=FIXED).key() != project_passenger(renamed, clock=FIXED).key():
         failures.append("changing identity changed the projection — identity is leaking "
                         "into reasoning, and no two agents will ever share a thought")
 
     print()
     print(f"  final growth over last 12,000 agents: +{growth} distinct situations")
     print(f"  identity-invariant projection: "
-          f"{project_passenger(sample).key() == project_passenger(renamed).key()}")
+          f"{project_passenger(sample, clock=FIXED).key() == project_passenger(renamed, clock=FIXED).key()}")
 
     print()
     if failures:

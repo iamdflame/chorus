@@ -15,6 +15,7 @@ from dataclasses import asdict
 
 import pytest
 
+from kernel.clock import FIXED
 from swarm.canonical import project_crew, project_passenger
 from swarm.scenario import build_scenario
 
@@ -35,13 +36,13 @@ def test_identity_does_not_change_the_projection(population):
             "order_id": "ORD-00000",
             "original_flight": "ZZ0000",
         }
-        assert project_passenger(passenger).key() == project_passenger(disguised).key()
-        assert project_passenger(passenger).to_prompt() == project_passenger(disguised).to_prompt()
+        assert project_passenger(passenger, clock=FIXED).key() == project_passenger(disguised, clock=FIXED).key()
+        assert project_passenger(passenger, clock=FIXED).to_prompt() == project_passenger(disguised, clock=FIXED).to_prompt()
 
 
 def test_no_identifying_value_appears_in_the_prompt(population):
     for passenger in population[:120]:
-        prompt = project_passenger(passenger).to_prompt()
+        prompt = project_passenger(passenger, clock=FIXED).to_prompt()
         for field in IDENTIFIERS:
             value = passenger.get(field)
             if value in (None, "", 0):
@@ -60,14 +61,14 @@ def test_the_prompt_contains_only_bucketed_vocabulary(population):
         "unencumbered", "checked_bags", "assisted",
     }
     for passenger in population[:120]:
-        values = set(project_passenger(passenger).to_dict().values()) - {"passenger"}
+        values = set(project_passenger(passenger, clock=FIXED).to_dict().values()) - {"passenger"}
         assert values <= allowed, f"unbucketed value in projection: {values - allowed}"
 
 
 def test_crew_projection_withholds_identity():
     scenario = build_scenario(passengers=40)
     for member in (asdict(c) for c in scenario.crew[:40]):
-        prompt = project_crew(member).to_prompt()
+        prompt = project_crew(member, clock=FIXED).to_prompt()
         assert str(member["id"]) not in prompt
         assert str(member["duty_hours_used"]) not in prompt, (
             "an exact duty figure is identifying; only the band may cross the boundary"
@@ -80,8 +81,8 @@ def test_two_travellers_in_the_same_situation_are_indistinguishable(population):
     seen: dict[str, str] = {}
     collisions = 0
     for passenger in population:
-        key = project_passenger(passenger).key()
-        prompt = project_passenger(passenger).to_prompt()
+        key = project_passenger(passenger, clock=FIXED).key()
+        prompt = project_passenger(passenger, clock=FIXED).to_prompt()
         if key in seen:
             collisions += 1
             assert seen[key] == prompt, "same situation produced different prompts"
@@ -90,3 +91,19 @@ def test_two_travellers_in_the_same_situation_are_indistinguishable(population):
         f"only {collisions} of {len(population)} travellers shared a situation; "
         "the projection is too fine to be worth anything"
     )
+
+
+def test_the_projection_does_not_move_with_the_wall_clock():
+    """Determinism holes are the expensive kind of bug in a determinism product.
+
+    Urgency is time-to-departure, so a projection that reads the clock re-buckets the same
+    passenger tomorrow. Every address derived from it moves with it, and a run recorded
+    today silently stops replaying next week — which would quietly retire the central
+    claim rather than break it loudly.
+    """
+    passenger = asdict(build_scenario(passengers=20).passengers[0])
+    baseline = project_passenger(passenger, clock=FIXED).key()
+
+    # The band genuinely depends on the instant, so the invariance above is not vacuous.
+    far_future = project_passenger(passenger, clock=FIXED.shifted(days=40)).key()
+    assert far_future != baseline, "urgency does not depend on time; the test proves nothing"

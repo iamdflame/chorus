@@ -29,7 +29,8 @@ from kernel.branch import PRIMARY
 from kernel.interposer import Mode
 from kernel.store import InMemoryEffectStore
 from swarm.allocate import allocate_first_come, allocate_with_preferences
-from swarm.canonical import collapse, project_passenger
+from kernel.clock import FIXED
+from swarm.canonical import bind, collapse, project_passenger
 from swarm.runtime import Swarm
 from swarm.scenario import build_scenario, load_into_world
 from world.shadow import ShadowWorld
@@ -47,7 +48,7 @@ async def main(count: int, concurrency: int) -> int:
     load_into_world(world, scenario, branch_id=PRIMARY)
 
     passengers = [asdict(p) for p in scenario.passengers]
-    predicted = collapse(passengers, project_passenger)
+    predicted = collapse(passengers, bind(project_passenger, FIXED))
 
     summary = scenario.summary()
     context = (

@@ -19,7 +19,8 @@ from dataclasses import asdict
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
 
-from swarm.canonical import collapse, project_passenger
+from kernel.clock import FIXED
+from swarm.canonical import bind, collapse, project_passenger
 from swarm.scenario import build_scenario
 
 W, H = 1200, 420
@@ -82,7 +83,7 @@ def mark(cx: float, cy: float, r: float) -> str:
 def main() -> int:
     scenario = build_scenario(passengers=20000)
     passengers = [asdict(p) for p in scenario.passengers]
-    groups = collapse(passengers, project_passenger)
+    groups = collapse(passengers, bind(project_passenger, FIXED))
     cohorts = sorted((len(v) for v in groups.values()), reverse=True)
 
     cells = squarify(cohorts, FIELD_X, PAD, FIELD_W, H - PAD * 2)

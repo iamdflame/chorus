@@ -43,6 +43,7 @@ from google.adk.tools.tool_context import ToolContext
 from kernel.branch import PRIMARY
 from kernel.effect import Determinism, Effect, EffectKind, canonical_json, hash_payload
 from kernel.quarantine import ReversibilityRegistry, staged_result
+from kernel.singleflight import SingleFlight
 from kernel.store import EffectStore
 
 # Gemini 3.5 Flash list price, USD per million tokens. Recorded per effect so that a
@@ -121,6 +122,16 @@ def _tool_key(agent: str, tool_name: str, tool_args: dict[str, Any]) -> str:
     return f"tool:{agent}:{tool_name}:{hash_payload(tool_args)}"
 
 
+def _model_key(agent: str, address: str) -> str:
+    """Key a pending model effect by its address, not by the agent alone.
+
+    `f"model:{agent}"` collides the moment one agent has two model calls in flight, and
+    the loser's effect is silently dropped -- it is opened, never closed, and never
+    recorded. Addresses are unique by construction, so they cannot collide.
+    """
+    return f"model:{agent}:{address}"
+
+
 class LightconePlugin(BasePlugin):
     """Records or replays every model call, tool call and delegation on a branch."""
 
@@ -134,6 +145,7 @@ class LightconePlugin(BasePlugin):
         name: str = "lightcone",
         seed_parents: tuple[str, ...] = (),
         state_fingerprint: Callable[[tuple[str, ...]], str] | None = None,
+        single_flight: SingleFlight | None = None,
     ) -> None:
         super().__init__(name=name)
         self.store = store
@@ -144,6 +156,10 @@ class LightconePlugin(BasePlugin):
         # well as by its arguments. Without it, a counterfactual that edits data the
         # agents consult would replay straight past the edit.
         self._state_fingerprint = state_fingerprint
+        # Shared across every plugin instance in a swarm: the point is to coalesce
+        # agents running in *different* invocations, so a per-plugin instance would
+        # coalesce nothing.
+        self._single_flight = single_flight
 
         # Causal bookkeeping. None of this may leak into an address: invocation ids are
         # fresh on every run, so including one would make every replay miss.
@@ -166,6 +182,10 @@ class LightconePlugin(BasePlugin):
         self.diverged: list[str] = []
         self.hits = 0
         self.misses = 0
+        # Calls suppressed because an identical question was already in flight.
+        # Distinct from a hit: a hit is work already recorded, a coalesce is work
+        # that was about to be duplicated.
+        self.coalesced = 0
 
     # -- causal position -------------------------------------------------------
 
@@ -341,16 +361,32 @@ class LightconePlugin(BasePlugin):
             self._register_producer(effect.id, recorded_response.get("content"))
             return LlmResponse.model_validate(recorded_response)
 
+        if self._single_flight is not None:
+            waiting = self._single_flight.begin(effect.id)
+            if waiting is not None:
+                # Someone is already asking this exact question. Wait for their answer
+                # rather than paying for the same one. Without this the collapse degrades
+                # precisely as concurrency rises -- the one thing you would raise to make
+                # a swarm fast.
+                shared = await waiting
+                if shared is not None:
+                    self.coalesced += 1
+                    self.recorded.append(effect.with_response(shared, replayed=True))
+                    self._register_producer(
+                        effect.id, shared["llm_response"].get("content")
+                    )
+                    return LlmResponse.model_validate(shared["llm_response"])
+
         self.misses += 1
         self.diverged.append(effect.id)
-        self._pending[f"model:{agent}"] = (effect, time.perf_counter())
+        self._pending[_model_key(agent, effect.id)] = (effect, time.perf_counter())
         return None
 
     async def after_model_callback(
         self, *, callback_context: CallbackContext, llm_response: LlmResponse
     ) -> LlmResponse | None:
         agent = callback_context.agent_name
-        entry = self._pending.pop(f"model:{agent}", None)
+        entry = self._take_pending_model(agent)
         if entry is None:
             # No pending open: before_model_callback served this from the store.
             return None
@@ -366,14 +402,30 @@ class LightconePlugin(BasePlugin):
         usage = llm_response.usage_metadata
         tokens_in = getattr(usage, "prompt_token_count", 0) or 0
         tokens_out = getattr(usage, "candidates_token_count", 0) or 0
+        payload = {"llm_response": llm_response.model_dump(mode="json", exclude_none=True)}
         self._close(
             effect,
-            {"llm_response": llm_response.model_dump(mode="json", exclude_none=True)},
+            payload,
             tokens_in=tokens_in,
             tokens_out=tokens_out,
             cost_usd=(tokens_in * PRICE_IN_PER_M + tokens_out * PRICE_OUT_PER_M) / 1e6,
             wall_ms=(time.perf_counter() - started) * 1000.0,
         )
+        if self._single_flight is not None:
+            self._single_flight.resolve(effect.id, payload)
+        return None
+
+    def _take_pending_model(self, agent: str) -> tuple[Effect, float] | None:
+        """The pending model effect for this agent.
+
+        ADK hands `after_model_callback` no address, so the entry is found by prefix.
+        Only one call per agent is outstanding within a single invocation; the address in
+        the key is what keeps *different* invocations from colliding.
+        """
+        prefix = f"model:{agent}:"
+        for key in list(self._pending):
+            if key.startswith(prefix):
+                return self._pending.pop(key)
         return None
 
     # -- tool boundary ---------------------------------------------------------
@@ -529,6 +581,7 @@ class LightconePlugin(BasePlugin):
             "branch": self.branch_id,
             "boundary_crossings": total,
             "replay_hits": self.hits,
+            "coalesced": self.coalesced,
             "executed": self.misses,
             "hit_rate": round(self.hits / total, 4) if total else 0.0,
             "diverged": len(self.diverged),

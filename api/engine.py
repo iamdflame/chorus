@@ -365,14 +365,15 @@ class Engine:
         """
         from dataclasses import asdict
 
-        from swarm.canonical import collapse, project_passenger
+        from kernel.clock import FIXED
+        from swarm.canonical import bind, collapse, project_passenger
         from swarm.runtime import Swarm
         from swarm.scenario import build_scenario
 
         async with self._lock:
             scenario = build_scenario(passengers=agents)
             passengers = [asdict(p) for p in scenario.passengers]
-            cohorts = collapse(passengers, project_passenger)
+            cohorts = collapse(passengers, bind(project_passenger, FIXED))
             summary = scenario.summary()
 
             yield {

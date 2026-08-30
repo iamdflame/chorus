@@ -32,6 +32,7 @@ sys.path.insert(0, ROOT)
 
 from kernel.effect import Determinism, Effect, EffectKind, hash_payload
 from kernel.store import InMemoryEffectStore
+from kernel.clock import FIXED
 from swarm.canonical import Projection, project_passenger
 from swarm.scenario import build_scenario
 
@@ -57,7 +58,7 @@ def arm_hand_grouped(populations) -> int:
     """Group by projection key within each run. The obvious, sensible implementation."""
     calls = 0
     for population in populations:
-        calls += len({project_passenger(p).key() for p in population})
+        calls += len({project_passenger(p, clock=FIXED).key() for p in population})
     return calls
 
 
@@ -68,7 +69,7 @@ def arm_chorus(populations) -> tuple[int, list[int]]:
     for population in populations:
         before = calls
         for passenger in population:
-            address = address_for(project_passenger(passenger))
+            address = address_for(project_passenger(passenger, clock=FIXED))
             if store.lookup("primary", address) is None:
                 calls += 1
                 store.put(
@@ -98,8 +99,8 @@ def main() -> int:
     b = arm_hand_grouped(populations)
     c, per_run = arm_chorus(populations)
 
-    g1 = len({project_passenger(p).key() for p in first})
-    g2 = len({project_passenger(p).key() for p in second})
+    g1 = len({project_passenger(p, clock=FIXED).key() for p in first})
+    g2 = len({project_passenger(p, clock=FIXED).key() for p in second})
 
     print(f"\n  Two populations of {len(first):,} agents each, generated from different seeds.\n")
     print(row("", "run 1", "run 2", "total", "cost"))
