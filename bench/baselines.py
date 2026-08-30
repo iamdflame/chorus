@@ -149,7 +149,7 @@ def allocate_by_preference(
     preferences: dict[str, dict[str, Any]],
     *,
     order: str = "urgency",
-    tie_break: bool = True,
+    tie_break: bool = False,
 ) -> Assignments:
     """One allocator, used by every preference-driven arm.
 

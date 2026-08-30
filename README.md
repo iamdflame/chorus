@@ -265,6 +265,86 @@ load-bearing fields collapses beautifully and answers the wrong question.**
 
 ---
 
+## What collapse costs
+
+Every number above measures what collapse saves. This measures what it loses, which is the
+only question that matters: one thought shared across a thousand agents is worthless if it
+is worse than the thousand it replaced.
+
+Two arms, differing in exactly one thing — the projection. **B5 is deliberately the stronger
+arm**: it sees the exact party size rather than a band, the real destination rather than a
+haul bucket, the timestamp, the bag count, and the traveller's name. Same runtime, same
+instruction, same model, same allocator, so a divergence cannot be blamed on anything else.
+Sampling is stratified over cohorts of fifteen, because in a random few hundred travellers
+most sit alone in their bucket and the shared thought under test is never shared.
+
+| arm | souls seated | satisfaction (weighted) | satisfaction (blind) | p95 wait | gini | calls |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| B4 collapsed | 73 | 113.2 | 79.4 | 31.0h | 0.330 | **45** |
+| B4t + tie-break | 73 | 103.1 | 86.2 | 31.0h | 0.330 | 45 |
+| B5 uncollapsed | 60 | **128.6** | **105.4** | **22.8h** | **0.297** | 584 |
+
+<sub>Regenerate: `python -m bench.fidelity --cohorts 40 --per-cohort 15`</sub>
+
+**Collapse is lossy here, and the plan for this section expected it not to be.** The target
+claim was `B4 ≈ B5` at a fraction of the cost. The measurement says otherwise and is
+published unchanged: collapsed reasoning costs **12–17% of tier-weighted satisfaction**,
+replicated across two independent runs, and loses on every metric — equity and worst-case
+wait included.
+
+**B4 seats more people and serves them worse.** The mechanism is visible in the rank
+correlation: −0.04 on `urgency_score`. Every member of a cohort receives an identical score,
+so the allocator has nothing to order them by, and the shared answer is uniformly permissive
+— scarce early seats go to whoever is reached first while the people who most needed them
+wait. B5 differentiates within the cohort, seats fewer, and seats the right ones sooner.
+
+**A tie-break does not fix it, and that was our first hypothesis.** Breaking ties by how long
+a traveller has already waited — a queue discipline chosen before seeing whether it helped,
+so that improving the score could not be the reason for choosing it — moved satisfaction
+between tiers and recovered nothing. Neither did record urgency nor party size, tested
+offline against the saved answers. All variants trail B5 by 20–30%.
+
+### The measurement is the instrument, not the caveat
+
+The system already has a mechanism for paying full price where a shared thought is unsafe —
+`route()` escalates a traveller out of their cohort. What it lacked was a way to know *which*
+cohorts. Per-cohort agreement is exactly that signal, and spending it selectively is cheap:
+
+| cohorts escalated | travellers | calls | satisfaction | gap closed | cost |
+| ---: | ---: | ---: | ---: | ---: | ---: |
+| 0 | 0 | 40 | 113.2 | 0% | 1.0× |
+| 4 | 60 | 96 | 130.4 | 49% | 2.4× |
+| **12** | **180** | **208** | **142.0** | **82%** | **5.2×** |
+| 40 (all) | 584 | 584 | 148.3 | 100% | 14.6× |
+
+**Escalating 30% of cohorts recovers 82% of what collapse loses, at a third of the cost of
+not collapsing at all.** Two honest caveats: escalating the two worst cohorts recovers
+nothing, because agreement is not the same as decision impact and a better ordering would
+weight it by seat contention; and the 20-cohort row overshoots B5, which is a mixing effect
+rather than a result to claim.
+
+### Where collapse is lossy
+
+Published rather than summarised, because a known and quantified failure mode is worth more
+than an unexamined success. These five cohorts had **zero** exact agreement across fifteen
+members each:
+
+```
+basic  | critical | family | checked_bags | intercontinental | hotel   | origin
+basic  | urgent   | group  | checked_bags | short            | hotel   | misconnect
+basic  | urgent   | family | unencumbered | short            | hotel   | misconnect
+silver | critical | pair   | checked_bags | short            | hotel   | origin
+silver | urgent   | pair   | unencumbered | short            | nohotel | origin
+```
+
+The pattern is legible: every one of them is a **high-urgency cohort with an unresolved
+trade-off** — a family with bags on a long haul, a misconnected group with a hotel. These are
+situations where two reasonable travellers genuinely differ, which is precisely where a
+bucket cannot speak for both. Low-urgency, unencumbered solo travellers agree nearly
+perfectly, because there is little to disagree about.
+
+---
+
 ## What Gemini never sees
 
 The canonical projection is a cost mechanism and a **compliance mechanism at the same time**. Identity is stripped before the boundary, not redacted after it, so there is no configuration under which a passenger name reaches a model provider.
@@ -459,6 +539,8 @@ export GOOGLE_CLOUD_PROJECT=YOUR_PROJECT
 | All six arms, scored identically | `python -m bench.run --agents 8000` |
 | Not a cache (3-arm ablation) | `scripts/ablation.py --agents 2000` |
 | Collapse is lossy here, and by how much | `python -m bench.fidelity` |
+| Escalation recovers 82% at a third the cost | `scripts/escalation_sweep.py` |
+| 39,996 spans, 1,965 executed | `scripts/trace_run.py` |
 | Injection cannot reach a shared address | `scripts/verify_armor.py` |
 | Is the model earning its cost? | `scripts/necessity.py` |
 | The whole pipeline, end to end | `scripts/prove_pipeline.py` |
