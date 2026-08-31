@@ -11,13 +11,13 @@ decide who flies. Chorus gives every one of them a real agent — and charges fo
 diversity of their situations, not their population.*
 
 [![Determinism proof](https://img.shields.io/badge/determinism-proved%20offline-0b8457)](scripts/verify_determinism.py)
-[![Tests](https://img.shields.io/badge/tests-306%20passing-0b8457)](tests/)
+[![Tests](https://img.shields.io/badge/tests-362%20passing-0b8457)](tests/)
 [![Cloud Run](https://img.shields.io/badge/Cloud%20Run-live-4285F4?logo=googlecloud&logoColor=white)](https://chorus-512017284899.us-central1.run.app)
 [![Gemini 3.5 Flash](https://img.shields.io/badge/Gemini-3.5%20Flash-8E75B2?logo=googlegemini&logoColor=white)](https://ai.google.dev)
 [![ADK](https://img.shields.io/badge/Google%20ADK-2.8-4285F4)](https://google.github.io/adk-docs)
 [![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-**[Live console](https://chorus-512017284899.us-central1.run.app)**  ·  **[Architecture](docs/ARCHITECTURE.md)**  ·  **[Reproduce every number](#reproducing-every-number-in-this-readme)**
+**[Live console](https://chorus-512017284899.us-central1.run.app)**  ·  **[Architecture](docs/ARCHITECTURE.md)**  ·  **[Audit & how each finding closed](docs/AUDIT.md)**  ·  **[Reproduce every number](#reproducing-every-number-in-this-readme)**
 
 **Track: The Fortified Enterprise Fleet**
 
