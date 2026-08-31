@@ -2,9 +2,13 @@
 
 # Chorus
 
-### Twenty thousand agents. Two thousand thoughts.
+### Every stranded traveller gets their own agent. Nobody waits for a queue.
 
-**Give every entity in a system its own permanent agent — and pay only for the diversity of their situations, not their population.**
+**Twenty thousand agents. Two thousand thoughts.**
+
+*A hub closes. 20,367 people are stranded, 2,888 seats exist, and one duty manager has to
+decide who flies. Chorus gives every one of them a real agent — and charges for the
+diversity of their situations, not their population.*
 
 [![Determinism proof](https://img.shields.io/badge/determinism-proved%20offline-0b8457)](scripts/verify_determinism.py)
 [![Tests](https://img.shields.io/badge/tests-306%20passing-0b8457)](tests/)
@@ -36,6 +40,47 @@ git clone https://github.com/iamdflame/chorus && cd chorus && ./scripts/bootstra
 ```
 
 The first command needs no API key and no Google Cloud account. It proves the central claim on an in-memory reference store using a counting instrument, and exits non-zero if the property does not hold.
+
+---
+
+## Who this is for
+
+Not an airline executive looking at a dashboard. **The duty manager at two in the morning**
+with a closed hub, twenty thousand stranded people, 2,888 seats, and a queue that is not
+getting shorter while they decide.
+
+That person does not need a system that reasons beautifully about one traveller. They need
+every traveller reasoned about *at all*, within the window where a seat still exists, and
+they need to be able to explain afterwards why a particular family was routed the way they
+were. Those are the two constraints that shaped everything here: cost per decision, and
+provenance for every decision.
+
+The scenario is airline irregular operations because it makes both constraints concrete and
+because the ground truth is checkable. The kernel is not airline-specific — `kernel/` has
+no domain knowledge and ADK appears in exactly one file — but **this repository ships one
+domain, and a second scenario is the honest test of that claim rather than a paragraph
+asserting it.** It has not been run.
+
+---
+
+## The Fortified Enterprise Fleet, component by component
+
+The track names eight things. Here is each one and the file that implements it, so nobody
+has to hunt — and the one that is partial says so.
+
+| Track component | Status | Where |
+| --- | --- | --- |
+| **Agent Registry** — discovery & lifecycle | Content-derived versions; declared coverage gaps escalate to a human | [`fleet/registry.py`](fleet/registry.py) |
+| **Agent Runtime** — long-running async execution | `POST /api/runs` → 202; the sweep outlives the request and resumes from the DAG at zero model cost | [`api/runs.py`](api/runs.py) |
+| **Memory Bank** — cross-session context | A returning traveller recognised 90 days later; memory feeds the *projection*, not the prompt | [`memory/`](memory/) |
+| **Agent Identity** — zero trust | One service account per role; the allocator cannot reach a model at all | [`infra/identity.sh`](infra/identity.sh) |
+| **Agent Gateway** — policy enforcement | Denials recorded as **effects**: replayable, diffable, addressable | [`gateway/policy.py`](gateway/policy.py) |
+| **Model Armor** — prompt safety | `sanitizeUserPrompt` as layer 0, a pattern screen as fallback, and a typed airlock that holds when both miss | [`armor/`](armor/) |
+| **Agent Observability** — OpenTelemetry | 39,996 spans in Cloud Trace; causal parents as span **links**, replays at zero duration | [`obs/otel.py`](obs/otel.py) |
+| **A2A interoperability** | An agent card at `/.well-known/agent-card.json`; every skill declares whether it can be **undone** | [`fleet/a2a.py`](fleet/a2a.py) |
+| **Time travel & fork/diff in the console** | *Partial* — the kernel supports both and the API exposes them; the UI surfaces the live collapse, not yet the scrubber | [`console/`](console/) |
+
+Full mapping with tests cited: [**Track compliance**](#track-the-fortified-enterprise-fleet).
 
 ---
 
@@ -290,6 +335,27 @@ exploit of your own scoring function is worth showing.
 
 ---
 
+## Failure handling
+
+Every row names the file that implements it and the test that pins it. A failure table
+without those is a list of intentions — and one row of this table used to be exactly that:
+it claimed exponential backoff with jitter when the codebase contained none. The claim is
+now true, and the way it was found is in [`docs/AUDIT.md`](docs/AUDIT.md).
+
+| Failure | Behaviour | Where | Pinned by |
+| --- | --- | --- | --- |
+| Model returns malformed JSON | Agent takes a second turn at a new causal position; the retry is a distinct address, so it correctly misses the store rather than poisoning it | [`kernel/interposer.py`](kernel/interposer.py) | `tests/test_kernel.py` |
+| Vertex AI 429 / quota exhaustion | Retried with **full jitter** at the one boundary the fleet touches a paid service — and a retry re-derives the *same* causal address, so it is one thought, not two. Beyond the attempt budget the run is resumable, because completed effects are already durable | [`kernel/backoff.py`](kernel/backoff.py) | `tests/test_backoff.py` |
+| A retry silently inflating the collapse ratio | The address is a hash of (kind, agent, causal parents, request); a retry re-derives all four identically, so the store records one row however many attempts it took | [`kernel/effect.py`](kernel/effect.py) | `tests/test_backoff.py::TestAddressInvariance` |
+| A replay reaching the network | Only the miss path retries. `REPLAY_STRICT` raises on a miss rather than being given another go at finding one | [`kernel/interposer.py`](kernel/interposer.py) | `tests/test_backoff.py::TestReplayIsNeverRetried` |
+| Firestore unavailable | Falls back to the in-memory reference store; the run completes and `/health` reports which backend is live rather than claiming the durable one | [`api/engine.py`](api/engine.py) | `tests/test_firestore.py` |
+| Partial run interrupted | The causal DAG is the checkpoint — re-invoking replays from the last recorded effect at zero model cost | [`kernel/dag.py`](kernel/dag.py) | `scripts/verify_determinism.py` |
+| Duplicate dispatch of an irreversible action | Quarantine gate stages side effects; nothing external fires until a timeline is adopted | [`kernel/quarantine.py`](kernel/quarantine.py) | `tests/test_replay.py` |
+| Concurrent fan-out reorders tool calls | Effects are sequenced by causal position, not wall clock; DAG comparison is order-insensitive | [`kernel/dag.py`](kernel/dag.py) | `scripts/verify_concurrency.py` |
+| A screening service having a bad afternoon | Model Armor unreachable degrades to the pattern screen and says so in the verdict; an *unintelligible* verdict fails closed | [`armor/screen.py`](armor/screen.py) | `tests/test_armor.py::TestLayeredScreen` |
+
+---
+
 ## Three ways in, one lattice
 
 Adding a modality is decorative unless it lands in the same place. The claim worth testing
@@ -449,26 +515,6 @@ the measurement correctly reports none.
 Measured per field rather than on all four at once, because requiring four simultaneous
 agreements leaves 22 samples to reason from and that cannot support a claim in either
 direction.
-
----
-
-## Who this is for
-
-Not an airline executive looking at a dashboard. **The duty manager at two in the morning**
-with a closed hub, twenty thousand stranded people, 2,888 seats, and a queue that is not
-getting shorter while they decide.
-
-That person does not need a system that reasons beautifully about one traveller. They need
-every traveller reasoned about *at all*, within the window where a seat still exists, and
-they need to be able to explain afterwards why a particular family was routed the way they
-were. Those are the two constraints that shaped everything here: cost per decision, and
-provenance for every decision.
-
-The scenario is airline irregular operations because it makes both constraints concrete and
-because the ground truth is checkable. The kernel is not airline-specific — `kernel/` has
-no domain knowledge and ADK appears in exactly one file — but **this repository ships one
-domain, and a second scenario is the honest test of that claim rather than a paragraph
-asserting it.** It has not been run.
 
 ---
 
@@ -921,27 +967,6 @@ Raw outputs from the runs quoted above are committed under [`docs/runs/`](docs/r
 to warrant an explanation rather than a shrug. [`docs/PROVENANCE.md`](docs/PROVENANCE.md)
 gives the straight account — what v1 was, what the audit found, and what the rebuild
 changed, including the six findings that came from measuring rather than intending.
-
----
-
-## Failure handling
-
-Every row names the file that implements it and the test that pins it. A failure table
-without those is a list of intentions — and one row of this table used to be exactly that:
-it claimed exponential backoff with jitter when the codebase contained none. The claim is
-now true, and the way it was found is in [`docs/AUDIT.md`](docs/AUDIT.md).
-
-| Failure | Behaviour | Where | Pinned by |
-| --- | --- | --- | --- |
-| Model returns malformed JSON | Agent takes a second turn at a new causal position; the retry is a distinct address, so it correctly misses the store rather than poisoning it | [`kernel/interposer.py`](kernel/interposer.py) | `tests/test_kernel.py` |
-| Vertex AI 429 / quota exhaustion | Retried with **full jitter** at the one boundary the fleet touches a paid service — and a retry re-derives the *same* causal address, so it is one thought, not two. Beyond the attempt budget the run is resumable, because completed effects are already durable | [`kernel/backoff.py`](kernel/backoff.py) | `tests/test_backoff.py` |
-| A retry silently inflating the collapse ratio | The address is a hash of (kind, agent, causal parents, request); a retry re-derives all four identically, so the store records one row however many attempts it took | [`kernel/effect.py`](kernel/effect.py) | `tests/test_backoff.py::TestAddressInvariance` |
-| A replay reaching the network | Only the miss path retries. `REPLAY_STRICT` raises on a miss rather than being given another go at finding one | [`kernel/interposer.py`](kernel/interposer.py) | `tests/test_backoff.py::TestReplayIsNeverRetried` |
-| Firestore unavailable | Falls back to the in-memory reference store; the run completes and `/health` reports which backend is live rather than claiming the durable one | [`api/engine.py`](api/engine.py) | `tests/test_firestore.py` |
-| Partial run interrupted | The causal DAG is the checkpoint — re-invoking replays from the last recorded effect at zero model cost | [`kernel/dag.py`](kernel/dag.py) | `scripts/verify_determinism.py` |
-| Duplicate dispatch of an irreversible action | Quarantine gate stages side effects; nothing external fires until a timeline is adopted | [`kernel/quarantine.py`](kernel/quarantine.py) | `tests/test_replay.py` |
-| Concurrent fan-out reorders tool calls | Effects are sequenced by causal position, not wall clock; DAG comparison is order-insensitive | [`kernel/dag.py`](kernel/dag.py) | `scripts/verify_concurrency.py` |
-| A screening service having a bad afternoon | Model Armor unreachable degrades to the pattern screen and says so in the verdict; an *unintelligible* verdict fails closed | [`armor/screen.py`](armor/screen.py) | `tests/test_armor.py::TestLayeredScreen` |
 
 ---
 

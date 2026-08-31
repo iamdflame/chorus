@@ -27,6 +27,8 @@ import os
 import time
 import uuid
 from dataclasses import asdict, dataclass, field
+
+from obs import logging as obslog
 from typing import Any, Iterable
 
 
@@ -84,7 +86,9 @@ class RunStore:
 
                 self._db = firestore.Client(project=project)
                 self.durable = True
-            except Exception:  # noqa: BLE001 - degraded, and every record says so
+            except Exception as exc:  # noqa: BLE001 - degraded, and every record says so
+                obslog.warn("run records are not durable",
+                            reason=type(exc).__name__)
                 self._db = None
 
     def put(self, run: Run) -> None:
@@ -161,6 +165,8 @@ class Runner:
             run.state = "running"
             run.started_at = time.time()
             self.store.put(run)
+            obslog.event("run.started", run_id=run.id, agents=run.agents,
+                         concurrency=run.concurrency, durable=run.durable)
 
             def emit(event: dict[str, Any], _id: str = run_id) -> None:
                 self._events.setdefault(_id, []).append(event)
@@ -174,9 +180,16 @@ class Runner:
             except Exception as exc:  # noqa: BLE001 - a failed run is a recorded state
                 run.state = "failed"
                 run.error = f"{type(exc).__name__}: {exc}"
+                obslog.error("run failed", run_id=run.id,
+                             reason=type(exc).__name__, detail=str(exc)[:200],
+                             progress=run.progress, agents=run.agents)
             finally:
                 run.finished_at = time.time()
                 self.store.put(run)
+                obslog.event("run.finished", run_id=run.id, state=run.state,
+                             agents=run.agents, progress=run.progress,
+                             model_calls=run.model_calls, cost_usd=run.cost_usd,
+                             elapsed_s=run.elapsed_s)
                 emit({"event": "run_finished", **run.to_dict()})
 
 

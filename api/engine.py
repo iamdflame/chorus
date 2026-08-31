@@ -21,6 +21,7 @@ from kernel.branch import PRIMARY, Branch
 from kernel.dag import CausalDAG
 from kernel.effect import Effect
 from kernel.interposer import Mode
+from obs import logging as obslog
 from kernel.snapshot import load, save
 from kernel.store import InMemoryEffectStore
 from world.shadow import ShadowWorld
@@ -68,9 +69,17 @@ class Engine:
                         remote.append_manifest(PRIMARY, [e.id for e in fresh])
                     self.store = remote
                     self.backend = "firestore"
+                    obslog.info("store promoted to firestore",
+                                effects=len(fresh), root=os.environ.get(
+                                    "CHORUS_STORE_ROOT", "lightcone"))
                 except Exception as exc:  # noqa: BLE001 - degraded, and it says so
                     self.backend = f"snapshot:{Path(snapshot).name} (firestore: "
                     self.backend += f"{type(exc).__name__})"
+                    # The single most important line in the operational log: the service
+                    # is running, and it is not durable. Without it the only signal is a
+                    # field in /health that nobody is watching.
+                    obslog.error("firestore unavailable, serving from snapshot",
+                                 reason=type(exc).__name__, detail=str(exc)[:200])
         else:
             self.store = InMemoryEffectStore()
             self.world = ShadowWorld(
