@@ -10,6 +10,7 @@ genuinely re-executes. A spinner would hide the only thing worth seeing.
 
 from __future__ import annotations
 
+import asyncio
 import json
 import os
 import time
@@ -28,6 +29,8 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 from api.engine import Engine
+from api.runs import Run, Runner
+from api.runs import store_from_env as run_store_from_env
 from fleet.a2a import agent_card
 from fleet.domain import COMMS, DISPUTES, LEDGER, POLICIES, TICKETS
 from kernel.branch import PRIMARY
@@ -516,6 +519,108 @@ def swarm_cohorts(agents: int = 20000) -> Response:
     sees of the product.
     """
     return Response(content=_cohort_layout(agents), media_type="application/json")
+
+
+# -- background runs ----------------------------------------------------------
+#
+# The synchronous /api/swarm stays, because a small demo run should be watchable in one
+# request. Anything larger belongs here: a fifty-minute sweep that costs real money should
+# not die with a dropped connection, and the effect DAG is already the checkpoint that
+# makes resuming free.
+
+_runs = run_store_from_env()
+_runner = Runner(_runs)
+
+
+async def _execute(run: Run, emit) -> None:
+    """Perform one queued sweep, mirroring progress onto the run record."""
+    async for event in engine.run_swarm(agents=run.agents, concurrency=run.concurrency):
+        emit(event)
+        # The engine emits "progress" carrying the metrics dict inline, and "swarm_done"
+        # carrying it nested. Reading the wrong field names is silent: the run completes,
+        # reports 0/12, and nothing errors — which is exactly what the first version did.
+        kind = event.get("event")
+        if kind == "progress":
+            run.progress = event.get("done", run.progress)
+            run.model_calls = event.get("model_calls", run.model_calls)
+            run.cache_hits = event.get("cache_hits", run.cache_hits)
+            run.cost_usd = event.get("cost_usd", run.cost_usd)
+            run.failed = event.get("failed", run.failed)
+            # Firestore on every agent would be twenty thousand writes; the record is
+            # mirrored on a cadence, and always on the terminal states.
+            if run.progress % 250 == 0:
+                _runs.put(run)
+        elif kind == "swarm_done":
+            metrics = event.get("metrics", {})
+            run.progress = metrics.get("agents_invoked", run.progress)
+            run.model_calls = metrics.get("model_calls", run.model_calls)
+            run.cache_hits = metrics.get("cache_hits", run.cache_hits)
+            run.cost_usd = metrics.get("cost_usd", run.cost_usd)
+            run.distinct_thoughts = metrics.get("distinct_thoughts", 0)
+            run.failed = metrics.get("failed", 0)
+
+
+@app.on_event("startup")
+async def _start_runner() -> None:
+    _runner.start(_execute)
+
+
+@app.post("/api/runs", status_code=202)
+def enqueue_run(
+    request: SwarmRequest, privileged: bool = Depends(demo_or_write)
+) -> dict[str, Any]:
+    """Queue a sweep and return immediately. The work outlives the request."""
+    agents = request.agents
+    if not privileged and agents > PUBLIC_AGENT_CEILING:
+        agents = PUBLIC_AGENT_CEILING
+    run = _runner.enqueue(agents, request.concurrency)
+    return {
+        "run_id": run.id,
+        "state": run.state,
+        "agents": run.agents,
+        "durable": run.durable,
+        "stream": f"/api/runs/{run.id}/stream",
+        "capped": agents != request.agents,
+    }
+
+
+@app.get("/api/runs")
+def list_runs(limit: int = 20) -> dict[str, Any]:
+    return {"runs": [r.to_dict() for r in _runs.recent(limit)]}
+
+
+@app.get("/api/runs/{run_id}")
+def get_run(run_id: str) -> dict[str, Any]:
+    run = _runs.get(run_id)
+    if run is None:
+        raise HTTPException(status_code=404, detail=f"no run {run_id!r}")
+    return run.to_dict()
+
+
+@app.get("/api/runs/{run_id}/stream")
+async def stream_run(run_id: str) -> StreamingResponse:
+    """Everything so far, then the live tail.
+
+    A client connecting at agent 12,000 is shown the run from its beginning rather than a
+    run that appears to start there — the emitted events are replayed first.
+    """
+    if _runs.get(run_id) is None:
+        raise HTTPException(status_code=404, detail=f"no run {run_id!r}")
+
+    async def stream():
+        sent = 0
+        while True:
+            events = _runner.events(run_id)
+            for event in events[sent:]:
+                yield f"data: {json.dumps(event)}\n\n"
+            sent = len(events)
+            run = _runs.get(run_id)
+            if run and run.state in ("done", "failed", "cancelled"):
+                yield f"data: {json.dumps({'event': 'closed', **run.to_dict()})}\n\n"
+                return
+            await asyncio.sleep(0.25)
+
+    return StreamingResponse(stream(), media_type="text/event-stream")
 
 
 @app.post("/api/swarm")

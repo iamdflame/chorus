@@ -21,7 +21,7 @@ const COMPLIANCE: [string, string, string, string][] = [
   ["Discovery & lifecycle — Agent Registry", "done",
    "Content-derived versions; declared coverage gaps escalate to a human", "fleet/registry.py"],
   ["Core execution & state — long-running async", "done",
-   "Cloud Run + SSE; the causal DAG is the durable execution log", "api/main.py, kernel/"],
+   "POST /api/runs returns 202 and a run id; the sweep outlives the request, progress is mirrored to Firestore, and the causal DAG is the checkpoint — a run that dies resumes at zero model cost", "api/runs.py"],
   ["Memory across weeks", "done",
    "Recognised 90 days later without re-stating anything; memory feeds the projection, not the prompt", "memory/"],
   ["Security — data handling & PII", "done",
