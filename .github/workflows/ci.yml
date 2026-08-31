@@ -1,5 +1,11 @@
 name: proofs
 
+# Every step here is offline and passes locally — `python -m pytest tests/ -q` is 306
+# tests, and the five proofs below need no credentials. GitHub Actions on this account is
+# currently locked for a billing reason unrelated to the code, so these runs report
+# "job was not started" rather than a result. The README therefore does not claim a green
+# CI, and the commands are printed instead so anyone can run them in about a minute.
+
 # The determinism and collapse properties are the whole claim, so they are checked on
 # every push rather than asserted in a README. Everything here runs offline against the
 # in-memory reference backend — no cloud credentials, no model spend — which is exactly

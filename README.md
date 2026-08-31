@@ -7,7 +7,7 @@
 **Give every entity in a system its own permanent agent — and pay only for the diversity of their situations, not their population.**
 
 [![Determinism proof](https://img.shields.io/badge/determinism-proved%20offline-0b8457)](scripts/verify_determinism.py)
-[![Tests](https://img.shields.io/badge/tests-57%20passing-0b8457)](tests/)
+[![Tests](https://img.shields.io/badge/tests-306%20passing-0b8457)](tests/)
 [![Cloud Run](https://img.shields.io/badge/Cloud%20Run-live-4285F4?logo=googlecloud&logoColor=white)](https://chorus-512017284899.us-central1.run.app)
 [![Gemini 3.5 Flash](https://img.shields.io/badge/Gemini-3.5%20Flash-8E75B2?logo=googlegemini&logoColor=white)](https://ai.google.dev)
 [![ADK](https://img.shields.io/badge/Google%20ADK-2.8-4285F4)](https://google.github.io/adk-docs)
@@ -376,7 +376,7 @@ never what that cohort thinks.
 [4] identity in prompts   0 of 500 remembered travellers
 ```
 
-<sub>Runs in CI. Regenerate: `python scripts/verify_memory.py`</sub>
+<sub>Regenerate: `python scripts/verify_memory.py` — offline, no credentials.</sub>
 
 **It is not free, and the cost is printed rather than omitted.** Remembering moves travellers
 between cells, so the lattice goes from 1,965 occupied cells to 2,164 and collapse from
@@ -613,7 +613,7 @@ change what it believes.
     cohorts quarantined: 1 of 2 — the healthy one keeps serving
 ```
 
-<sub>Regenerate: `python scripts/verify_armor.py` — it runs in CI, offline, on every push.</sub>
+<sub>Regenerate: `python scripts/verify_armor.py` — offline, no credentials.</sub>
 
 Written up in full: [**Cache poisoning in collapsed agent fleets**](docs/blog/cache-poisoning-in-collapsed-agent-fleets.md).
 

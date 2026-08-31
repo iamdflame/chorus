@@ -36,7 +36,7 @@ flowchart TB
     RT -->|every model call| IP
     IP --> AD --> ST
     ST -->|miss| GEM
-    ST -->|hit: 19,778 of 20,000| RT
+    ST -->|hit: 17,964 of 20,000| RT
     RT -->|preferences| AL
     ST --> FS
 ```
