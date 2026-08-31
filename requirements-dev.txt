@@ -3,3 +3,4 @@
 # dependency tree inside the image that serves the API.
 -r requirements.txt
 playwright==1.62.0
+hypothesis
