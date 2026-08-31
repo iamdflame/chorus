@@ -28,6 +28,7 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 from api.engine import Engine
+from fleet.a2a import agent_card
 from fleet.domain import COMMS, DISPUTES, LEDGER, POLICIES, TICKETS
 from kernel.branch import PRIMARY
 from kernel.interposer import Mode
@@ -190,6 +191,9 @@ def health() -> dict[str, Any]:
         "branches": len(engine.branches()),
         "primary_effects": len(engine.store.timeline(PRIMARY)),
         "snapshot": SNAPSHOT,
+        # Which store the process is really serving from — "firestore" when the durable
+        # backend is live, otherwise the snapshot it fell back to and why.
+        "backend": getattr(engine, "backend", "unknown"),
         "deployment": os.environ.get("K_SERVICE", "local"),
         "region": os.environ.get("LIGHTCONE_REGION", "local"),
     }
@@ -358,6 +362,25 @@ def adopt(request: AdoptRequest) -> dict[str, Any]:
 
 
 # -- registry -----------------------------------------------------------------
+
+@app.get("/.well-known/agent-card.json", include_in_schema=False)
+def a2a_agent_card(request: Request) -> dict[str, Any]:
+    """The A2A discovery document, at the path the specification names.
+
+    Mapped from the registry rather than maintained beside it: a second hand-written copy
+    of what the agents are would drift from the first, and the drift would be invisible
+    because both files would keep looking plausible.
+
+    The base URL is taken from the request so the card is correct behind Cloud Run's
+    hostname without anyone configuring it — a card that advertises localhost is worse
+    than no card.
+    """
+    base = str(request.base_url).rstrip("/")
+    forwarded = request.headers.get("x-forwarded-proto")
+    if forwarded == "https" and base.startswith("http://"):
+        base = "https://" + base[len("http://"):]
+    return agent_card(base)
+
 
 @app.get("/api/registry")
 def registry() -> dict[str, Any]:

@@ -73,15 +73,21 @@ class Verdict:
 
     An unexplained block is unactionable: the operator cannot tell a real attack from a
     false positive, so every verdict carries the category and the span that triggered it.
+
+    `flagged` is deliberately not `blocked`. A layer can be confident enough to warrant a
+    human look without being confident enough to refuse a traveller, and collapsing those
+    two into one boolean is what turns a good detector into a bad gate.
     """
 
     blocked: bool = False
+    flagged: bool = False
     categories: list[str] = field(default_factory=list)
     evidence: list[str] = field(default_factory=list)
 
     def to_dict(self) -> dict[str, Any]:
         return {
             "blocked": self.blocked,
+            "flagged": self.flagged,
             "categories": self.categories,
             "evidence": self.evidence,
         }
@@ -144,3 +150,209 @@ def amplification(cohort_size: int) -> int:
     what the system built to save money.
     """
     return max(cohort_size, 0)
+
+
+# ── Layer 0: Model Armor ─────────────────────────────────────────────────────
+#
+# The pattern screen above is honest about being weak. This is the managed guardrail in
+# front of it: Google Cloud Model Armor's `sanitizeUserPrompt`, which does semantic
+# prompt-injection and jailbreak detection rather than substring matching, and therefore
+# catches the paraphrases that defeat a regex by construction.
+#
+# It returns the same `Verdict`, so nothing downstream changes. The layering is
+# deliberate and the order matters:
+#
+#   layer 0   Model Armor        semantic, managed, and the one that can be evaded least
+#   layer 1   the pattern screen fallback when layer 0 is unreachable, and a second
+#                                opinion when it is not
+#   layer 2   the typed airlock  the one that actually holds — an injected instruction
+#                                has no field to live in, so it cannot reach a shared
+#                                prompt even when both screens miss
+#
+# Two failure modes, treated differently on purpose. **Unreachable** means the network or
+# the API is down, and blocking every traveller because a screening service is having a
+# bad afternoon would be an outage of our own making — so it falls back to patterns and
+# says so in the verdict. **Unintelligible** means the service answered with something we
+# cannot interpret, and there is no safe reading of that: it fails closed.
+
+import json as _json
+import os as _os
+import urllib.error as _urlerror
+import urllib.request as _urlrequest
+
+MODEL_ARMOR_TEMPLATE = "chorus-intake"
+
+
+@dataclass(frozen=True, slots=True)
+class ArmorConfig:
+    """Where the managed guardrail lives. Absent a project, layer 0 is simply skipped."""
+
+    project: str
+    location: str = "us-central1"
+    template: str = MODEL_ARMOR_TEMPLATE
+    timeout: float = 8.0
+
+    @classmethod
+    def from_env(cls) -> "ArmorConfig | None":
+        project = _os.environ.get("GOOGLE_CLOUD_PROJECT", "")
+        if not project:
+            return None
+        return cls(
+            project=project,
+            location=_os.environ.get("MODEL_ARMOR_LOCATION", "us-central1"),
+            template=_os.environ.get("MODEL_ARMOR_TEMPLATE", MODEL_ARMOR_TEMPLATE),
+        )
+
+    @property
+    def endpoint(self) -> str:
+        return (
+            f"https://modelarmor.{self.location}.rep.googleapis.com/v1/"
+            f"projects/{self.project}/locations/{self.location}/"
+            f"templates/{self.template}:sanitizeUserPrompt"
+        )
+
+
+class Unreachable(Exception):
+    """Layer 0 could not be consulted. The caller falls back rather than failing."""
+
+
+def _access_token() -> str:
+    """Application Default Credentials, resolved lazily.
+
+    Imported inside the function so the pattern screen — and therefore CI, and therefore
+    `scripts/verify_armor.py` offline — never needs a cloud library present.
+    """
+    import google.auth
+    import google.auth.transport.requests
+
+    credentials, _ = google.auth.default(
+        scopes=["https://www.googleapis.com/auth/cloud-platform"]
+    )
+    credentials.refresh(google.auth.transport.requests.Request())
+    return credentials.token
+
+
+def screen_managed(text: str, config: ArmorConfig, *, token: str | None = None) -> Verdict:
+    """Screen one message with Model Armor. Raises `Unreachable`; never returns None.
+
+    A `MATCH_FOUND` on any filter blocks. An answer we cannot parse blocks — there is no
+    safe reading of an unintelligible verdict from a security service, and treating it as
+    "probably fine" would turn the strongest layer into the weakest.
+    """
+    body = _json.dumps({"user_prompt_data": {"text": text}}).encode("utf-8")
+    request = _urlrequest.Request(
+        config.endpoint,
+        data=body,
+        headers={
+            "Authorization": f"Bearer {token or _access_token()}",
+            "Content-Type": "application/json",
+            "x-goog-user-project": config.project,
+        },
+    )
+    try:
+        with _urlrequest.urlopen(request, timeout=config.timeout) as response:
+            payload = _json.loads(response.read())
+    except _urlerror.HTTPError as exc:
+        # 4xx and 5xx alike: the guardrail did not render a judgement, so we fall back.
+        raise Unreachable(f"HTTP {exc.code}") from exc
+    except Exception as exc:  # noqa: BLE001 - transport, DNS, timeout, credentials
+        raise Unreachable(f"{type(exc).__name__}") from exc
+
+    result = payload.get("sanitizationResult")
+    if not isinstance(result, dict):
+        return Verdict(
+            blocked=True,
+            categories=["unparseable_verdict"],
+            evidence=["Model Armor answered in a shape this code cannot read"],
+        )
+
+    state = result.get("filterMatchState")
+    if state == "NO_MATCH_FOUND":
+        return Verdict(blocked=False)
+    if state != "MATCH_FOUND":
+        return Verdict(
+            blocked=True,
+            categories=["unparseable_verdict"],
+            evidence=[f"unknown filterMatchState {state!r}"],
+        )
+
+    # Name the filters that fired, so an operator can tell a real attack from a false
+    # positive without opening a console.
+    categories: list[str] = []
+    for name, detail in (result.get("filterResults") or {}).items():
+        if not isinstance(detail, dict):
+            continue
+        for inner in detail.values():
+            if isinstance(inner, dict) and inner.get("matchState") == "MATCH_FOUND":
+                categories.append(f"model_armor:{name}")
+    return Verdict(
+        blocked=True,
+        categories=categories or ["model_armor:match"],
+        evidence=["blocked by Model Armor sanitizeUserPrompt"],
+    )
+
+
+def screen_layered(
+    text: str, config: ArmorConfig | None = None, *, token: str | None = None
+) -> Verdict:
+    """Layer 0 then layer 1, returning one `Verdict`.
+
+    With no config, or when layer 0 is unreachable, this is exactly the pattern screen —
+    which is why nothing downstream has to know whether the managed guardrail was
+    available. The verdict records which layers actually ran, because a block whose origin
+    is unknown is a block nobody can act on.
+    """
+    patterns = screen(text)
+
+    if config is None:
+        return patterns
+
+    try:
+        managed = screen_managed(text, config, token=token)
+    except Unreachable as exc:
+        # Degraded, not failed. Blocking every traveller because a screening service is
+        # having a bad afternoon would be an outage of our own making.
+        return Verdict(
+            blocked=patterns.blocked,
+            categories=[*patterns.categories, f"layer0_unreachable:{exc}"],
+            evidence=patterns.evidence,
+        )
+
+    if managed.blocked:
+        # An unintelligible answer from a security service has no safe reading, so it is
+        # the one Model Armor result that refuses the traveller outright.
+        if "unparseable_verdict" in managed.categories:
+            return Verdict(
+                blocked=True,
+                categories=[*managed.categories, *patterns.categories],
+                evidence=[*managed.evidence, *patterns.evidence],
+            )
+
+        # Otherwise a Model Armor match FLAGS rather than blocks, and this is a decision
+        # made from measurement rather than taste.
+        #
+        # Screened against the same 2,000-message benign corpus, the managed guardrail
+        # blocks 3.35% of genuine travellers where the pattern screen blocks 0.00% — and
+        # the ones it blocks are not randomly distributed. They are the distressed:
+        # "everything is melting down here at the gate", "please help us everything is
+        # collapsing". Semantic jailbreak detection reads panic as manipulation.
+        #
+        # In an irregular-operations system those are precisely the people who most need
+        # to get through, so blocking on this signal would deny help to the travellers the
+        # product exists for. The match is kept, routed to review, and the structural
+        # airlock — which cannot be evaded by paraphrase because there is no field for an
+        # instruction to occupy — does the actual containment.
+        return Verdict(
+            blocked=patterns.blocked,
+            flagged=True,
+            categories=[*managed.categories, *patterns.categories],
+            evidence=[*managed.evidence, *patterns.evidence],
+        )
+    # Layer 0 passed it; layer 1 still gets a say. Two screens disagreeing is information,
+    # not a contradiction — and the cheap one occasionally catches what the clever one
+    # waves through.
+    return Verdict(
+        blocked=patterns.blocked,
+        categories=[*patterns.categories, "model_armor:clean"],
+        evidence=patterns.evidence,
+    )

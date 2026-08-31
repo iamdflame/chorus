@@ -452,6 +452,26 @@ direction.
 
 ---
 
+## Who this is for
+
+Not an airline executive looking at a dashboard. **The duty manager at two in the morning**
+with a closed hub, twenty thousand stranded people, 2,888 seats, and a queue that is not
+getting shorter while they decide.
+
+That person does not need a system that reasons beautifully about one traveller. They need
+every traveller reasoned about *at all*, within the window where a seat still exists, and
+they need to be able to explain afterwards why a particular family was routed the way they
+were. Those are the two constraints that shaped everything here: cost per decision, and
+provenance for every decision.
+
+The scenario is airline irregular operations because it makes both constraints concrete and
+because the ground truth is checkable. The kernel is not airline-specific — `kernel/` has
+no domain knowledge and ADK appears in exactly one file — but **this repository ships one
+domain, and a second scenario is the honest test of that claim rather than a paragraph
+asserting it.** It has not been run.
+
+---
+
 ## What collapse costs
 
 Every number above measures what collapse saves. This measures what it loses, which is the
@@ -597,7 +617,30 @@ change what it believes.
 
 Written up in full: [**Cache poisoning in collapsed agent fleets**](docs/blog/cache-poisoning-in-collapsed-agent-fleets.md).
 
-The pattern screen is the **weakest** layer and the code says so: matching on natural language
+### The managed guardrail, and what measuring it cost
+
+Model Armor's `sanitizeUserPrompt` is layer 0 — semantic prompt-injection detection rather
+than substring matching, so paraphrase does not evade it the way it evades a regex. Screened
+against the same 2,000 benign messages:
+
+| layer | attacks blocked | false positives on 2,000 genuine messages |
+| --- | ---: | ---: |
+| Model Armor | 6/7 | **3.35%** |
+| pattern screen | 7/7 | **0.00%** |
+
+**The managed guardrail blocks 3.35% of real travellers, and the ones it blocks are not
+random.** They are the distressed — *"everything is melting down here at the gate"*,
+*"please help us everything is collapsing"* — because semantic jailbreak detection reads
+panic as manipulation. In an irregular-operations system those are precisely the people who
+most need to get through.
+
+So **a Model Armor match flags for review rather than blocking**, and the structural airlock
+does the containment. Two failure modes are treated differently on purpose: *unreachable*
+falls back to patterns, because blocking every traveller over a bad afternoon at a screening
+service is an outage of our own making; *unintelligible* fails closed, because there is no
+safe reading of an answer a security service gave that we cannot parse.
+
+The pattern screen is the **fallback** layer and the code says so: matching on natural language
 is defeated by paraphrase, and any claim that a regex list stops prompt injection should not
 survive contact with an adversary. Writing it, a test caught a real evasion — deleting
 zero-width characters is not enough, because an attacker using them as word separators leaves
@@ -748,7 +791,9 @@ Firestore    durable timeline, keyed by content address
 | **Governance — policy enforcement** | Quarantine gate: irreversible actions are staged, not dispatched, until a policy adopts the timeline | [`kernel/quarantine.py`](kernel/quarantine.py) |
 | **Agent Gateway** | Every tool call passes a policy read from the agent's own card, and **a denial is recorded as an effect** — content-addressed, replayable, and diffable, so "what would it have done if allowed?" is a branch and a diff rather than a thought experiment | [`gateway/policy.py`](gateway/policy.py) |
 | **Telemetry — reasoning-chain traces** | Effects map to OTel spans with `causal_parents` as **links**, so the trace is a DAG rather than a tree; replays render at zero duration. 39,996 spans exported to Cloud Trace | [`obs/otel.py`](obs/otel.py), [`scripts/trace_run.py`](scripts/trace_run.py) |
-| **Security — prompt injection** | Collapse amplifies injection by the collapse ratio, so the airlock is structural: no attacker-controlled byte reaches a shared address. Proved in CI | [`armor/`](armor/), [`scripts/verify_armor.py`](scripts/verify_armor.py) |
+| **Security — prompt injection** | Three layers. **Model Armor** `sanitizeUserPrompt` is layer 0; the pattern screen is the fallback; the typed airlock is what actually holds, because no attacker-controlled byte reaches a shared address. Proved in CI | [`armor/`](armor/), [`scripts/verify_armor.py`](scripts/verify_armor.py) |
+| **Interoperability — A2A** | An agent card at `/.well-known/agent-card.json`, mapped from the registry rather than maintained beside it. Every skill declares **whether it can be undone** and whether it has a compensator — consequence, not just capability | [`fleet/a2a.py`](fleet/a2a.py) |
+| **Durable state, actually served** | The deployed service boots on Firestore and `/health` reports `"backend"`, so which store is live is checkable without cloning | [`api/engine.py`](api/engine.py) |
 | **Governance — is the model earning its cost?** | Shadow sampling re-asks the model against its own cache and reports the disagreement rate as REASONING NECESSITY | [`policy/`](policy/), [`scripts/necessity.py`](scripts/necessity.py) |
 
 ### Required technologies
@@ -856,6 +901,7 @@ export GOOGLE_CLOUD_PROJECT=YOUR_PROJECT
 | Escalation recovers 85% at a third the cost | `scripts/escalation_sweep.py` |
 | 39,996 spans, 1,965 executed | `scripts/trace_run.py` |
 | Injection cannot reach a shared address | `scripts/verify_armor.py` |
+| Both screening layers, false positives measured | `scripts/verify_armor.py --managed 2000` |
 | Gemma agreement predicts correctness | `scripts/verify_gemma.py --sample 200` |
 | Memory persists 90 days and costs 9% of collapse | `scripts/verify_memory.py` |
 | Voice and a photographed pass reach the same lattice | `scripts/verify_multimodal.py` |
@@ -868,6 +914,11 @@ export GOOGLE_CLOUD_PROJECT=YOUR_PROJECT
 | No PII crosses the boundary | `pytest tests/test_projection_leakage.py` |
 
 Raw outputs from the runs quoted above are committed under [`docs/runs/`](docs/runs/) with their timestamps and commit SHAs.
+
+**On this repository's history:** it runs from 29 to 31 August 2026, which is dense enough
+to warrant an explanation rather than a shrug. [`docs/PROVENANCE.md`](docs/PROVENANCE.md)
+gives the straight account — what v1 was, what the audit found, and what the rebuild
+changed, including the six findings that came from measuring rather than intending.
 
 ---
 

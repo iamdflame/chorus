@@ -11,6 +11,7 @@ translation of requests into kernel calls.
 from __future__ import annotations
 
 import asyncio
+import os
 from pathlib import Path
 from typing import Any, AsyncIterator
 
@@ -29,9 +30,47 @@ class Engine:
     """Owns the live timeline and every operation over it."""
 
     def __init__(self, snapshot: str | Path | None = None) -> None:
+        # Which store is actually serving, reported by /health so the claim is checkable
+        # from the one surface a reader has without cloning the repo.
+        self.backend = "memory"
+
         if snapshot and Path(snapshot).exists():
             self.store, self.world = load(snapshot)
             self.state_floor = self._infer_state_floor()
+            self.backend = f"snapshot:{Path(snapshot).name}"
+
+            # Firestore is the durable store, and saying so while serving from a JSON file
+            # would be the softest claim in the project. When a project is configured the
+            # timeline is promoted into Firestore on boot and served from there; the
+            # snapshot becomes the seed rather than the source.
+            #
+            # Failure here is not fatal on purpose. A demo that will not start because a
+            # database is unreachable is worse than one that starts on the reference
+            # backend and says which it is — and it says which either way.
+            project = os.environ.get("GOOGLE_CLOUD_PROJECT", "")
+            if project and os.environ.get("CHORUS_STORE", "firestore") == "firestore":
+                try:
+                    from kernel.firestore_store import FirestoreEffectStore
+
+                    remote = FirestoreEffectStore(
+                        project=project,
+                        root=os.environ.get("CHORUS_STORE_ROOT", "lightcone"),
+                    )
+                    for branch in self.store.list_branches():
+                        if remote.get_branch(branch.id) is None:
+                            remote.create_branch(branch)
+                    existing = {e.id for e in remote.own_effects(PRIMARY)}
+                    fresh = [
+                        e for e in self.store.timeline(PRIMARY) if e.id not in existing
+                    ]
+                    if fresh:
+                        remote.put_many(fresh)
+                        remote.append_manifest(PRIMARY, [e.id for e in fresh])
+                    self.store = remote
+                    self.backend = "firestore"
+                except Exception as exc:  # noqa: BLE001 - degraded, and it says so
+                    self.backend = f"snapshot:{Path(snapshot).name} (firestore: "
+                    self.backend += f"{type(exc).__name__})"
         else:
             self.store = InMemoryEffectStore()
             self.world = ShadowWorld(

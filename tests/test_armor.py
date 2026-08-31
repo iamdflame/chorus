@@ -218,3 +218,80 @@ class TestAmplificationIsTheCollapseRatio:
         biggest = max(grouped.values())
         assert biggest > 50, "a cohort this small would understate the risk"
         assert amplification(biggest) == biggest
+
+
+class TestLayeredScreen:
+    """Layer 0 is a managed guardrail; layer 1 is the pattern screen; the airlock is what
+    actually holds. These pin how the layers combine, including the two failure modes that
+    are treated differently on purpose."""
+
+    def _cfg(self):
+        from armor.screen import ArmorConfig
+
+        return ArmorConfig(project="test-project")
+
+    def test_no_config_is_exactly_the_pattern_screen(self) -> None:
+        from armor.screen import screen, screen_layered
+
+        for text in ATTACKS + BENIGN:
+            assert screen_layered(text).blocked == screen(text).blocked
+
+    def test_unreachable_falls_back_rather_than_failing_shut(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Blocking every traveller because a screening service is having a bad afternoon
+        would be an outage of our own making."""
+        import armor.screen as mod
+
+        def boom(*a, **k):
+            raise mod.Unreachable("ConnectionError")
+
+        monkeypatch.setattr(mod, "screen_managed", boom)
+        clean = mod.screen_layered(BENIGN[0], self._cfg())
+        assert clean.blocked is False
+        assert any("layer0_unreachable" in c for c in clean.categories)
+
+        attack = mod.screen_layered(ATTACKS[0], self._cfg())
+        assert attack.blocked is True  # patterns still caught it
+
+    def test_an_unparseable_verdict_fails_closed(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """There is no safe reading of an unintelligible answer from a security service."""
+        import armor.screen as mod
+
+        monkeypatch.setattr(mod, "screen_managed", lambda *a, **k: mod.Verdict(
+            blocked=True, categories=["unparseable_verdict"], evidence=["shape"]))
+        got = mod.screen_layered(BENIGN[0], self._cfg())
+        assert got.blocked is True
+
+    def test_a_match_flags_rather_than_blocks(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Measured, not chosen: Model Armor blocks 3.35% of genuine travellers on this
+        corpus, and the ones it blocks are the distressed. Denying help to the people who
+        most need it is a worse failure than routing them to review."""
+        import armor.screen as mod
+
+        monkeypatch.setattr(mod, "screen_managed", lambda *a, **k: mod.Verdict(
+            blocked=True, categories=["model_armor:pi_and_jailbreak"], evidence=["m"]))
+        got = mod.screen_layered(BENIGN[0], self._cfg())
+        assert got.blocked is False
+        assert got.flagged is True
+        assert "model_armor:pi_and_jailbreak" in got.categories
+
+    def test_patterns_still_block_when_layer0_passes(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """The cheap screen occasionally catches what the clever one waves through."""
+        import armor.screen as mod
+
+        monkeypatch.setattr(mod, "screen_managed", lambda *a, **k: mod.Verdict(blocked=False))
+        got = mod.screen_layered(ATTACKS[0], self._cfg())
+        assert got.blocked is True
+        assert "model_armor:clean" in got.categories
+
+    def test_the_endpoint_is_built_from_config_not_hardcoded(self) -> None:
+        cfg = self._cfg()
+        assert cfg.project in cfg.endpoint
+        assert "sanitizeUserPrompt" in cfg.endpoint
