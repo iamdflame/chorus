@@ -2,6 +2,9 @@ import { Console } from "./Console";
 import { Footer } from "./site/Footer";
 import { Nav } from "./site/Nav";
 import { Evidence } from "./site/pages/Evidence";
+import { Architecture } from "./site/pages/Architecture";
+import { Policy } from "./site/pages/Policy";
+import { Registry } from "./site/pages/Registry";
 import { Home } from "./site/pages/Home";
 import { Incident } from "./site/pages/Incident";
 import { Intake } from "./site/pages/Intake";
@@ -33,6 +36,9 @@ function Routes() {
           : path === "/ledger" ? <LedgerPage />
           : path === "/incident" ? <Incident />
           : path === "/intake" ? <Intake />
+          : path === "/registry" ? <Registry />
+          : path === "/architecture" ? <Architecture />
+          : path === "/policy" || path.startsWith("/policy/") ? <Policy />
           : <Home />}
       </main>
       <Footer />

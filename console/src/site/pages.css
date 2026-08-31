@@ -874,3 +874,177 @@
   left: 0;
   color: var(--text-faint);
 }
+
+/* ── Policy provenance ──────────────────────────────────────────────────────── */
+
+.policy-search { display: grid; gap: 0.4rem; max-width: 24rem; margin-bottom: 1.5rem; }
+
+.policy-search input {
+  font-family: var(--data);
+  font-size: var(--t-sm);
+  color: var(--text-hi);
+  background: var(--chassis);
+  border: 1px solid var(--rule-hi);
+  border-radius: 2px;
+  padding: 0.55rem 0.7rem;
+}
+
+.policy-count { font-size: var(--t-xs); margin: 0 0 1rem; }
+
+.policy-rows { display: grid; border-top: 1px solid var(--rule); }
+
+.policy-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 1rem;
+  align-items: baseline;
+  padding: 0.7rem 0.25rem;
+  border-bottom: 1px solid var(--rule);
+  text-decoration: none;
+  color: var(--text);
+  transition: background 140ms var(--ease-place), color 140ms var(--ease-place);
+}
+
+.policy-row:hover { background: var(--chassis); color: var(--text-hi); }
+.policy-row-key { font-size: var(--t-xs); overflow-wrap: anywhere; }
+.policy-row-served { font-size: var(--t-xs); color: var(--filament); }
+.policy-row-flag {
+  font-family: var(--data);
+  font-size: var(--t-xs);
+  color: var(--counterfact);
+}
+
+.policy-facets { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+
+.policy-facet {
+  font-size: var(--t-xs);
+  padding: 0.22rem 0.55rem;
+  border: 1px solid var(--rule-hi);
+  border-radius: 999px;
+  color: var(--text-lo);
+}
+
+.policy-flag {
+  margin: 1.25rem 0 0;
+  padding: 0.9rem 1.1rem;
+  border-left: 2px solid var(--counterfact);
+  background: var(--chassis);
+  color: var(--text);
+  max-width: 74ch;
+}
+
+.policy-answer,
+.policy-prov {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(12rem, 100%), 1fr));
+  gap: 1.1rem;
+  margin: 0.75rem 0 0;
+}
+
+.policy-answer dt,
+.policy-prov dt {
+  font-family: var(--data);
+  font-size: var(--t-xs);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.policy-answer dd,
+.policy-prov dd { margin: 0.2rem 0 0; color: var(--text-hi); }
+
+.policy-hash { font-size: var(--t-xs); overflow-wrap: anywhere; }
+
+/* ── Registry cards ─────────────────────────────────────────────────────────── */
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(22rem, 100%), 1fr));
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+}
+
+.card { background: var(--chassis); padding: 1.25rem; }
+
+.card-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.75rem;
+}
+
+.card-id { font-size: var(--t-sm); color: var(--text-hi); }
+.card-ver { font-size: var(--t-xs); color: var(--filament); }
+.card-summary { margin: 0 0 1rem; font-size: var(--t-sm); color: var(--text); }
+
+.card-meta { display: grid; gap: 0.6rem; margin: 0 0 1rem; }
+.card-meta div { display: flex; justify-content: space-between; gap: 1rem; }
+.card-meta dt { font-size: var(--t-xs); color: var(--text-faint); }
+.card-meta dd { margin: 0; font-size: var(--t-xs); color: var(--text); text-align: right; }
+
+.card-policy { border-top: 1px solid var(--rule); padding-top: 0.9rem; }
+
+.card-policy-head {
+  margin: 0 0 0.3rem;
+  font-family: var(--data);
+  font-size: var(--t-xs);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.card-sees { margin: 0 0 0.9rem; font-size: var(--t-xs); color: var(--reflect); }
+.card-never { margin: 0; font-size: var(--t-xs); color: var(--breach); }
+
+/* ── Architecture ───────────────────────────────────────────────────────────── */
+
+.stages { list-style: none; margin: 0; padding: 0; display: grid; }
+
+.stage {
+  display: grid;
+  grid-template-columns: 3rem 1fr;
+  gap: 1.25rem;
+  padding: 1.1rem 0;
+  border-bottom: 1px solid var(--rule);
+}
+
+.stage:first-child { border-top: 1px solid var(--rule); }
+.stage-n { color: var(--text-faint); font-size: var(--t-sm); }
+
+.stage-name {
+  margin: 0 0 0.3rem;
+  color: var(--text-hi);
+  font-variation-settings: "wght" 600, "wdth" 92, "ROND" 0;
+}
+
+.stage-cost {
+  margin-left: 0.6rem;
+  font-size: var(--t-xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--filament);
+}
+
+.stage-body { margin: 0; font-size: var(--t-sm); max-width: 70ch; }
+
+.compliance th[scope="row"] { white-space: normal; min-width: 18rem; }
+.compliance .compliance-how { text-align: left; white-space: normal; color: var(--text); font-size: var(--t-xs); max-width: 30rem; }
+.compliance .compliance-where { color: var(--reflect); font-size: var(--t-xs); }
+
+.compliance-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  margin-right: 0.55rem;
+  background: var(--filament);
+}
+
+/* Not green-for-everything: a partial row is drawn differently as well as labelled, so
+   the distinction survives a glance and a colour-blind reader alike. */
+.compliance-dot[data-state="partial"] {
+  background: transparent;
+  border: 1px solid var(--reflect);
+}

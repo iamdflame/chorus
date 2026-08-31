@@ -20,6 +20,9 @@ const ROUTES = [
 const SHEET = [
   { to: "/", label: "Overview" },
   ...ROUTES,
+  { to: "/architecture", label: "Architecture" },
+  { to: "/registry", label: "Registry" },
+  { to: "/policy", label: "Policy" },
   { to: "/console", label: "Console" },
 ];
 

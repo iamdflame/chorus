@@ -23,6 +23,7 @@ const PLACES: Record<string, Place> = {
   "/ledger": "plate",
   "/registry": "plate",
   "/architecture": "plate",
+  "/policy": "plate",
 };
 
 export function placeFor(path: string): Place {

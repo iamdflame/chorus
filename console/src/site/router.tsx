@@ -50,6 +50,16 @@ export function RouterProvider({ children }: { children: ReactNode }) {
 
 export const useRoute = () => useContext(RouteContext);
 
+/** The segment after a prefix, decoded — e.g. `/policy/v2|passenger|…` -> the cell key.
+ *  Returns null when the path is not under that prefix, so a page can render its index
+ *  view and its detail view from one route without a second router. */
+export function useParam(prefix: string): string | null {
+  const { path } = useRoute();
+  if (!path.startsWith(prefix + "/")) return null;
+  const tail = path.slice(prefix.length + 1);
+  return tail ? decodeURIComponent(tail) : null;
+}
+
 export function Link({
   to, children, className, ...rest
 }: { to: string; children: ReactNode; className?: string } & Record<string, unknown>) {

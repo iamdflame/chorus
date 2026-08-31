@@ -434,6 +434,56 @@ def necessity() -> dict[str, Any]:
     return {"available": True, **payload}
 
 
+@app.get("/api/policy")
+def policy_table(limit: int = 60, q: str = "") -> dict[str, Any]:
+    """The distilled policy, row by row, each with the provenance that derived it.
+
+    Served from the last recorded distillation. Rows are the product of real model calls,
+    so recomputing them on request would be both slow and a different table each time —
+    which is the opposite of what a policy version is for.
+    """
+    path = Path(os.environ.get("CHORUS_POLICY", "data/policy.json"))
+    if not path.exists():
+        return {"available": False, "reason": "no policy distilled; scripts/necessity.py writes this"}
+    try:
+        payload = json.loads(path.read_text())
+    except (OSError, json.JSONDecodeError) as exc:
+        return {"available": False, "reason": f"unreadable: {type(exc).__name__}"}
+
+    rows = payload.get("rows", [])
+    if q:
+        needle = q.lower()
+        rows = [r for r in rows if needle in r["key"].lower()]
+    # Most-served first: the rows that carry the most traffic are the ones worth auditing.
+    rows = sorted(rows, key=lambda r: -r.get("provenance", {}).get("served", 0))
+    return {
+        "available": True,
+        "version": payload.get("version"),
+        "ceiling": payload.get("ceiling"),
+        "populated": payload.get("populated"),
+        "matched": len(rows),
+        "rows": rows[: max(1, min(limit, 400))],
+    }
+
+
+@app.get("/api/policy/{cell}")
+def policy_cell(cell: str) -> dict[str, Any]:
+    """One cell, deep-linkable. Every number elsewhere should be able to reach here.
+
+    Provenance you can get to in one click is what separates an audited system from a
+    dashboard: the effect that derived this answer, the model that produced it, when, how
+    many entities it has served, and whether drift has since invalidated it.
+    """
+    path = Path(os.environ.get("CHORUS_POLICY", "data/policy.json"))
+    if not path.exists():
+        raise HTTPException(status_code=404, detail="no policy distilled")
+    payload = json.loads(path.read_text())
+    for row in payload.get("rows", []):
+        if row["key"] == cell:
+            return {"available": True, "version": payload.get("version"), **row}
+    raise HTTPException(status_code=404, detail=f"no policy cell {cell!r}")
+
+
 @app.get("/api/swarm/cohorts")
 def swarm_cohorts(agents: int = 20000) -> Response:
     """The population at rest: pure bucketing, no model calls, no cost.

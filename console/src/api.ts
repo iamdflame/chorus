@@ -36,6 +36,54 @@ export interface Graph {
 }
 
 
+export interface AgentCard {
+  id: string;
+  version: string;
+  role: string;
+  summary: string;
+  status: string;
+  model: string;
+  generation?: { thinking_level?: string; temperature?: number };
+  tools: { name: string; determinism?: string; reversible?: boolean }[];
+  data_policy: { sees: string[]; never_sees: string[] };
+  delegates_to?: string[];
+}
+
+export interface Registry {
+  registry: string;
+  count: number;
+  agents: AgentCard[];
+  reversibility_classes?: Record<string, string>;
+}
+
+export interface Provenance {
+  effect_id: string | null;
+  model: string;
+  derived_at: string;
+  served: number;
+}
+
+export interface PolicyRow {
+  key: string;
+  answer: Record<string, unknown>;
+  provenance: Provenance;
+  confirmations: number;
+  disagreements: number;
+  invalidated: boolean;
+}
+
+export interface PolicyList {
+  available: boolean;
+  reason?: string;
+  version?: string;
+  ceiling?: number;
+  populated?: number;
+  matched?: number;
+  rows?: PolicyRow[];
+}
+
+export type PolicyCell = PolicyRow & { available: boolean; version: string };
+
 export interface Shadow {
   sampled: number;
   answered: number;
@@ -105,6 +153,11 @@ export const api = {
    *  rather than zeros when no run exists — a necessity of 0% from a measurement
    *  that never happened is the most reassuring number here and the least true. */
   necessity: () => json<Necessity>("/api/necessity"),
+  registry: () => json<Registry>("/api/registry"),
+  policy: (q = "", limit = 60) =>
+    json<PolicyList>(`/api/policy?limit=${limit}&q=${encodeURIComponent(q)}`),
+  policyCell: (cell: string) =>
+    json<PolicyCell>(`/api/policy/${encodeURIComponent(cell)}`),
 };
 
 /** Shared SSE reader. Both replay and search stream over POST, which EventSource

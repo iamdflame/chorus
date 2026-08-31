@@ -25,6 +25,19 @@ const COLUMNS: { title: string; links: FooterLink[] }[] = [
     ],
   },
   {
+    // Reference surfaces live here rather than in the bar. Eight destinations across one
+    // row crowds the mark, and putting them in the mobile sheet alone would make them
+    // unreachable above 60rem — a trap this build has already fallen into once.
+    title: "Governance",
+    links: [
+      { label: "Architecture", to: "/architecture" },
+      { label: "Agent registry", to: "/registry" },
+      { label: "Policy provenance", to: "/policy" },
+      { label: "Necessity ledger", to: "/ledger" },
+      { label: "Incident", to: "/incident" },
+    ],
+  },
+  {
     title: "Reading",
     links: [
       { label: "Architecture", href: LINKS.architecture },
