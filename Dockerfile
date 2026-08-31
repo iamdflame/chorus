@@ -21,11 +21,27 @@ WORKDIR /app
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Every package the serving path can reach, not just the ones it reached last time.
+#
+# This list has now silently broken the deployment twice: once when swarm/ was missing and
+# the container booted healthy then failed on the first real request, and once when obs/
+# was missing and it would not start at all. A COPY list that is maintained by remembering
+# is a COPY list that will be wrong again, so tests/test_dockerfile.py now walks the
+# imports and fails if any reachable package is absent from this file.
 COPY kernel/ ./kernel/
 COPY world/ ./world/
 COPY fleet/ ./fleet/
 COPY swarm/ ./swarm/
 COPY optimizer/ ./optimizer/
+COPY armor/ ./armor/
+COPY gateway/ ./gateway/
+COPY memory/ ./memory/
+COPY models/ ./models/
+COPY obs/ ./obs/
+COPY policy/ ./policy/
+COPY extract/ ./extract/
+COPY intake/ ./intake/
+COPY bench/ ./bench/
 COPY api/ ./api/
 COPY scripts/ ./scripts/
 COPY data/ ./data/
