@@ -74,7 +74,16 @@ export function Console() {
     setNote("waking 20,000 agents…");
     try {
       await streamSwarm({ agents: 20000, concurrency: 8 }, (event) => {
-        if (event.event === "progress") {
+        // The server caps an unauthenticated caller and says so in the opening frame.
+        // Ignoring that would leave the counters reading 300 while the page still claims
+        // twenty thousand — the interface contradicting itself in the one place a viewer
+        // is reading numbers off the screen.
+        if (event.event === "capped") {
+          setNote(
+            `capped to ${num(event.running as number)} agents — the public demo ceiling. ` +
+            `A write token lifts it.`,
+          );
+        } else if (event.event === "progress") {
           if (event.cohort) {
             if (event.thought) murmurRef.current?.think(event.cohort);
             else murmurRef.current?.share(event.cohort);

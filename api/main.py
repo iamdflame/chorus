@@ -105,7 +105,11 @@ def require_write(authorization: str = Header(default="")) -> None:
 # rate is the limit times the instance count, which is a real weakness and is written down
 # rather than left for someone to discover. A global limit belongs in Cloud Armor.
 
-PUBLIC_AGENT_CEILING = 300
+# Bounded, but configurable — because the flagship demo *is* a 20,000-agent run, and a
+# ceiling that silently truncates it to 300 while the console keeps saying twenty thousand
+# is a contradiction on screen rather than a safety control. Set CHORUS_PUBLIC_CEILING for
+# a recording session or a local run.
+PUBLIC_AGENT_CEILING = int(os.environ.get("CHORUS_PUBLIC_CEILING", "300"))
 _RATE_WINDOW_S = 60.0
 _RATE_MAX = 6
 _recent: dict[str, list[float]] = defaultdict(list)
