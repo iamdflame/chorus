@@ -33,6 +33,7 @@ from google.adk.runners import Runner
 from google.adk.sessions import InMemorySessionService
 from google.genai import types
 
+from kernel.backoff import Attempts, with_backoff
 from kernel.branch import PRIMARY
 from kernel.effect import Determinism, Effect, EffectKind, hash_payload
 from kernel.interposer import LightconePlugin, Mode
@@ -239,6 +240,9 @@ class Swarm:
         self._sessions = InMemorySessionService()
         # Cohort traces from the most recent run, for distillation to compile.
         self.last_cohorts: dict[str, CohortTrace] = {}
+        # What retrying actually cost, reported rather than hidden: a run that quietly
+        # retried two hundred times is a different run from one that did not.
+        self.attempts = Attempts()
 
     def round_anchor(self, round_id: str, context: dict[str, Any]) -> str:
         """A causal anchor shared by every agent reasoning in this round.
@@ -307,9 +311,23 @@ class Swarm:
             async with self.gate:
                 projection = projector(entity)
                 try:
-                    answer, plugin = await asyncio.wait_for(
-                        self._invoke(role, projection, context, anchor),
-                        timeout=AGENT_TIMEOUT,
+                    # Retry lives here rather than inside the interposer because ADK owns
+                    # the call between before_model_callback and after_model_callback —
+                    # the plugin can substitute a response but cannot re-issue one.
+                    #
+                    # Retrying a whole invocation is safe precisely because of how effects
+                    # are addressed: the address is a hash of (kind, agent, causal
+                    # parents, request), and a retry re-derives all four identically. A
+                    # retried call is therefore the SAME address, not a second thought —
+                    # which is the invariant tests/test_backoff.py pins, because if it
+                    # broke, the collapse number would silently inflate by the number of
+                    # transient failures a run happened to hit.
+                    answer, plugin = await with_backoff(
+                        lambda: asyncio.wait_for(
+                            self._invoke(role, projection, context, anchor),
+                            timeout=AGENT_TIMEOUT,
+                        ),
+                        stats=self.attempts,
                     )
                 except Exception as exc:  # noqa: BLE001 - one agent must not end the swarm
                     # Counted before returning. Previously a failed agent never reached

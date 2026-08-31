@@ -787,6 +787,7 @@ Firestore    durable timeline, keyed by content address
 | **Memory across weeks** | 21-day recorded history in Firestore, keyed by content address; branches fork it in O(1) and time-travel to any sequence number | [`world/`](world/), [`kernel/firestore_store.py`](kernel/firestore_store.py) |
 | **Cross-session traveller memory** | A returning traveller is recognised 90 days later without re-stating anything. Memory feeds the **projection, not the prompt** — it changes which cohort you join, never what that cohort thinks — so the shared thought stays shareable and no identity reaches a model. Constraints expire on a schedule rather than mislabelling someone for years | [`memory/`](memory/), [`scripts/verify_memory.py`](scripts/verify_memory.py) |
 | **Security — data handling & PII** | Identity never crosses the model boundary; enforced structurally, not by policy | [`swarm/canonical.py`](swarm/canonical.py) |
+| **Public read surface** | `allUsers` on the Cloud Run service is a stated decision: reads are open so a judge needs no account, while every mutating or spending endpoint requires a bearer token from Secret Manager and is refused outright when none is set. The demo endpoint is capped at 300 agents and rate-limited per caller | [`infra/terraform/run.tf`](infra/terraform/run.tf), [`tests/test_api_security.py`](tests/test_api_security.py) |
 | **Zero-trust — agent identity** | One service account per agent *role*, not per app. The allocator has no model access at all, so a model there is unreachable rather than merely unused. Proved by attempting the forbidden action from each identity — including two probes that must be ALLOWED, since an identity that can do nothing proves only that it is broken | [`infra/identity.sh`](infra/identity.sh), [`scripts/verify_controls.sh`](scripts/verify_controls.sh) |
 | **Governance — policy enforcement** | Quarantine gate: irreversible actions are staged, not dispatched, until a policy adopts the timeline | [`kernel/quarantine.py`](kernel/quarantine.py) |
 | **Agent Gateway** | Every tool call passes a policy read from the agent's own card, and **a denial is recorded as an effect** — content-addressed, replayable, and diffable, so "what would it have done if allowed?" is a branch and a diff rather than a thought experiment | [`gateway/policy.py`](gateway/policy.py) |
@@ -805,6 +806,7 @@ Firestore    durable timeline, keyed by content address
 | Additional Google model | **Gemma 4** (`gemma-4-26b-a4b-it`) as an independent second reader whose agreement lifts extraction accuracy by ~10 points on the two fields Gemini gets wrong. Measured, not claimed — including the two corrections to our own method that the measurement required | [`models/gemma.py`](models/gemma.py), [`scripts/verify_gemma.py`](scripts/verify_gemma.py) |
 | Google agent framework | **ADK** (`google-adk` 2.8) — `BasePlugin` interposition, `SequentialAgent`, runtime `transfer_to_agent` | [`kernel/interposer.py`](kernel/interposer.py) |
 | Google Cloud infrastructure | **Cloud Run** (serving), **Firestore** native mode (durable effect store), **Vertex AI** (model access), **Cloud Trace** (39,996 spans from one run), **Secret Manager** (the write token) | [`infra/terraform/`](infra/terraform/), [`infra/deploy.sh`](infra/deploy.sh) |
+| Secrets | **Secret Manager** → Cloud Run `secret_key_ref` ([`infra/terraform/data.tf`](infra/terraform/data.tf), [`run.tf`](infra/terraform/run.tf)), granted by `roles/secretmanager.secretAccessor` ([`iam.tf`](infra/terraform/iam.tf)). The write token is **never an env literal and never in the image** — and deliberately not fetched with `access_secret_version()` in-process, which would put the client library in the request path and the secret in application memory. It is injected by the platform, so a `grep` for the Python call correctly finds nothing | [`infra/terraform/`](infra/terraform/) |
 | Infrastructure as code | **Terraform** declares services, per-role IAM, Firestore, Artifact Registry, Secret Manager and the Cloud Run service. Validated and planned against the live project: 23 to add, 0 to change, 0 to destroy. The image stays out of Terraform on purpose — a plan that is dirty after every deploy is a plan nobody reads | [`infra/terraform/`](infra/terraform/) |
 
 `thinking_level` is set per agent rather than left at Gemini 3.5 Flash's `medium` default: the policy decision that moves money gets `high`, record lookups get `low`. Per-agent context caching is enabled because every delegation swaps the system instruction and re-sends the prompt uncached, which was most of the bill.
@@ -924,14 +926,22 @@ changed, including the six findings that came from measuring rather than intendi
 
 ## Failure handling
 
-| Failure | Behaviour |
-| --- | --- |
-| Model returns malformed JSON | Agent takes a second turn at a new causal position; the retry is a distinct address, so it correctly misses the store rather than poisoning it |
-| Vertex AI 429 / quota exhaustion | Exponential backoff with jitter; the run is resumable because completed effects are already durable |
-| Firestore unavailable | Falls back to the in-memory reference store; the run completes and is flagged non-durable rather than failing |
-| Partial run interrupted | The causal DAG is the checkpoint — re-invoking replays from the last recorded effect at zero model cost |
-| Duplicate dispatch of an irreversible action | Quarantine gate stages side effects; nothing external fires until a timeline is adopted |
-| Concurrent fan-out reorders tool calls | Effects are sequenced by causal position, not wall clock; DAG comparison is order-insensitive |
+Every row names the file that implements it and the test that pins it. A failure table
+without those is a list of intentions — and one row of this table used to be exactly that:
+it claimed exponential backoff with jitter when the codebase contained none. The claim is
+now true, and the way it was found is in [`docs/AUDIT.md`](docs/AUDIT.md).
+
+| Failure | Behaviour | Where | Pinned by |
+| --- | --- | --- | --- |
+| Model returns malformed JSON | Agent takes a second turn at a new causal position; the retry is a distinct address, so it correctly misses the store rather than poisoning it | [`kernel/interposer.py`](kernel/interposer.py) | `tests/test_kernel.py` |
+| Vertex AI 429 / quota exhaustion | Retried with **full jitter** at the one boundary the fleet touches a paid service — and a retry re-derives the *same* causal address, so it is one thought, not two. Beyond the attempt budget the run is resumable, because completed effects are already durable | [`kernel/backoff.py`](kernel/backoff.py) | `tests/test_backoff.py` |
+| A retry silently inflating the collapse ratio | The address is a hash of (kind, agent, causal parents, request); a retry re-derives all four identically, so the store records one row however many attempts it took | [`kernel/effect.py`](kernel/effect.py) | `tests/test_backoff.py::TestAddressInvariance` |
+| A replay reaching the network | Only the miss path retries. `REPLAY_STRICT` raises on a miss rather than being given another go at finding one | [`kernel/interposer.py`](kernel/interposer.py) | `tests/test_backoff.py::TestReplayIsNeverRetried` |
+| Firestore unavailable | Falls back to the in-memory reference store; the run completes and `/health` reports which backend is live rather than claiming the durable one | [`api/engine.py`](api/engine.py) | `tests/test_firestore.py` |
+| Partial run interrupted | The causal DAG is the checkpoint — re-invoking replays from the last recorded effect at zero model cost | [`kernel/dag.py`](kernel/dag.py) | `scripts/verify_determinism.py` |
+| Duplicate dispatch of an irreversible action | Quarantine gate stages side effects; nothing external fires until a timeline is adopted | [`kernel/quarantine.py`](kernel/quarantine.py) | `tests/test_replay.py` |
+| Concurrent fan-out reorders tool calls | Effects are sequenced by causal position, not wall clock; DAG comparison is order-insensitive | [`kernel/dag.py`](kernel/dag.py) | `scripts/verify_concurrency.py` |
+| A screening service having a bad afternoon | Model Armor unreachable degrades to the pattern screen and says so in the verdict; an *unintelligible* verdict fails closed | [`armor/screen.py`](armor/screen.py) | `tests/test_armor.py::TestLayeredScreen` |
 
 ---
 

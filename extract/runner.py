@@ -21,6 +21,7 @@ from typing import Any, Callable, Iterable
 
 from extract import keyword
 from extract.situation import INSTRUCTION, MODEL, SCHEMA, Extracted, parse
+from kernel.backoff import Attempts, with_backoff
 from kernel.interposer import PRICE_IN_PER_M, PRICE_OUT_PER_M
 from swarm.canonical import Projection
 from swarm.pipeline import message_address
@@ -41,6 +42,9 @@ class ExtractionRun:
     cost_usd: float = 0.0
     quoted_checked: int = 0
     quoted_genuine: int = 0
+    # Transient failures survived rather than swallowed. A run that retried is a
+    # different run from one that did not, so it says so.
+    attempts: Attempts = field(default_factory=Attempts)
 
     @property
     def quotation_rate(self) -> float:
@@ -101,7 +105,7 @@ async def extract_many(
         got: Extracted | None = None
         async with gate:
             try:
-                response = await asyncio.wait_for(
+                response = await with_backoff(lambda: asyncio.wait_for(
                     asyncio.to_thread(
                         client.models.generate_content,
                         model=MODEL,
@@ -117,7 +121,7 @@ async def extract_many(
                         },
                     ),
                     timeout=CALL_TIMEOUT,
-                )
+                ), stats=run.attempts)
                 got = parse(message.id, json.loads(response.text))
                 usage = response.usage_metadata
                 run.calls += 1

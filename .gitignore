@@ -17,3 +17,14 @@ infra/terraform/.terraform/
 infra/terraform/.terraform.lock.hcl
 *.tfstate
 *.tfstate.*
+
+# Working plans, kept locally and out of the repository.
+#
+# changes_that_must_be_made.md is a v2 rebuild plan that labels four of its own findings
+# "fatal" and "severe". Those findings were acted on — the claims are withdrawn or
+# corrected, the controls are built, and tests pin them — but the document is written in
+# the present tense and carries no dates, so a reader browsing the file list finds an
+# indictment with no way to tell it was resolved. docs/AUDIT.md is the same content in the
+# past tense, with each finding linked to the commit and the test that closed it.
+changes_that_must_be_made.md
+frontendplan.md

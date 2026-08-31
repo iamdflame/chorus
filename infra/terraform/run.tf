@@ -98,9 +98,21 @@ data "google_project" "this" {
   project_id = var.project_id
 }
 
-# Public reads. A judge, a reader or a recruiter should be able to open the console without
-# being issued a credential. Mutation endpoints are gated in the application and are closed
-# outright when no write token is set, so "public" here means readable, not writable.
+# Public reads — a deliberate decision, not an oversight, and worth stating because
+# `allUsers` is exactly the binding a reviewer greps for.
+#
+# A judge, a reader or a recruiter should be able to open the console and watch twenty
+# thousand agents collapse without being issued a credential. Requiring one would protect
+# nothing that is not already protected and would remove the product's only demonstration.
+#
+# What is NOT public: every endpoint that mutates state or spends money. Fork, merge,
+# replay, adopt and search require a bearer token compared in constant time, and are
+# refused outright when no token is configured — an unset secret is the most common way a
+# control like this ends up doing nothing. The demo endpoint stays open with a 300-agent
+# ceiling and a per-caller rate limit, so abuse is bounded rather than prevented by
+# removing the demo. tests/test_api_security.py pins all of it.
+#
+# Set `public_console = false` to close reads too.
 resource "google_cloud_run_v2_service_iam_member" "public" {
   count = var.public_console ? 1 : 0
 
