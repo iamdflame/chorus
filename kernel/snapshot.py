@@ -17,6 +17,7 @@ from typing import Any
 
 from kernel.branch import Branch
 from kernel.effect import Effect
+from kernel.errors import SnapshotCorrupt, SnapshotVersionMismatch
 from kernel.store import InMemoryEffectStore
 from world.shadow import TOMBSTONE, ShadowWorld, Version
 
@@ -65,10 +66,21 @@ def save(path: str | Path, *, store: InMemoryEffectStore, world: ShadowWorld) ->
 
 def load(path: str | Path) -> tuple[InMemoryEffectStore, ShadowWorld]:
     """Reconstruct store and world from a snapshot."""
-    document = json.loads(Path(path).read_text())
+    try:
+        document = json.loads(Path(path).read_text())
+    except (OSError, json.JSONDecodeError) as exc:
+        # Fails closed. A half-loaded effect log is worse than none: the run continues,
+        # the store answers lookups, and the answers are wrong for exactly the addresses
+        # whose records were dropped.
+        raise SnapshotCorrupt(
+            f"snapshot at {path} could not be read", path=str(path),
+            reason=type(exc).__name__,
+        ) from exc
+
     if document.get("schema") != SCHEMA_VERSION:
-        raise ValueError(
-            f"snapshot schema {document.get('schema')} != expected {SCHEMA_VERSION}"
+        raise SnapshotVersionMismatch(
+            f"snapshot schema {document.get('schema')} != expected {SCHEMA_VERSION}",
+            found=document.get("schema"), expected=SCHEMA_VERSION, path=str(path),
         )
 
     store = InMemoryEffectStore()

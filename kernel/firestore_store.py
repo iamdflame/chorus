@@ -33,6 +33,7 @@ from google.cloud import firestore
 from kernel.branch import PRIMARY, Branch
 from kernel.dag import CausalDAG
 from kernel.effect import Effect
+from kernel.errors import BranchExists
 
 # Firestore caps a document at 1 MiB. Addresses are 32 characters, so 5,000 per chunk
 # leaves a wide margin while keeping the number of manifest reads small.
@@ -93,7 +94,8 @@ class FirestoreEffectStore:
     def create_branch(self, branch: Branch) -> Branch:
         ref = self._branch_ref(branch.id)
         if ref.get().exists:
-            raise ValueError(f"branch already exists: {branch.id}")
+            raise BranchExists(f"branch already exists: {branch.id}",
+                               branch_id=branch.id)
         if branch.parent_id and not self._branch_ref(branch.parent_id).get().exists:
             raise ValueError(f"unknown parent branch: {branch.parent_id}")
         ref.set({**branch.to_dict(), "seq": branch.fork_at_seq or 0})

@@ -19,6 +19,7 @@ from typing import Iterable, Protocol, runtime_checkable
 from kernel.branch import PRIMARY, Branch
 from kernel.dag import CausalDAG
 from kernel.effect import Effect
+from kernel.errors import BranchExists, UnknownBranch
 
 
 @runtime_checkable
@@ -63,9 +64,11 @@ class InMemoryEffectStore:
 
     def create_branch(self, branch: Branch) -> Branch:
         if branch.id in self._branches:
-            raise ValueError(f"branch already exists: {branch.id}")
+            raise BranchExists(f"branch already exists: {branch.id}",
+                               branch_id=branch.id)
         if branch.parent_id and branch.parent_id not in self._branches:
-            raise ValueError(f"unknown parent branch: {branch.parent_id}")
+            raise UnknownBranch(f"unknown parent branch: {branch.parent_id}",
+                                branch_id=branch.id, parent_id=branch.parent_id)
         self._branches[branch.id] = branch
         return branch
 

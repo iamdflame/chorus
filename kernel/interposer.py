@@ -42,6 +42,7 @@ from google.adk.tools.tool_context import ToolContext
 
 from kernel.branch import PRIMARY
 from kernel.effect import Determinism, Effect, EffectKind, canonical_json, hash_payload
+from kernel.errors import ReplayError
 from kernel.quarantine import ReversibilityRegistry, staged_result
 from kernel.singleflight import SingleFlight
 from kernel.store import EffectStore
@@ -83,7 +84,7 @@ class Mode(str, Enum):
     REPLAY_STRICT = "replay_strict"
 
 
-class ReplayMiss(RuntimeError):
+class ReplayMiss(ReplayError):
     """Raised in REPLAY_STRICT when an address is absent from the store.
 
     In strict mode a miss means execution diverged where it was asserted not to — a
